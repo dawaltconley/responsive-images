@@ -1,0 +1,29 @@
+{
+  "name": "@dawaltconley/responsive-images",
+  "version": "0.1.0",
+  "description": "Scripts and utilities for working with responsive images.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "images",
+    "responsive",
+    "eleventy"
+  ],
+  "author": "Dylan Awalt-Conley",
+  "license": "ISC",
+  "dependencies": {
+    "@11ty/eleventy-img": "^2.0.0",
+    "sass-cast": "^0.2.0"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^1.0.0",
+    "eslint": "^8.13.0",
+    "prettier": "2.6.2",
+    "stylelint": "^14.7.1",
+    "stylelint-config-recommended": "^7.0.0",
+    "stylelint-config-recommended-scss": "^6.0.0",
+    "stylelint-scss": "^4.2.0"
+  }
+}
