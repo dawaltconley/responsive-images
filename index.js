@@ -32,7 +32,6 @@ class ResponsiveImageFunctions {
         });
     }
 
-    // TODO need to wrap in a callback for async filters
     async generatePicture(image, kwargs={}) {
         let { widths, formats, ...properties } = kwargs;
         delete properties.__keywords;
