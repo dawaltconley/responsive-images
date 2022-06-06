@@ -15,13 +15,13 @@
   "license": "ISC",
   "dependencies": {
     "@11ty/eleventy-img": "^2.0.0",
-    "sass-cast": "^0.2.0"
+    "sass-cast": "^0.4.1"
   },
   "devDependencies": {
-    "@11ty/eleventy": "^1.0.0",
-    "eslint": "^8.13.0",
-    "prettier": "2.6.2",
-    "stylelint": "^14.7.1",
+    "@11ty/eleventy": "^1.0.1",
+    "eslint": "^8.17.0",
+    "prettier": "^2.6.2",
+    "stylelint": "^14.8.5",
     "stylelint-config-recommended": "^7.0.0",
     "stylelint-config-recommended-scss": "^6.0.0",
     "stylelint-scss": "^4.2.0"
