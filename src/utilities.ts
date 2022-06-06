@@ -12,32 +12,6 @@ const cssValue = (v: string): [number, string] => {
   return [Number(value), unit]
 }
 
-/** represents a media query condition, such as `(min-width: 600px)` */
-interface MediaCondition {
-  /** type of media query; usually 'min-width' or 'max-width' */
-  mediaFeature: string
-  /** breakpoint where this applies */
-  value: string
-}
-
-/**
- * represents a valid rule for the img sizes attribute,
- * such as `(min-width: 600px) 400px` or `100vw`
- */
-interface Size {
-  /** the conditions under which a sizes rule applies */
-  conditions: MediaCondition[]
-  /** the image width applied under these conditions */
-  width: string
-}
-
-interface Dimension {
-  /** width */
-  w: number
-  /** height */
-  h: number
-}
-
 const isDimension = (object: any): object is Dimension =>
   object &&
   typeof object.w === 'number' &&
@@ -49,16 +23,6 @@ const isDimensionArray = (array: any[]): array is Dimension[] => {
   return true
 }
 
-/** represents a supported device */
-interface Device extends Dimension {
-  /** possible dppx for devices with these dimensions */
-  dppx: number[]
-  /** whether the device can be rotated and the dimensions flipped */
-  flip: boolean
-}
-
-type Order = 'min' | 'max'
-
 /**
  * Takes a parsed img sizes attribute and a specific device,
  * returning the image widths needed to support that device.
@@ -69,8 +33,8 @@ type Order = 'min' | 'max'
  * @return unique widths that will need to be produced for the given device
  */
 function deviceWidths(
-  sizes: Size[],
-  device: Device /* , order: Order */
+  sizes: SizesQuery.Object[],
+  device: Device /* , order: SizesQuery.Order */
 ): Set<number> {
   let imgWidth: string
 
@@ -110,9 +74,9 @@ function deviceWidths(
  */
 
 function widthsFromSizes(
-  sizesQueryString: string,
+  sizesQueryString: SizesQuery.String,
   opt: {
-    order?: Order
+    order?: SizesQuery.Order
     minScale?: number
   } = {}
 ): number[] {
@@ -171,12 +135,12 @@ function filterSizes(
  * Parses the value of the img element's sizes attribute.
  *
  * @param sizesQueryString - a string representation of a valid img 'sizes' attribute
- * @return an array of Size objects describing media query parameters
+ * @return an array of SizesQuery.Object objects describing media query parameters
  */
-function parseSizes(sizesQueryString: string): Size[] {
+function parseSizes(sizesQueryString: SizesQuery.String): SizesQuery.Object[] {
   const mediaParser = require('postcss-media-query-parser').default
   return sizesQueryString.split(/\s*,\s*/).map((descriptor: string) => {
-    let conditions: MediaCondition[] = []
+    let conditions: SizesQuery.Condition[] = []
     let parsed = descriptor.match(/^(.*)\s+(\S+)$/)
     if (!parsed) return { conditions, width: descriptor }
 
