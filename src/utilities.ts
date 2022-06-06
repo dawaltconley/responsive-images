@@ -1,15 +1,9 @@
 const devices: Device[] = require('./default-devices.json')
 
-/**
- * @constant {RegExp} - used for parsing a CSS value
- */
+/** @constant used for parsing a CSS value */
 const valueRegex: RegExp = /([\d.]+)(\D*)/
 
-/**
- * Parses a string as a value with an optional unit.
- * @param {string} v - string to parse
- * @return {string[]|null} - [ value, unit ]
- */
+/** Parses a string as a value with an optional unit. */
 const cssValue = (v: string): [number, string] => {
   let value: string = v,
     unit: string = ''
@@ -18,26 +12,29 @@ const cssValue = (v: string): [number, string] => {
   return [Number(value), unit]
 }
 
-/**
- * @typedef {Object} Size
- * @property {Object[]} Size.conditions -
- * @property {string} Size.conditions[].mediaFeature - type of media query; usually 'min-width' or 'max-width'
- * @property {string} Size.conditions[].value - breakpoint where this applies
- * @property {string} Size.width - the object size when that query is valid
- */
-
+/** represents a media query condition, such as `(min-width: 600px)` */
 interface MediaCondition {
+  /** type of media query; usually 'min-width' or 'max-width' */
   mediaFeature: string
+  /** breakpoint where this applies */
   value: string
 }
 
+/**
+ * represents a valid rule for the img sizes attribute,
+ * such as `(min-width: 600px) 400px` or `100vw`
+ */
 interface Size {
+  /** the conditions under which a sizes rule applies */
   conditions: MediaCondition[]
+  /** the image width applied under these conditions */
   width: string
 }
 
 interface Dimension {
+  /** width */
   w: number
+  /** height */
   h: number
 }
 
@@ -52,23 +49,24 @@ const isDimensionArray = (array: any[]): array is Dimension[] => {
   return true
 }
 
+/** represents a supported device */
 interface Device extends Dimension {
+  /** possible dppx for devices with these dimensions */
   dppx: number[]
+  /** whether the device can be rotated and the dimensions flipped */
   flip: boolean
 }
-
-// type Dimension = number
 
 type Order = 'min' | 'max'
 
 /**
- * Takes a 2d array representation of the img sizes attribute and a specific device,
+ * Takes a parsed img sizes attribute and a specific device,
  * returning the image widths needed to support that device.
  *
- * @param {Size[]} sizes
- * @param {Device} device - object representing an expected device
- * @param {string} order - whether the widths should be interpreted as 'min' or 'max'
- * @return {Set} unique widths that will need to be produced for the given device
+ * @param sizes
+ * @param device - object representing an expected device
+ * @param order - whether the widths should be interpreted as 'min' or 'max'
+ * @return unique widths that will need to be produced for the given device
  */
 const deviceWidths = (
   sizes: Size[],
@@ -106,59 +104,9 @@ const deviceWidths = (
   return needWidths
 }
 
-let sizes = {
-  desktop: '630px',
-  laptop: '550px',
-  tablet: '437px',
-  mobile: '540px',
-  last: '100vw',
-}
-
-// /**
-//  * Takes an object representation of the img 'sizes' attribute
-//  * and returns an array of dimensions, which represent
-//  * image copies that should be produced to satisfy these sizes
-//  *
-//  * @param {Object} mqObject
-//  * @param {Object} opt={} - options
-//  * @param {string} opt.order - whether to interpret the mqObject as a map of min-widths or max-widths; otherwise inferred from their order
-//  * @param {string} opt.minScale - minimum percentage by which to downscale the image (passed as 'factor' to filterSizes)
-//  * @return {Dimension[]}
-//  */
-// const widthsFromSizes = (mqObject, opt={}) => {
-//     let {
-//         order,
-//         minScale
-//     } = opt;
-//     let sizes = [];
-//     let last;
-//     for (let bp in mqObject) {
-//         let val = cssValue(breakpoints[bp] || bp);
-//         val = val ? val[0] : bp;
-//         sizes.push([ val, mqObject[bp] ]);
-//         if (last && !order)
-//             order = last > val ? 'min' : 'max';
-//         last = val;
-//     }
-//
-//     let needWidths = devices.reduce((all, device) => {
-//         deviceWidths(sizes, device, order).forEach(all.add, all);
-//         return all;
-//     }, new Set());
-//
-//     needWidths = Array.from(needWidths);
-//
-//     return filterSizes(needWidths, minScale);
-// };
-
 /**
- * Rewriting to work with sizesQueryStrings
- *
- * @param {string} sizesQueryString
- * @param {Object} opt={} - options
- * @param {string} opt.order - whether to interpret the mqObject as a map of min-widths or max-widths; otherwise inferred from their order
- * @param {number} opt.minScale - minimum percentage by which to downscale the image (passed as 'factor' to filterSizes)
- * @return {Dimension[]}
+ * @param sizesQueryString - a string representation of a valid img 'sizes' attribute
+ * @returns an array of dimensions, which represent image copies that should be produced to satisfy these sizes.
  */
 
 const widthsFromSizes = (
@@ -184,11 +132,9 @@ const widthsFromSizes = (
 /**
  * Filters a dimensions list, returning only dimensions that meet a threshold for downsizing.
  *
- * @param {Dimension[]} list - an array of dimension objects
- * @param {number} list[].w
- * @param {number} list[].h
- * @param {number} factor=0.8 - the maximum value for downscaling; i.e. 0.8 means any values that reduce an images pixels by less than 20% will be removed from the list
- * @return {Dimension[]} - filtered array of dimensions
+ * @param list - an array of dimension objects
+ * @param factor - the maximum value for downscaling; i.e. 0.8 means any values that reduce an images pixels by less than 20% will be removed from the list
+ * @return filtered array of dimensions
  */
 function filterSizes(list: number[], factor?: number): number[]
 function filterSizes(list: Dimension[], factor?: number): Dimension[]
@@ -245,8 +191,8 @@ interface MediaQueryNode {
 /**
  * Parses the value of the img element's sizes attribute.
  *
- * @param {string} sizesQueryString
- * @return {Size[]} - an array of Size objects describing media query parameters
+ * @param sizesQueryString - a string representation of a valid img 'sizes' attribute
+ * @return an array of Size objects describing media query parameters
  */
 var parseSizes = (sizesQueryString: string): Size[] => {
   const mediaParser = require('postcss-media-query-parser').default
