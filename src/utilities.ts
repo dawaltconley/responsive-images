@@ -1,4 +1,4 @@
-import devices from './default-devices'
+import devices from './data/devices'
 
 /** @constant used for parsing a CSS value */
 const valueRegex: RegExp = /([\d.]+)(\D*)/
@@ -179,7 +179,6 @@ function parseSizes(sizesQueryString: SizesQuery.String): SizesQuery.Object[] {
 }
 
 module.exports = {
-  devices,
   widthsFromSizes,
   parseSizes,
   deviceWidths,
