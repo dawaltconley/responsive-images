@@ -68,10 +68,10 @@ type Order = 'min' | 'max'
  * @param order - whether the widths should be interpreted as 'min' or 'max'
  * @return unique widths that will need to be produced for the given device
  */
-const deviceWidths = (
+function deviceWidths(
   sizes: Size[],
   device: Device /* , order: Order */
-): Set<number> => {
+): Set<number> {
   let imgWidth: string
 
   whichSize: for (let { conditions, width } of sizes) {
@@ -109,13 +109,13 @@ const deviceWidths = (
  * @returns an array of dimensions, which represent image copies that should be produced to satisfy these sizes.
  */
 
-const widthsFromSizes = (
+function widthsFromSizes(
   sizesQueryString: string,
   opt: {
     order?: Order
     minScale?: number
   } = {}
-): number[] => {
+): number[] {
   let { order, minScale } = opt
   let sizes = parseSizes(sizesQueryString)
 
@@ -169,14 +169,14 @@ function filterSizes(
 
 interface MediaQueryNode {
   type:
-    | 'media-query-list'
-    | 'media-query'
-    | 'media-feature-expression'
-    | 'media-feature'
-    | 'colon'
-    | 'value'
-    | 'media-type'
-    | 'keyword'
+    | 'media-query-list' // i.e. '(max-width: 100px), not print'
+    | 'media-query' // i.e. '(max-width: 100px)', 'not print'
+    | 'media-feature-expression' // i.e. '(max-width: 100px)'
+    | 'media-feature' // i.e. 'max-height'
+    | 'colon' // i.e. ':'
+    | 'value' // i.e. '100px'
+    | 'media-type' // i.e. 'print'
+    | 'keyword' // i.e. 'not'
   after: string
   before: string
   value: string
@@ -194,7 +194,7 @@ interface MediaQueryNode {
  * @param sizesQueryString - a string representation of a valid img 'sizes' attribute
  * @return an array of Size objects describing media query parameters
  */
-var parseSizes = (sizesQueryString: string): Size[] => {
+function parseSizes(sizesQueryString: string): Size[] {
   const mediaParser = require('postcss-media-query-parser').default
   return sizesQueryString.split(/\s*,\s*/).map((descriptor: string) => {
     let conditions: MediaCondition[] = []
@@ -222,14 +222,6 @@ var parseSizes = (sizesQueryString: string): Size[] => {
               .value,
             value: node.nodes.find(n => n.type === 'value')!.value,
           })
-          // let mediaFeature = node.nodes.find(n => n.type === 'media-feature')
-          // let value = node.nodes.find(n => n.type === 'value')
-          // if (!mediaFeature || !value)
-          //   throw new Error(`Bad media-feature-expression: ${node}`)
-          // conditions.push({
-          //     mediaFeature: mediaFeature.value,
-          //     value: value.value,
-          // });
         } else if (node.type === 'keyword' && node.value === 'and') {
           continue // TODO wouldn't be valid sizes attribute, but regardless this doesn't work
           // maybe parse with cssValue here?
