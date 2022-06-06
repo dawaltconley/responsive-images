@@ -1,4 +1,4 @@
-const devices: Device[] = require('./default-devices.json')
+import devices from './default-devices'
 
 /** @constant used for parsing a CSS value */
 const valueRegex: RegExp = /([\d.]+)(\D*)/
