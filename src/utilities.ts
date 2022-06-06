@@ -1,3 +1,4 @@
+import mediaParser from 'postcss-media-query-parser'
 import devices from './data/devices'
 
 /** @constant used for parsing a CSS value */
@@ -138,7 +139,6 @@ function filterSizes(
  * @return an array of SizesQuery.Object objects describing media query parameters
  */
 function parseSizes(sizesQueryString: SizesQuery.String): SizesQuery.Object[] {
-  const mediaParser = require('postcss-media-query-parser').default
   return sizesQueryString.split(/\s*,\s*/).map((descriptor: string) => {
     let conditions: SizesQuery.Condition[] = []
     let parsed = descriptor.match(/^(.*)\s+(\S+)$/)

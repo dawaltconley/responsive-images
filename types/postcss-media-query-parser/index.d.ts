@@ -16,4 +16,12 @@ declare namespace MediaQuery {
     parent?: MediaQuery.Node
     nodes: MediaQuery.Node[]
   }
+
+  interface List extends Node {
+    type: 'media-query-list'
+  }
+}
+
+declare module 'postcss-media-query-parser' {
+  export default function parseMedia(queryString: string): MediaQuery.Node
 }
