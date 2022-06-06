@@ -2,6 +2,7 @@
   "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.spec.ts"],
   "compilerOptions": {
+    "typeRoots": ["./node_modules/@types", "./types"],
     "outDir": "dist",
     "target": "es6",
     "module": "commonjs",

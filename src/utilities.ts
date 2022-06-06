@@ -167,27 +167,6 @@ function filterSizes(
   return filtered
 }
 
-interface MediaQueryNode {
-  type:
-    | 'media-query-list' // i.e. '(max-width: 100px), not print'
-    | 'media-query' // i.e. '(max-width: 100px)', 'not print'
-    | 'media-feature-expression' // i.e. '(max-width: 100px)'
-    | 'media-feature' // i.e. 'max-height'
-    | 'colon' // i.e. ':'
-    | 'value' // i.e. '100px'
-    | 'media-type' // i.e. 'print'
-    | 'keyword' // i.e. 'not'
-  after: string
-  before: string
-  value: string
-  sourceIndex: number
-  parent?: MediaQueryNode
-  nodes: MediaQueryNode[]
-}
-
-// valid units for queries are:
-// width/height: px, em, rem
-
 /**
  * Parses the value of the img element's sizes attribute.
  *
@@ -214,7 +193,7 @@ function parseSizes(sizesQueryString: string): Size[] {
         // but instead fires on (min-width: 49em) and (max-width: 55px)
         mediaCondition = mediaCondition.slice(1, -1)
       }
-      let parsed = mediaParser(mediaCondition).nodes[0] as MediaQueryNode
+      let parsed = mediaParser(mediaCondition).nodes[0] as MediaQuery.Node
       for (let node of parsed.nodes) {
         if (node.type === 'media-feature-expression') {
           conditions.push({
