@@ -45,9 +45,17 @@ declare namespace Query {
   type Orientation = 'landscape' | 'portrait'
 
   interface Image {
+    /** width of an actual image */
     w: number
+
+    /** device dppx at which this image size will apply */
     dppx: number
+
+    /** device orientation in which this image will be used */
     orientation: Orientation
+
+    /** if present treats this image as an alias for another image */
+    use?: Omit<Image, 'use'>
   }
 
   interface Object extends Dimension {
@@ -58,6 +66,8 @@ declare namespace Query {
     [key in Orientation]: Object[]
   }
 }
+
+type ImageMap = Record<Query.Orientation, Dimension[]>
 
 /** sent to sass mixin */
 interface SassQuery {
