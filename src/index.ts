@@ -149,7 +149,7 @@ class ResponsiveImageFunctions {
   ): Promise<SassQuery[]> {
     let {
       widths = null,
-      formats = ['jpeg'],
+      formats = [null],
       orientations = ['landscape', 'portrait'],
       sizes = '100vw',
     } = kwargs || {}
@@ -251,7 +251,7 @@ class ResponsiveImageFunctions {
 
   get sassFunctions() {
     const resizeFunction = `${this.sassPrefix}-resize($src, $widths: null, $formats: null)`
-    const queriesFunction = `${this.sassPrefix}-queries($src, $widths: null, $formats: jpeg, $orientation: landscape portrait, $sizes: '100vw')`
+    const queriesFunction = `${this.sassPrefix}-queries($src, $widths: null, $formats: null, $orientation: landscape portrait, $sizes: '100vw')`
     return {
       [resizeFunction]: async (args: [SassString, SassList, SassList]) => {
         let src: string = args[0].assertString('src').text
