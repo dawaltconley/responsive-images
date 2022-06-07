@@ -174,11 +174,10 @@ class ResponsiveImageFunctions {
     })
 
     if (!widths)
-      // fallback based on sizes
+      // fallback based on queries
       widths = Object.entries(queries).reduce(
         (flat: number[], [o, queries]) => {
           if (!orientations.includes(o)) return flat
-          // let widths = queries.map(s => s.w)
           let widths = queries.reduce((flat: number[], { images }) => {
             return flat.concat(images.map(img => img.w))
           }, [])
@@ -186,16 +185,19 @@ class ResponsiveImageFunctions {
         },
         []
       )
-    widths = filterSizes(
-      widths.map(w => (w === null ? originalImage.width : w)),
-      this.scalingFactor
-    )
+    let filteredWidths = widths
+      .map(w => (w === null ? originalImage.width : w))
+      .filter(w => w <= originalImage.width)
+    filteredWidths = filterSizes(filteredWidths, this.scalingFactor)
 
     const mediaQueries: SassQuery[] = []
-    // this is just picking the metadata images from the first resize format, since only one can be specified
-    let metadata = (await this.resize(src, { widths, formats }).then(
-      formats => Object.values(formats)[0]
-    )) as EleventyImage.MetadataEntry[]
+    let metadata = await this.resize(src, {
+      widths: filteredWidths,
+      formats,
+    }).then(
+      // just picking the metadata images from the first resize format, since only one can be specified
+      formats => Object.values(formats)[0] as EleventyImage.MetadataEntry[]
+    )
     metadata = metadata.sort((a, b) => b.width - a.width)
 
     const metaByWidth: ImageMetadataByWidth = {}
