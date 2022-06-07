@@ -178,9 +178,4 @@ function parseSizes(sizesQueryString: SizesQuery.String): SizesQuery.Object[] {
   })
 }
 
-module.exports = {
-  widthsFromSizes,
-  parseSizes,
-  deviceWidths,
-  filterSizes,
-}
+export { widthsFromSizes, parseSizes, deviceWidths, filterSizes }
