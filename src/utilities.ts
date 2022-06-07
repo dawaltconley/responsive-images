@@ -26,18 +26,20 @@ const isDimensionArray = (array: any[]): array is Dimension[] => {
 
 /**
  * Takes a parsed img sizes attribute and a specific device,
- * returning the image widths needed to support that device.
+ * returning the image dimensions needed to support that device.
  *
  * @param sizes
  * @param device - object representing an expected device
  * @param order - whether the widths should be interpreted as 'min' or 'max'
  * @return unique widths that will need to be produced for the given device
  */
-function deviceWidths(
+function deviceImages(
   sizes: SizesQuery.Object[],
   device: Device /* , order: SizesQuery.Order */
-): Set<number> {
+): Query.Image[] {
   let imgWidth: string
+  let orientation: Query.Orientation =
+    device.w >= device.h ? 'landscape' : 'portrait'
 
   whichSize: for (let { conditions, width } of sizes) {
     imgWidth = width
@@ -55,18 +57,31 @@ function deviceWidths(
     break whichSize
   }
 
-  let needWidths: Set<number> = new Set()
+  let needImages: Query.Image[] = []
+  let { dppx } = device
+  if (dppx.indexOf(1) < 0) dppx.push(1) // always include a dppx value of one for queries, to avoid upscaling when screen resizes on larger 1dppx displays. TODO any way I can require this as part of the type?
 
-  device.dppx.forEach((dppx: number) => {
-    let [scaledWidth, unit = 'px']: [number, string] = cssValue(imgWidth)
+  dppx.forEach(dppx => {
+    // TODO handle flipping here...
+    let [scaledWidth, unit = 'px'] = cssValue(imgWidth)
     if (unit === 'vw') scaledWidth = (device.w * scaledWidth) / 100
     scaledWidth = Math.ceil(scaledWidth * dppx)
-    needWidths.add(scaledWidth)
+    needImages.push({
+      w: scaledWidth,
+      dppx,
+      orientation,
+    })
   })
 
-  console.log(device, needWidths)
+  if (device.flip)
+    needImages = deviceImages(sizes, {
+      ...device,
+      w: device.h,
+      h: device.w,
+      flip: false,
+    }).concat(needImages)
 
-  return needWidths
+  return needImages
 }
 
 /**
@@ -76,23 +91,69 @@ function deviceWidths(
 
 function widthsFromSizes(
   sizesQueryString: SizesQuery.String,
-  opt: Partial<{
+  opt?: Partial<{
     devices: Device[]
     order: SizesQuery.Order
     minScale: number
-  }> = {}
+  }>
 ): number[] {
-  let { devices = defaultDevices, order, minScale } = opt
+  let { devices = defaultDevices, order, minScale } = opt || {}
   let sizes = parseSizes(sizesQueryString)
 
   let needWidths: Set<number> = devices.reduce((all, device) => {
-    deviceWidths(sizes, device).forEach(n => all.add(n), all)
+    deviceImages(sizes, device).forEach(n => all.add(n.w), all)
     return all
   }, new Set<number>())
 
   let widthsArray: number[] = Array.from(needWidths)
 
   return filterSizes(widthsArray, minScale)
+}
+
+function queriesFromSizes(
+  sizesQueryString: SizesQuery.String,
+  opt?: Partial<{
+    devices: Device[]
+    order: SizesQuery.Order
+    minScale: number
+  }>
+): Query.Map {
+  let { devices = defaultDevices, order, minScale } = opt || {}
+  let sizes = parseSizes(sizesQueryString)
+
+  const queries: Query.Map = {
+    landscape: [],
+    portrait: [],
+  }
+
+  devices.forEach(device => {
+    const images: {
+      [key in Query.Orientation]: Query.Image[]
+    } = {
+      landscape: [],
+      portrait: [],
+    }
+    deviceImages(sizes, device).forEach(img =>
+      images[img.orientation].push(img)
+    )
+    if (images.landscape.length)
+      queries.landscape.push({
+        w: device.w,
+        h: device.h,
+        images: images.landscape,
+      })
+    if (images.portrait.length)
+      queries.portrait.push({
+        w: device.h,
+        h: device.w,
+        images: images.portrait,
+      })
+  })
+
+  queries.landscape = queries.landscape.sort((a, b) => b.w - a.w)
+  queries.portrait = queries.portrait.sort((a, b) => b.w - a.w)
+
+  return queries // this works, just need to filter
 }
 
 /**
@@ -179,4 +240,10 @@ function parseSizes(sizesQueryString: SizesQuery.String): SizesQuery.Object[] {
   })
 }
 
-export { widthsFromSizes, parseSizes, deviceWidths, filterSizes }
+export {
+  widthsFromSizes,
+  queriesFromSizes,
+  parseSizes,
+  deviceImages,
+  filterSizes,
+}

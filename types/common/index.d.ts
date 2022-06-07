@@ -44,8 +44,10 @@ interface Device extends Dimension {
 declare namespace Query {
   type Orientation = 'landscape' | 'portrait'
 
-  interface Image extends Dimension {
+  interface Image {
+    w: number
     dppx: number
+    orientation: Orientation
   }
 
   interface Object extends Dimension {
