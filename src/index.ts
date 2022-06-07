@@ -143,6 +143,13 @@ class ResponsiveImageFunctions {
         let formats = args[2].asList
           .toArray()
           .map(s => assertValidImageFormat(s.realNull && s.assertString().text))
+        // TODO support multiple image formats using image-set and fallbacks https://developer.mozilla.org/en-US/docs/Web/CSS/image/image-set#providing_a_fallback
+        if (formats.length > 1)
+          throw new Error(
+            `Currently only one background image format is supported, but multiple formats were specified: (${formats.join(
+              ', '
+            )})`
+          )
         let orientations = args[3].asList
           .toArray()
           .map(s => s.assertString().text)
@@ -159,6 +166,7 @@ class ResponsiveImageFunctions {
 
         const mediaQueries: SassQuery[] = []
         const metadata = await this.resize(src, { widths, formats })
+        // this is just picking the metadata images from the first resize format, since only one can be specified
         const metadataEntry = Object.values(
           metadata
         )[0] as EleventyImage.MetadataEntry[]
