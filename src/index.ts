@@ -204,13 +204,17 @@ class ResponsiveImageFunctions {
             },
             []
           )
-        widths = widths.map(w => (w === null ? originalImage.width : w))
+        widths = filterSizes(
+          widths.map(w => (w === null ? originalImage.width : w)),
+          this.scalingFactor
+        )
 
         const mediaQueries: SassQuery[] = []
         // this is just picking the metadata images from the first resize format, since only one can be specified
-        const metadata = (await this.resize(src, { widths, formats }).then(
+        let metadata = (await this.resize(src, { widths, formats }).then(
           formats => Object.values(formats)[0]
         )) as EleventyImage.MetadataEntry[]
+        metadata = metadata.sort((a, b) => b.width - a.width)
 
         const metaByWidth: ImageMetadataByWidth = {}
 
@@ -231,11 +235,15 @@ class ResponsiveImageFunctions {
               let imageMeta: EleventyImage.MetadataEntry | undefined =
                 metaByWidth[image.w]
               if (imageMeta === undefined) {
-                imageMeta = metadata.find(m => m.width === image.w)
-                if (!imageMeta)
-                  throw new Error(
-                    `Resize error: media query needs image of width ${image.w}, but none was created.`
-                  )
+                imageMeta = originalImage
+                for (let i = 0, l = metadata.length; i < l; i++) {
+                  let m = metadata[i]
+                  let next = metadata[i + 1]
+                  if (m.width >= image.w && (!next || next.width < image.w)) {
+                    imageMeta = m
+                    break
+                  }
+                }
                 metaByWidth[image.w] = imageMeta
               }
               const { url, sourceType, format } = imageMeta
