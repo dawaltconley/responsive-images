@@ -138,6 +138,115 @@ class ResponsiveImageFunctions {
     return this._fromSizes('generateSources', image, kwargs)
   }
 
+  async generateMediaQueries(
+    src: Image.ImageSource,
+    kwargs?: Partial<{
+      widths: (number | null)[] | null
+      formats: ValidImageFormat[]
+      orientations: string[]
+      sizes: SizesQuery.String
+    }>
+  ): Promise<SassQuery[]> {
+    let {
+      widths = null,
+      formats = ['jpeg'],
+      orientations = ['landscape', 'portrait'],
+      sizes = '100vw',
+    } = kwargs || {}
+
+    // TODO support multiple image formats using image-set and fallbacks https://developer.mozilla.org/en-US/docs/Web/CSS/image/image-set#providing_a_fallback
+    if (formats.length > 1)
+      throw new Error(
+        `Currently only one background image format is supported, but multiple formats were specified: (${formats.join(
+          ', '
+        )})`
+      )
+
+    let originalImage = await Image(src, {
+      statsOnly: true,
+      widths: [null],
+      formats: [null],
+    }).then(metadata => Object.values(metadata)[0][0])
+
+    let queries = queriesFromSizes(sizes, {
+      devices: this.devices,
+      minScale: this.scalingFactor,
+    })
+
+    if (!widths)
+      // fallback based on sizes
+      widths = Object.entries(queries).reduce(
+        (flat: number[], [o, queries]) => {
+          if (!orientations.includes(o)) return flat
+          // let widths = queries.map(s => s.w)
+          let widths = queries.reduce((flat: number[], { images }) => {
+            return flat.concat(images.map(img => img.w))
+          }, [])
+          return flat.concat(widths)
+        },
+        []
+      )
+    widths = filterSizes(
+      widths.map(w => (w === null ? originalImage.width : w)),
+      this.scalingFactor
+    )
+
+    const mediaQueries: SassQuery[] = []
+    // this is just picking the metadata images from the first resize format, since only one can be specified
+    let metadata = (await this.resize(src, { widths, formats }).then(
+      formats => Object.values(formats)[0]
+    )) as EleventyImage.MetadataEntry[]
+    metadata = metadata.sort((a, b) => b.width - a.width)
+
+    const metaByWidth: ImageMetadataByWidth = {}
+
+    for (const o of orientations) {
+      if (!isOrientation(o)) {
+        console.warn(`Unrecognized orientation "${o}", skipping`)
+        continue
+      }
+      const orientation = orientations.length > 1 && o
+
+      queries[o].forEach(({ w, images }, i, queries) => {
+        const next = queries[i + 1]
+        const maxWidth = i > 0 && w,
+          minWidth = next && next.w
+
+        images.forEach((image, j, images) => {
+          const next = images[j + 1]
+          let imageMeta: EleventyImage.MetadataEntry | undefined =
+            metaByWidth[image.w]
+          if (imageMeta === undefined) {
+            imageMeta = originalImage
+            for (let i = 0, l = metadata.length; i < l; i++) {
+              let m = metadata[i]
+              let next = metadata[i + 1]
+              if (m.width >= image.w && (!next || next.width < image.w)) {
+                imageMeta = m
+                break
+              }
+            }
+            metaByWidth[image.w] = imageMeta
+          }
+          const { url, sourceType, format } = imageMeta
+          const mq: SassQuery = {
+            orientation,
+            maxWidth,
+            minWidth,
+            maxResolution: j > 0 && image.dppx,
+            minResolution: next && next.dppx,
+            url,
+            sourceType,
+            format,
+          }
+          mediaQueries.push(mq)
+        })
+      })
+    }
+
+    return mediaQueries
+  }
+
   get sassFunctions() {
     const resizeFunction = `${this.sassPrefix}-resize($src, $widths: null, $formats: null)`
     const queriesFunction = `${this.sassPrefix}-queries($src, $widths: null, $formats: jpeg, $orientation: landscape portrait, $sizes: '100vw')`
@@ -168,99 +277,17 @@ class ResponsiveImageFunctions {
         let formats = args[2].asList
           .toArray()
           .map(s => assertValidImageFormat(s.realNull && s.assertString().text))
-        // TODO support multiple image formats using image-set and fallbacks https://developer.mozilla.org/en-US/docs/Web/CSS/image/image-set#providing_a_fallback
-        if (formats.length > 1)
-          throw new Error(
-            `Currently only one background image format is supported, but multiple formats were specified: (${formats.join(
-              ', '
-            )})`
-          )
         let orientations = args[3].asList
           .toArray()
           .map(s => s.assertString().text)
         let sizes = args[4].assertString('sizes').text
 
-        let originalImage = await Image(src, {
-          statsOnly: true,
-          widths: [null],
-          formats: [null],
-        }).then(metadata => Object.values(metadata)[0][0])
-
-        let queries = queriesFromSizes(sizes, {
-          devices: this.devices,
-          minScale: this.scalingFactor,
+        let mediaQueries = await this.generateMediaQueries(src, {
+          widths,
+          formats,
+          orientations,
+          sizes,
         })
-
-        if (!widths)
-          // fallback based on sizes
-          widths = Object.entries(queries).reduce(
-            (flat: number[], [o, queries]) => {
-              if (!orientations.includes(o)) return flat
-              // let widths = queries.map(s => s.w)
-              let widths = queries.reduce((flat: number[], { images }) => {
-                return flat.concat(images.map(img => img.w))
-              }, [])
-              return flat.concat(widths)
-            },
-            []
-          )
-        widths = filterSizes(
-          widths.map(w => (w === null ? originalImage.width : w)),
-          this.scalingFactor
-        )
-
-        const mediaQueries: SassQuery[] = []
-        // this is just picking the metadata images from the first resize format, since only one can be specified
-        let metadata = (await this.resize(src, { widths, formats }).then(
-          formats => Object.values(formats)[0]
-        )) as EleventyImage.MetadataEntry[]
-        metadata = metadata.sort((a, b) => b.width - a.width)
-
-        const metaByWidth: ImageMetadataByWidth = {}
-
-        for (const o of orientations) {
-          if (!isOrientation(o)) {
-            console.warn(`Unrecognized orientation "${o}", skipping`)
-            continue
-          }
-          const orientation = orientations.length > 1 && o
-
-          queries[o].forEach(({ w, images }, i, queries) => {
-            const next = queries[i + 1]
-            const maxWidth = i > 0 && w,
-              minWidth = next && next.w
-
-            images.forEach((image, j, images) => {
-              const next = images[j + 1]
-              let imageMeta: EleventyImage.MetadataEntry | undefined =
-                metaByWidth[image.w]
-              if (imageMeta === undefined) {
-                imageMeta = originalImage
-                for (let i = 0, l = metadata.length; i < l; i++) {
-                  let m = metadata[i]
-                  let next = metadata[i + 1]
-                  if (m.width >= image.w && (!next || next.width < image.w)) {
-                    imageMeta = m
-                    break
-                  }
-                }
-                metaByWidth[image.w] = imageMeta
-              }
-              const { url, sourceType, format } = imageMeta
-              const mq: SassQuery = {
-                orientation,
-                maxWidth,
-                minWidth,
-                maxResolution: j > 0 && image.dppx,
-                minResolution: next && next.dppx,
-                url,
-                sourceType,
-                format,
-              }
-              mediaQueries.push(mq)
-            })
-          })
-        }
 
         return cast.toSass(mediaQueries)
       },
