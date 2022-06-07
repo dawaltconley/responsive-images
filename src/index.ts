@@ -45,9 +45,9 @@ const isOrientation = (test: any): test is Query.Orientation =>
 
 class ResponsiveImageFunctions {
   defaults?: EleventyImage.ImageOptions
-  images: ImageMap
+  // images: ImageMap
   devices: Device[]
-  queries: Query.Map
+  // queries: Query.Map
   sassPrefix: string
   scalingFactor?: number
 
@@ -69,9 +69,9 @@ class ResponsiveImageFunctions {
     } = options || {}
 
     this.defaults = defaults
-    this.images = images
+    // this.images = images
     this.devices = devices
-    this.queries = queries
+    // this.queries = queries
     this.sassPrefix = sassPrefix
 
     this.resize = this.resize.bind(this)
