@@ -1,12 +1,10 @@
 import EleventyImage from '11ty__eleventy-img'
-import generateHTML from '11ty__eleventy-img/generate-html'
-import { SassList, SassString, SassNumber, Value } from 'sass/types'
+import { SassList, SassString } from 'sass/types'
 
 import Image from '@11ty/eleventy-img'
 import cast from 'sass-cast'
 import defaultDevices from './data/devices'
-import { parseSizes, deviceWidths, widthsFromSizes } from './utilities'
-// const { images, queries } = require(path.join('data', 'responsive'))
+import { filterSizes, widthsFromSizes, queriesFromSizes } from './utilities'
 
 interface KeywordArguments extends EleventyImage.BaseImageOptions {
   alt: string
@@ -15,8 +13,6 @@ interface KeywordArguments extends EleventyImage.BaseImageOptions {
 }
 
 type ImageMetadataByWidth = Record<number, EleventyImage.MetadataEntry>
-
-type ImageMap = Record<Query.Orientation, Dimension[]>
 
 type ValidImageFormat = 'auto' | EleventyImage.ImageFormatWithAliases | null
 
@@ -44,35 +40,30 @@ const isOrientation = (test: any): test is Query.Orientation =>
   validOrientations.includes(test)
 
 class ResponsiveImageFunctions {
-  defaults?: EleventyImage.ImageOptions
-  // images: ImageMap
+  defaults: Partial<EleventyImage.ImageOptions>
   devices: Device[]
-  // queries: Query.Map
   sassPrefix: string
-  scalingFactor?: number
+  scalingFactor: number
 
   constructor(
     options?: Partial<{
       defaults: Partial<EleventyImage.ImageOptions>
-      images: ImageMap
       devices: Device[]
-      queries: Query.Map
       sassPrefix: string
+      scalingFactor: number
     }>
   ) {
     let {
       defaults = {},
-      images,
       devices = defaultDevices,
-      queries,
       sassPrefix = 'image',
+      scalingFactor = 0.8,
     } = options || {}
 
     this.defaults = defaults
-    // this.images = images
     this.devices = devices
-    // this.queries = queries
     this.sassPrefix = sassPrefix
+    this.scalingFactor = scalingFactor
 
     this.resize = this.resize.bind(this)
     this.generatePicture = this.generatePicture.bind(this)
@@ -149,7 +140,7 @@ class ResponsiveImageFunctions {
 
   get sassFunctions() {
     const resizeFunction = `${this.sassPrefix}-resize($src, $widths: null, $formats: null)`
-    const queriesFunction = `${this.sassPrefix}-queries($src, $widths: null, $formats: jpeg, $orientation: landscape portrait)`
+    const queriesFunction = `${this.sassPrefix}-queries($src, $widths: null, $formats: jpeg, $orientation: landscape portrait, $sizes: '100vw')`
     return {
       [resizeFunction]: async (args: [SassString, SassList, SassList]) => {
         let src: string = args[0].assertString('src').text
@@ -166,7 +157,7 @@ class ResponsiveImageFunctions {
         return cast.toSass(metadata)
       },
       [queriesFunction]: async (
-        args: [SassString, SassList, SassList, SassList]
+        args: [SassString, SassList, SassList, SassList, SassString]
       ) => {
         let src = args[0].assertString('src').text
         let widths =
@@ -187,23 +178,39 @@ class ResponsiveImageFunctions {
         let orientations = args[3].asList
           .toArray()
           .map(s => s.assertString().text)
+        let sizes = args[4].assertString('sizes').text
+
+        let originalImage = await Image(src, {
+          statsOnly: true,
+          widths: [null],
+          formats: [null],
+        }).then(metadata => Object.values(metadata)[0][0])
+
+        let queries = queriesFromSizes(sizes, {
+          devices: this.devices,
+          minScale: this.scalingFactor,
+        })
 
         if (!widths)
-          // fallback based on orientation
-          widths = Object.entries(this.images)
-            .reduce((flat: number[], [o, sizes]) => {
+          // fallback based on sizes
+          widths = Object.entries(queries).reduce(
+            (flat: number[], [o, queries]) => {
               if (!orientations.includes(o)) return flat
-              let widths = sizes.map(s => s.w)
+              // let widths = queries.map(s => s.w)
+              let widths = queries.reduce((flat: number[], { images }) => {
+                return flat.concat(images.map(img => img.w))
+              }, [])
               return flat.concat(widths)
-            }, [])
-            .filter((w, i, arr) => arr.indexOf(w) === i)
+            },
+            []
+          )
+        widths = widths.map(w => (w === null ? originalImage.width : w))
 
         const mediaQueries: SassQuery[] = []
-        const metadata = await this.resize(src, { widths, formats })
         // this is just picking the metadata images from the first resize format, since only one can be specified
-        const metadataEntry = Object.values(
-          metadata
-        )[0] as EleventyImage.MetadataEntry[]
+        const metadata = (await this.resize(src, { widths, formats }).then(
+          formats => Object.values(formats)[0]
+        )) as EleventyImage.MetadataEntry[]
 
         const metaByWidth: ImageMetadataByWidth = {}
 
@@ -214,8 +221,7 @@ class ResponsiveImageFunctions {
           }
           const orientation = orientations.length > 1 && o
 
-          let q = this.queries[o as keyof Query.Map] as Query.Object[]
-          q.forEach(({ w, images }, i, queries) => {
+          queries[o].forEach(({ w, images }, i, queries) => {
             const next = queries[i + 1]
             const maxWidth = i > 0 && w,
               minWidth = next && next.w
@@ -225,7 +231,7 @@ class ResponsiveImageFunctions {
               let imageMeta: EleventyImage.MetadataEntry | undefined =
                 metaByWidth[image.w]
               if (imageMeta === undefined) {
-                imageMeta = metadataEntry.find(m => m.width === image.w)
+                imageMeta = metadata.find(m => m.width === image.w)
                 if (!imageMeta)
                   throw new Error(
                     `Resize error: media query needs image of width ${image.w}, but none was created.`
