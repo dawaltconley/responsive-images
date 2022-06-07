@@ -4,6 +4,8 @@ import { SassList, SassString, SassNumber, Value } from 'sass/types'
 
 import Image from '@11ty/eleventy-img'
 import cast from 'sass-cast'
+import defaultDevices from './data/devices'
+import { parseSizes, deviceWidths, widthsFromSizes } from './utilities'
 // const { images, queries } = require(path.join('data', 'responsive'))
 
 interface KeywordArguments extends EleventyImage.BaseImageOptions {
@@ -44,9 +46,10 @@ const isOrientation = (test: any): test is Query.Orientation =>
 class ResponsiveImageFunctions {
   defaults?: EleventyImage.ImageOptions
   images: ImageMap
-  devices?: Device[]
+  devices: Device[]
   queries: Query.Map
   sassPrefix: string
+  scalingFactor?: number
 
   constructor(
     options?: Partial<{
@@ -60,7 +63,7 @@ class ResponsiveImageFunctions {
     let {
       defaults = {},
       images,
-      devices,
+      devices = defaultDevices,
       queries,
       sassPrefix = 'image',
     } = options || {}
@@ -111,6 +114,37 @@ class ResponsiveImageFunctions {
   ): Promise<string> {
     let html = await this.generatePicture(image, kwargs)
     return html.replace(/(^<picture>|<\/picture>$)/g, '')
+  }
+
+  private _fromSizes(
+    method: 'generatePicture' | 'generateSources',
+    image: Image.ImageSource,
+    kwargs: KeywordArguments
+  ): Promise<string> {
+    let { sizes, ...generatorOptions } = kwargs
+    delete generatorOptions.__keywords
+    return this[method](image, {
+      sizes: sizes,
+      widths: widthsFromSizes(sizes, {
+        devices: this.devices,
+        minScale: this.scalingFactor,
+      }),
+      ...generatorOptions,
+    })
+  }
+
+  pictureFromSizes(
+    image: Image.ImageSource,
+    kwargs: KeywordArguments = { alt: '', sizes: '100vw' }
+  ): Promise<string> {
+    return this._fromSizes('generatePicture', image, kwargs)
+  }
+
+  sourceFromSizes(
+    image: Image.ImageSource,
+    kwargs: KeywordArguments = { alt: '', sizes: '100vw' }
+  ): Promise<string> {
+    return this._fromSizes('generateSources', image, kwargs)
   }
 
   get sassFunctions() {
