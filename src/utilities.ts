@@ -1,5 +1,5 @@
 import mediaParser from 'postcss-media-query-parser'
-import devices from './data/devices'
+import defaultDevices from './data/devices'
 
 /** @constant used for parsing a CSS value */
 const valueRegex: RegExp = /([\d.]+)(\D*)/
@@ -76,12 +76,13 @@ function deviceWidths(
 
 function widthsFromSizes(
   sizesQueryString: SizesQuery.String,
-  opt: {
-    order?: SizesQuery.Order
-    minScale?: number
-  } = {}
+  opt: Partial<{
+    devices: Device[]
+    order: SizesQuery.Order
+    minScale: number
+  }> = {}
 ): number[] {
-  let { order, minScale } = opt
+  let { devices = defaultDevices, order, minScale } = opt
   let sizes = parseSizes(sizesQueryString)
 
   let needWidths: Set<number> = devices.reduce((all, device) => {
