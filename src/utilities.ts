@@ -127,9 +127,7 @@ function queriesFromSizes(
   }
 
   devices.forEach(device => {
-    const images: {
-      [key in Query.Orientation]: Query.Image[]
-    } = {
+    const images: Record<Query.Orientation, Query.Image[]> = {
       landscape: [],
       portrait: [],
     }
