@@ -23,12 +23,12 @@ module.exports = function (
   if (options instanceof ResponsiveImages) configured = options
   else configured = new ResponsiveImages(options)
 
-  const { resize, generateSources, generatePicture } = configured
+  const { resize, sourceFromSizes, pictureFromSizes } = configured
 
   // Nunjucks
   eleventyConfig.addNunjucksAsyncFilter('resize', resize)
-  eleventyConfig.addNunjucksAsyncFilter('img', filterify(generateSources))
-  eleventyConfig.addNunjucksAsyncShortcode('img', generateSources)
-  eleventyConfig.addNunjucksAsyncFilter('picture', filterify(generatePicture))
-  eleventyConfig.addNunjucksAsyncShortcode('picture', generatePicture)
+  eleventyConfig.addNunjucksAsyncFilter('img', filterify(sourceFromSizes))
+  eleventyConfig.addNunjucksAsyncShortcode('img', sourceFromSizes)
+  eleventyConfig.addNunjucksAsyncFilter('picture', filterify(pictureFromSizes))
+  eleventyConfig.addNunjucksAsyncShortcode('picture', pictureFromSizes)
 }
