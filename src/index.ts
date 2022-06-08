@@ -89,7 +89,11 @@ class ResponsiveImageFunctions implements ResponsiveImagesOptions {
     image: Image.ImageSource,
     kwargs: Partial<KeywordArguments> = {}
   ): Promise<string> {
-    let { widths, formats, ...properties } = kwargs
+    let {
+      widths = this.defaults.widths,
+      formats = this.defaults.formats,
+      ...properties
+    } = kwargs
     delete properties.__keywords
 
     let metadata = await this.resize(image, { widths, formats })
