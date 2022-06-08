@@ -9,12 +9,14 @@
     "./devices": "./dist/data/devices.js"
   },
   "files": [
+    "_index.scss",
     "dist/**/*"
   ],
   "scripts": {
     "compile": "npx tsc",
+    "build": "node build.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "npm run compile"
+    "prepare": "npm run build"
   },
   "keywords": [
     "images",
@@ -35,6 +37,7 @@
     "@typescript-eslint/parser": "^5.27.0",
     "eslint": "^8.17.0",
     "eslint-config-prettier": "^8.5.0",
+    "node-typescript-compiler": "^3.0.0",
     "prettier": "^2.6.2",
     "sass": "^1.52.2",
     "stylelint": "^14.8.5",

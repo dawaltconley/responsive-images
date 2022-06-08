@@ -1,0 +1,79 @@
+@use 'sass:list';
+@use 'sass:map';
+
+// from @dawaltconley/sass/functions/_lists.scss
+@function join-str($list, $str: "") {
+    $return: "";
+    @for $i from 1 to list.length($list) {
+        $return: $return + list.nth($list, $i) + $str;
+    }
+    $return: $return + list.nth($list, list.length($list));
+    @return $return;
+}
+
+// mixin to work with output of resize-image() function and build.$queries
+@function permute($matrix, $permutations: (), $a: ()) {
+    @if (list.length($a) == list.length($matrix)) {
+        @return list.append($permutations, $a);
+    }
+
+    $row: list.nth($matrix, list.length($a) + 1);
+
+    @each $item in $row {
+        $permutations: permute($matrix, $permutations, list.append($a, $item));
+    }
+
+    @return $permutations;
+}
+
+@mixin responsive-image($args...) {
+    $queries: image-queries($args...);
+    @each $query in $queries {
+        $selectors: ();
+        $andQueries: ();
+        $orQueries: ();
+        $webkitResolutions: ();
+        $resolutions: ();
+
+        $orientation : map.get($query, 'orientation');
+        $max-width: map.get($query, 'maxWidth');
+        $min-width: map.get($query, 'minWidth');
+        $max-resolution: map.get($query, 'maxResolution');
+        $min-resolution: map.get($query, 'minResolution');
+        $image: map.get($query, 'url');
+
+        @if $orientation {
+            $andQueries: list.append($andQueries, '(orientation: #{$orientation})');
+        }
+        @if $max-width {
+            $andQueries: list.append($andQueries, '(max-width: #{$max-width * 1px})');
+        }
+        @if $min-width {
+            $orQueries: list.append($orQueries, '(min-width: #{($min-width * 1px) + 1px})');
+        }
+        @if $max-resolution or $min-resolution {
+            @if $max-resolution {
+                $webkitResolutions: list.append($webkitResolutions, '(-webkit-max-device-pixel-ratio: #{$max-resolution})');
+                $resolutions: list.append($resolutions, '(max-resolution: #{$max-resolution * 96dpi})');
+            }
+            @if $min-resolution {
+                $webkitResolutions: list.append($webkitResolutions, '(-webkit-min-device-pixel-ratio: #{$min-resolution + 0.01})');
+                $resolutions: list.append($resolutions, '(min-resolution: #{($min-resolution * 96dpi) + 1dpi})');
+            }
+            $orQueries: list.append($orQueries, (
+                join-str($webkitResolutions, ' and '),
+                join-str($resolutions, ' and ')
+            ));
+        }
+
+        @each $set in permute($orQueries) {
+            $q: list.join($andQueries, $set);
+            $q: join-str($q, ' and ');
+            $selectors: list.append($selectors, $q, comma);
+        }
+
+        @media #{$selectors} {
+            background-image: url($image);
+        }
+    }
+}
