@@ -1,5 +1,6 @@
 @use 'sass:list';
 @use 'sass:map';
+@use 'sass:meta';
 
 // from @dawaltconley/sass/functions/_lists.scss
 @function join-str($list, $str: '') {
@@ -26,8 +27,8 @@
   @return $permutations;
 }
 
-@mixin responsive-image($args...) {
-  $queries: image-queries($args...);
+@mixin bg($src, $prepend-backgrounds: (), $append-backgrounds: (), $kwargs...) {
+  $queries: image-queries($src, $kwargs...);
   @each $query in $queries {
     $selectors: ();
     $andQueries: ();
@@ -88,7 +89,19 @@
     }
 
     @media #{$selectors} {
-      background-image: url($image);
+      $backgrounds: list.join(
+        $prepend-backgrounds,
+        url($image),
+        $separator: comma,
+        $bracketed: false
+      );
+      $backgrounds: list.join(
+        $backgrounds,
+        $append-backgrounds,
+        $separator: comma,
+        $bracketed: false
+      );
+      background-image: $backgrounds;
     }
   }
 }
