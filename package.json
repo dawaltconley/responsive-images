@@ -2,10 +2,19 @@
   "name": "@dawaltconley/responsive-images",
   "version": "0.1.0",
   "description": "Scripts and utilities for working with responsive images.",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./eleventy": "./dist/eleventy-plugin.js",
+    "./devices": "./dist/data/devices.js"
+  },
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
     "compile": "npx tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "npm run compile"
   },
   "keywords": [
     "images",
