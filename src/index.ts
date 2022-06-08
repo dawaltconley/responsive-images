@@ -39,20 +39,20 @@ const validOrientations: Query.Orientation[] = ['landscape', 'portrait']
 const isOrientation = (test: any): test is Query.Orientation =>
   validOrientations.includes(test)
 
-class ResponsiveImageFunctions {
+export interface ResponsiveImagesOptions {
+  defaults?: Partial<EleventyImage.ImageOptions>
+  devices?: Device[]
+  sassPrefix?: string
+  scalingFactor?: number
+}
+
+class ResponsiveImageFunctions implements ResponsiveImagesOptions {
   defaults: Partial<EleventyImage.ImageOptions>
   devices: Device[]
   sassPrefix: string
   scalingFactor: number
 
-  constructor(
-    options?: Partial<{
-      defaults: Partial<EleventyImage.ImageOptions>
-      devices: Device[]
-      sassPrefix: string
-      scalingFactor: number
-    }>
-  ) {
+  constructor(options?: Partial<ResponsiveImagesOptions>) {
     let {
       defaults = {},
       devices = defaultDevices,
