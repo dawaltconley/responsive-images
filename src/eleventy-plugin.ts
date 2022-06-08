@@ -1,4 +1,3 @@
-// const ResponsiveImages = require('./index')
 import ResponsiveImages, { ResponsiveImagesOptions } from './index'
 
 type CallbackFunction = (error?: any, result?: any) => void
@@ -16,12 +15,11 @@ const filterify =
     }
   }
 
-let configured: InstanceType<typeof ResponsiveImages>
-
-export default function (
+module.exports = function (
   eleventyConfig: any,
   options: ResponsiveImagesOptions | InstanceType<typeof ResponsiveImages> = {}
 ): void {
+  let configured: InstanceType<typeof ResponsiveImages>
   if (options instanceof ResponsiveImages) configured = options
   else configured = new ResponsiveImages(options)
 
@@ -34,5 +32,3 @@ export default function (
   eleventyConfig.addNunjucksAsyncFilter('picture', filterify(generatePicture))
   eleventyConfig.addNunjucksAsyncShortcode('picture', generatePicture)
 }
-
-export { configured }
