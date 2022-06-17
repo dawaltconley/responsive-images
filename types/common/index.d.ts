@@ -40,3 +40,31 @@ interface Device extends Dimension {
   /** whether the device can be rotated and the dimensions flipped */
   flip: boolean
 }
+
+declare namespace Query {
+  type Orientation = 'landscape' | 'portrait'
+
+  interface Image extends Dimension {
+    dppx: number
+  }
+
+  interface Object extends Dimension {
+    images: Image[]
+  }
+
+  type Map = {
+    [key in Orientation]: Object[]
+  }
+}
+
+/** sent to sass mixin */
+interface SassQuery {
+  orientation: Query.Orientation | false
+  maxWidth: number | boolean | undefined
+  minWidth: number | boolean | undefined
+  maxResolution: number | boolean | undefined
+  minResolution: number | boolean | undefined
+  url: string
+  sourceType: string
+  format: string
+}
