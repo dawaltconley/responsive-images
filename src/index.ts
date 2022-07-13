@@ -8,7 +8,7 @@ import { filterSizes, widthsFromSizes, queriesFromSizes } from './utilities'
 
 interface KeywordArguments extends EleventyImage.BaseImageOptions {
   alt: string
-  sizes: string
+  sizes?: string
   __keywords?: true
 }
 
@@ -121,27 +121,31 @@ class ResponsiveImageFunctions implements ResponsiveImagesOptions {
     let { sizes, ...generatorOptions } = kwargs
     delete generatorOptions.__keywords
     return this[method](image, {
-      sizes: sizes,
-      widths: widthsFromSizes(sizes, {
-        devices: this.devices,
-        minScale: this.scalingFactor,
-      }),
+      ...(sizes
+        ? {
+            sizes: sizes,
+            widths: widthsFromSizes(sizes, {
+              devices: this.devices,
+              minScale: this.scalingFactor,
+            }),
+          }
+        : {}),
       ...generatorOptions,
     })
   }
 
   pictureFromSizes(
     image: Image.ImageSource,
-    kwargs: KeywordArguments = { alt: '', sizes: '100vw' }
+    kwargs: Partial<KeywordArguments> = {}
   ): Promise<string> {
-    return this._fromSizes('generatePicture', image, kwargs)
+    return this._fromSizes('generatePicture', image, { alt: '', ...kwargs })
   }
 
   sourceFromSizes(
     image: Image.ImageSource,
-    kwargs: KeywordArguments = { alt: '', sizes: '100vw' }
+    kwargs: Partial<KeywordArguments> = {}
   ): Promise<string> {
-    return this._fromSizes('generateSources', image, kwargs)
+    return this._fromSizes('generateSources', image, { alt: '', ...kwargs })
   }
 
   async generateMediaQueries(
