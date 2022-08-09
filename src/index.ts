@@ -44,6 +44,7 @@ export interface ResponsiveImagesOptions {
   devices?: Device[]
   sassPrefix?: string
   scalingFactor?: number
+  disable?: boolean
 }
 
 class ResponsiveImageFunctions implements ResponsiveImagesOptions {
@@ -51,6 +52,7 @@ class ResponsiveImageFunctions implements ResponsiveImagesOptions {
   devices: Device[]
   sassPrefix: string
   scalingFactor: number
+  disable: boolean
 
   constructor(options?: Partial<ResponsiveImagesOptions>) {
     let {
@@ -58,12 +60,14 @@ class ResponsiveImageFunctions implements ResponsiveImagesOptions {
       devices = defaultDevices,
       sassPrefix = 'image',
       scalingFactor = 0.8,
+      disable = false,
     } = options || {}
 
     this.defaults = defaults
     this.devices = devices
     this.sassPrefix = sassPrefix
     this.scalingFactor = scalingFactor
+    this.disable = disable
 
     this.resize = this.resize.bind(this)
     this.generatePicture = this.generatePicture.bind(this)
@@ -81,10 +85,17 @@ class ResponsiveImageFunctions implements ResponsiveImagesOptions {
     image: EleventyImage.ImageSource,
     options: Partial<EleventyImage.ImageOptions> = {}
   ): Promise<EleventyImage.Metadata> {
-    return Image(image, {
+    let imgOpts = {
       ...this.defaults,
       ...options,
-    })
+    }
+    if (this.disable)
+      imgOpts = {
+        ...imgOpts,
+        widths: [null],
+        formats: [null],
+      }
+    return Image(image, imgOpts)
   }
 
   async generatePicture(
