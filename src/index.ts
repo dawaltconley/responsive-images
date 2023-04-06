@@ -1,6 +1,6 @@
 import type EleventyImage from '11ty__eleventy-img'
 import type { Value as SassValue, CustomFunction } from 'sass/types'
-import type { Device } from './types/common'
+import type { Orientation, Device } from './types/common'
 import type { SassQuery } from './types/queries'
 
 import Image from '@11ty/eleventy-img'
@@ -30,6 +30,13 @@ const validImageFormats: ValidImageFormat[] = [
   'auto',
   null,
 ]
+
+const assertOrientation = (test: any): Orientation => {
+  if (!isOrientation(test)) {
+    throw new Error(`Invalid orientation: ${test}`)
+  }
+  return test
+}
 
 const assertValidImageFormat = (test: any): ValidImageFormat => {
   if (!validImageFormats.includes(test))
@@ -162,7 +169,7 @@ class ResponsiveImageFunctions implements ResponsiveImagesOptions {
     kwargs?: Partial<{
       widths: (number | null)[] | null
       formats: ValidImageFormat[]
-      orientations: string[]
+      orientations: Orientation[]
       sizes: string
     }>
   ): Promise<SassQuery[]> {
@@ -195,7 +202,7 @@ class ResponsiveImageFunctions implements ResponsiveImagesOptions {
       // fallback based on queries
       widths = Object.entries(queries).reduce(
         (flat: number[], [o, queries]) => {
-          if (!orientations.includes(o)) return flat
+          if (isOrientation(o) && !orientations.includes(o)) return flat
           let widths = queries.reduce((flat: number[], { images }) => {
             return flat.concat(images.map(img => img.w))
           }, [])
@@ -297,7 +304,7 @@ class ResponsiveImageFunctions implements ResponsiveImagesOptions {
           .map(s => assertValidImageFormat(s.realNull && s.assertString().text))
         let orientations = args[3].asList
           .toArray()
-          .map(s => s.assertString().text)
+          .map(s => assertOrientation(s.assertString().text))
         let sizes = args[4].assertString('sizes').text
 
         let mediaQueries = await this.generateMediaQueries(src, {
