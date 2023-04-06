@@ -201,7 +201,7 @@ function filterSizes(
 function parseSizes(sizesQueryString: SizesQuery.String): SizesQuery.Object[] {
   return sizesQueryString.split(/\s*,\s*/).map((descriptor: string) => {
     let conditions: SizesQuery.Condition[] = []
-    let parsed = descriptor.match(/^(.*)\s+(\S+)$/)
+    let parsed = descriptor.match(/^(.*)\s+(\S+)$/) // TODO get this from parser instead; last node in media-query
     if (!parsed) return { conditions, width: descriptor }
 
     let [, mediaCondition, width]: string[] = parsed
@@ -217,17 +217,29 @@ function parseSizes(sizesQueryString: SizesQuery.String): SizesQuery.Object[] {
         // but instead fires on (min-width: 49em) and (max-width: 55px)
         mediaCondition = mediaCondition.slice(1, -1)
       }
-      let parsed = mediaParser(mediaCondition).nodes[0] as MediaQuery.Node
-      for (let node of parsed.nodes) {
+      let mediaQuery = mediaParser(mediaCondition).nodes[0]
+      for (let node of mediaQuery.nodes) {
         if (node.type === 'media-feature-expression') {
           conditions.push({
             mediaFeature: node.nodes.find(n => n.type === 'media-feature')!
               .value,
-            value: node.nodes.find(n => n.type === 'value')!.value,
+            value: node.nodes.find(n => n.type === 'value')!.value, // TODO if value is null, should treat valid mediaFeatures as booleans
           })
         } else if (node.type === 'keyword' && node.value === 'and') {
           continue // TODO wouldn't be valid sizes attribute, but regardless this doesn't work
           // maybe parse with cssValue here?
+          if (node.value === 'and' || node.value === 'only') {
+            continue // ignore; add next valid node to the conditions list
+          } else if (node.value === 'not') {
+            // handle
+          } else {
+            throw new Error(`invalid media query keyword: ${node.value}`)
+          }
+        } else if (node.type === 'media-type') {
+          if (node.value === 'all')
+            continue // ignore; all is the only valid media-type
+          else
+            throw new Error(`media type ${node.value} cannot be used in a sizes attribute`)
         } else {
           // not currently supporting other keywords, like not
           break
