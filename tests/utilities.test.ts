@@ -606,3 +606,444 @@ describe('widthsFromSizes()', () => {
     ).toEqual([2816, 1442, 720, 360])
   })
 })
+
+describe('queriesFromSizes()', () => {
+  test('calculates queries using the default devices', () => {
+    expect(queriesFromSizes('400px')).toEqual({
+      landscape: [
+        {
+          w: 2560,
+          h: 1600,
+          images: [{ w: 400, dppx: 1, orientation: 'landscape' }],
+        },
+        {
+          w: 1920,
+          h: 1200,
+          images: [{ w: 400, dppx: 1, orientation: 'landscape' }],
+        },
+        {
+          w: 1680,
+          h: 1050,
+          images: [{ w: 400, dppx: 1, orientation: 'landscape' }],
+        },
+        {
+          w: 1440,
+          h: 900,
+          images: [
+            { w: 800, dppx: 2, orientation: 'landscape' },
+            { w: 400, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+        {
+          w: 1366,
+          h: 1024,
+          images: [
+            { w: 800, dppx: 2, orientation: 'landscape' },
+            { w: 400, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+        {
+          w: 1280,
+          h: 800,
+          images: [
+            { w: 800, dppx: 2, orientation: 'landscape' },
+            { w: 600, dppx: 1.5, orientation: 'landscape' },
+            { w: 400, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+        {
+          w: 1024,
+          h: 768,
+          images: [
+            { w: 800, dppx: 2, orientation: 'landscape' },
+            { w: 400, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+        {
+          w: 960,
+          h: 600,
+          images: [
+            { w: 1200, dppx: 3, orientation: 'landscape' },
+            { w: 800, dppx: 2, orientation: 'landscape' },
+            { w: 400, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+        {
+          w: 768,
+          h: 432,
+          images: [
+            { w: 1600, dppx: 4, orientation: 'landscape' },
+            { w: 1200, dppx: 3, orientation: 'landscape' },
+            { w: 1000, dppx: 2.5, orientation: 'landscape' },
+            { w: 400, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+        {
+          w: 690,
+          h: 412,
+          images: [
+            { w: 1400, dppx: 3.5, orientation: 'landscape' },
+            { w: 800, dppx: 2, orientation: 'landscape' },
+            { w: 400, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+        {
+          w: 640,
+          h: 360,
+          images: [
+            { w: 1600, dppx: 4, orientation: 'landscape' },
+            { w: 1200, dppx: 3, orientation: 'landscape' },
+            { w: 800, dppx: 2, orientation: 'landscape' },
+            { w: 600, dppx: 1.5, orientation: 'landscape' },
+            { w: 400, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+        {
+          w: 480,
+          h: 320,
+          images: [
+            { w: 1600, dppx: 4, orientation: 'landscape' },
+            { w: 1200, dppx: 3, orientation: 'landscape' },
+            { w: 800, dppx: 2, orientation: 'landscape' },
+            { w: 600, dppx: 1.5, orientation: 'landscape' },
+            { w: 400, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+      ],
+      portrait: [
+        {
+          w: 1024,
+          h: 1366,
+          images: [
+            { w: 800, dppx: 2, orientation: 'portrait' },
+            { w: 400, dppx: 1, orientation: 'portrait' },
+          ],
+        },
+        {
+          w: 800,
+          h: 1280,
+          images: [
+            { w: 800, dppx: 2, orientation: 'portrait' },
+            { w: 600, dppx: 1.5, orientation: 'portrait' },
+            { w: 400, dppx: 1, orientation: 'portrait' },
+          ],
+        },
+        {
+          w: 768,
+          h: 1024,
+          images: [
+            { w: 800, dppx: 2, orientation: 'portrait' },
+            { w: 400, dppx: 1, orientation: 'portrait' },
+          ],
+        },
+        {
+          w: 600,
+          h: 960,
+          images: [
+            { w: 1200, dppx: 3, orientation: 'portrait' },
+            { w: 800, dppx: 2, orientation: 'portrait' },
+            { w: 400, dppx: 1, orientation: 'portrait' },
+          ],
+        },
+        {
+          w: 432,
+          h: 768,
+          images: [
+            { w: 1600, dppx: 4, orientation: 'portrait' },
+            { w: 1200, dppx: 3, orientation: 'portrait' },
+            { w: 1000, dppx: 2.5, orientation: 'portrait' },
+            { w: 400, dppx: 1, orientation: 'portrait' },
+          ],
+        },
+        {
+          w: 412,
+          h: 690,
+          images: [
+            { w: 1400, dppx: 3.5, orientation: 'portrait' },
+            { w: 800, dppx: 2, orientation: 'portrait' },
+            { w: 400, dppx: 1, orientation: 'portrait' },
+          ],
+        },
+        {
+          w: 360,
+          h: 640,
+          images: [
+            { w: 1600, dppx: 4, orientation: 'portrait' },
+            { w: 1200, dppx: 3, orientation: 'portrait' },
+            { w: 800, dppx: 2, orientation: 'portrait' },
+            { w: 600, dppx: 1.5, orientation: 'portrait' },
+            { w: 400, dppx: 1, orientation: 'portrait' },
+          ],
+        },
+        {
+          w: 320,
+          h: 480,
+          images: [
+            { w: 1600, dppx: 4, orientation: 'portrait' },
+            { w: 1200, dppx: 3, orientation: 'portrait' },
+            { w: 800, dppx: 2, orientation: 'portrait' },
+            { w: 600, dppx: 1.5, orientation: 'portrait' },
+            { w: 400, dppx: 1, orientation: 'portrait' },
+          ],
+        },
+      ],
+    })
+    expect(queriesFromSizes('80vw')).toEqual({
+      landscape: [
+        {
+          w: 2560,
+          h: 1600,
+          images: [{ w: 2048, dppx: 1, orientation: 'landscape' }],
+        },
+        {
+          w: 1920,
+          h: 1200,
+          images: [{ w: 1536, dppx: 1, orientation: 'landscape' }],
+        },
+        {
+          w: 1680,
+          h: 1050,
+          images: [{ w: 1344, dppx: 1, orientation: 'landscape' }],
+        },
+        {
+          w: 1440,
+          h: 900,
+          images: [
+            { w: 2304, dppx: 2, orientation: 'landscape' },
+            { w: 1152, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+        {
+          w: 1366,
+          h: 1024,
+          images: [
+            { w: 2186, dppx: 2, orientation: 'landscape' },
+            { w: 1093, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+        {
+          w: 1280,
+          h: 800,
+          images: [
+            { w: 2048, dppx: 2, orientation: 'landscape' },
+            { w: 1536, dppx: 1.5, orientation: 'landscape' },
+            { w: 1024, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+        {
+          w: 1024,
+          h: 768,
+          images: [
+            { w: 1639, dppx: 2, orientation: 'landscape' },
+            { w: 820, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+        {
+          w: 960,
+          h: 600,
+          images: [
+            { w: 2304, dppx: 3, orientation: 'landscape' },
+            { w: 1536, dppx: 2, orientation: 'landscape' },
+            { w: 768, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+        {
+          w: 768,
+          h: 432,
+          images: [
+            { w: 2458, dppx: 4, orientation: 'landscape' },
+            { w: 1844, dppx: 3, orientation: 'landscape' },
+            { w: 1536, dppx: 2.5, orientation: 'landscape' },
+            { w: 615, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+        {
+          w: 690,
+          h: 412,
+          images: [
+            { w: 1932, dppx: 3.5, orientation: 'landscape' },
+            { w: 1104, dppx: 2, orientation: 'landscape' },
+            { w: 552, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+        {
+          w: 640,
+          h: 360,
+          images: [
+            { w: 2048, dppx: 4, orientation: 'landscape' },
+            { w: 1536, dppx: 3, orientation: 'landscape' },
+            { w: 1024, dppx: 2, orientation: 'landscape' },
+            { w: 768, dppx: 1.5, orientation: 'landscape' },
+            { w: 512, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+        {
+          w: 480,
+          h: 320,
+          images: [
+            { w: 1536, dppx: 4, orientation: 'landscape' },
+            { w: 1152, dppx: 3, orientation: 'landscape' },
+            { w: 768, dppx: 2, orientation: 'landscape' },
+            { w: 576, dppx: 1.5, orientation: 'landscape' },
+            { w: 384, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+      ],
+      portrait: [
+        {
+          w: 1024,
+          h: 1366,
+          images: [
+            { w: 1639, dppx: 2, orientation: 'portrait' },
+            { w: 820, dppx: 1, orientation: 'portrait' },
+          ],
+        },
+        {
+          w: 800,
+          h: 1280,
+          images: [
+            { w: 1280, dppx: 2, orientation: 'portrait' },
+            { w: 960, dppx: 1.5, orientation: 'portrait' },
+            { w: 640, dppx: 1, orientation: 'portrait' },
+          ],
+        },
+        {
+          w: 768,
+          h: 1024,
+          images: [
+            { w: 1229, dppx: 2, orientation: 'portrait' },
+            { w: 615, dppx: 1, orientation: 'portrait' },
+          ],
+        },
+        {
+          w: 600,
+          h: 960,
+          images: [
+            { w: 1440, dppx: 3, orientation: 'portrait' },
+            { w: 960, dppx: 2, orientation: 'portrait' },
+            { w: 480, dppx: 1, orientation: 'portrait' },
+          ],
+        },
+        {
+          w: 432,
+          h: 768,
+          images: [
+            { w: 1383, dppx: 4, orientation: 'portrait' },
+            { w: 1037, dppx: 3, orientation: 'portrait' },
+            { w: 864, dppx: 2.5, orientation: 'portrait' },
+            { w: 346, dppx: 1, orientation: 'portrait' },
+          ],
+        },
+        {
+          w: 412,
+          h: 690,
+          images: [
+            { w: 1154, dppx: 3.5, orientation: 'portrait' },
+            { w: 660, dppx: 2, orientation: 'portrait' },
+            { w: 330, dppx: 1, orientation: 'portrait' },
+          ],
+        },
+        {
+          w: 360,
+          h: 640,
+          images: [
+            { w: 1152, dppx: 4, orientation: 'portrait' },
+            { w: 864, dppx: 3, orientation: 'portrait' },
+            { w: 576, dppx: 2, orientation: 'portrait' },
+            { w: 432, dppx: 1.5, orientation: 'portrait' },
+            { w: 288, dppx: 1, orientation: 'portrait' },
+          ],
+        },
+        {
+          w: 320,
+          h: 480,
+          images: [
+            { w: 1024, dppx: 4, orientation: 'portrait' },
+            { w: 768, dppx: 3, orientation: 'portrait' },
+            { w: 512, dppx: 2, orientation: 'portrait' },
+            { w: 384, dppx: 1.5, orientation: 'portrait' },
+            { w: 256, dppx: 1, orientation: 'portrait' },
+          ],
+        },
+      ],
+    })
+  })
+
+    const customDevices: Device[] = [
+      {
+        w: 800,
+        h: 600,
+        dppx: [1, 2],
+        flip: true,
+      },
+    ]
+
+  test('calculate queries using custom devices', () => {
+    let devices = [...customDevices];
+
+    expect(
+      queriesFromSizes('(min-width(680px) 400px, 100vw', { devices })
+    ).toEqual({
+      landscape: [
+        {
+          w: 800,
+          h: 600,
+          images: [
+            { w: 800, dppx: 2, orientation: 'landscape' },
+            { w: 400, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+      ],
+      portrait: [
+        {
+          w: 600,
+          h: 800,
+          images: [
+            { w: 800, dppx: 2, orientation: 'portrait' },
+            { w: 400, dppx: 1, orientation: 'portrait' },
+          ],
+        },
+      ],
+    })
+
+    devices.push({
+      w: 1400,
+      h: 1400,
+      dppx: [1.5],
+      flip: false,
+    })
+
+    expect(
+      queriesFromSizes('(min-width(680px) 400px, 100vw', { devices })
+    ).toEqual({
+      landscape: [
+        {
+          w: 1400,
+          h: 1400,
+          images: [
+            { w: 600, dppx: 1.5, orientation: 'landscape' },
+            { w: 400, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+        {
+          w: 800,
+          h: 600,
+          images: [
+            { w: 800, dppx: 2, orientation: 'landscape' },
+            { w: 400, dppx: 1, orientation: 'landscape' },
+          ],
+        },
+      ],
+      portrait: [
+        {
+          w: 600,
+          h: 800,
+          images: [
+            { w: 800, dppx: 2, orientation: 'portrait' },
+            { w: 400, dppx: 1, orientation: 'portrait' },
+          ],
+        },
+      ],
+    })
+  })
+})
