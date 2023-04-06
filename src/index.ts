@@ -1,5 +1,5 @@
-import EleventyImage from '11ty__eleventy-img'
-import { SassList, SassString } from 'sass/types'
+import type EleventyImage from '11ty__eleventy-img'
+import type { Value as SassValue, CustomFunction } from 'sass/types'
 
 import Image from '@11ty/eleventy-img'
 import cast from 'sass-cast'
@@ -269,11 +269,11 @@ class ResponsiveImageFunctions implements ResponsiveImagesOptions {
     return mediaQueries
   }
 
-  get sassFunctions() {
+  get sassFunctions(): Record<string, CustomFunction<'async'>> {
     const resizeFunction = `${this.sassPrefix}-resize($src, $widths: null, $formats: null)`
     const queriesFunction = `${this.sassPrefix}-queries($src, $widths: null, $formats: null, $orientation: landscape portrait, $sizes: '100vw')`
     return {
-      [resizeFunction]: async (args: [SassString, SassList, SassList]) => {
+      [resizeFunction]: async (args: SassValue[]): Promise<SassValue> => {
         let src: string = args[0].assertString('src').text
         let widths = args[1].asList
           .toArray()
@@ -287,9 +287,7 @@ class ResponsiveImageFunctions implements ResponsiveImagesOptions {
         let metadata = await this.resize(src, { widths, formats })
         return cast.toSass(metadata)
       },
-      [queriesFunction]: async (
-        args: [SassString, SassList, SassList, SassList, SassString]
-      ) => {
+      [queriesFunction]: async (args: SassValue[]): Promise<SassValue> => {
         let src = args[0].assertString('src').text
         let widths =
           args[1].realNull &&
