@@ -131,7 +131,7 @@ function queriesFromSizes(
       landscape: [],
       portrait: [],
     }
-    deviceImages(sizes, device).forEach(img =>
+    deviceImages(sizes, device).sort((a, b) => b.dppx - a.dppx).forEach(img =>
       images[img.orientation].push(img)
     )
     if (images.landscape.length)
