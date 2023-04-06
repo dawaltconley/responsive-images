@@ -32,6 +32,9 @@
     "postcss-media-query-parser": "^0.2.3",
     "sass-cast": "^0.4.1"
   },
+  "optionalDependencies": {
+    "sass": "^1.45.0"
+  },
   "devDependencies": {
     "@11ty/eleventy": "^1.0.1",
     "@types/jest": "^28.1.2",
