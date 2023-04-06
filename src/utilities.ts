@@ -37,12 +37,11 @@ function deviceImages(
   sizes: SizesQuery.Object[],
   device: Device /* , order: SizesQuery.Order */
 ): Query.Image[] {
-  let imgWidth: string
+  let imgWidth: string = '100vw' // fallback to 100vw if no queries apply; this is the browser default
   let orientation: Query.Orientation =
     device.w >= device.h ? 'landscape' : 'portrait'
 
   whichSize: for (let { conditions, width } of sizes) {
-    imgWidth = width
     for (let { mediaFeature, value: valueString } of conditions) {
       let [value, unit]: [number, string] = cssValue(valueString)
       if (unit !== 'px')
@@ -54,7 +53,8 @@ function deviceImages(
         (mediaFeature === 'max-height' && device.h <= value)
       if (!match) continue whichSize
     }
-    break whichSize
+    imgWidth = width
+    break whichSize // break loop when device matches all conditions
   }
 
   let needImages: Query.Image[] = []
