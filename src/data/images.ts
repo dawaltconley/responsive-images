@@ -1,3 +1,5 @@
+import type { Dimension } from '../types/common'
+
 const images: Dimension[] = [
   { w: 3072, h: 1728 },
   { w: 2880, h: 1800 },

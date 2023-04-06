@@ -1,3 +1,6 @@
+import type { Orientation, Dimension, Device } from './types/common'
+import type { SizesQuery, MediaCondition, Image, QueryMap } from './types/queries'
+
 import mediaParser from 'postcss-media-query-parser'
 import defaultDevices from './data/devices'
 
@@ -34,11 +37,11 @@ const isDimensionArray = (array: any[]): array is Dimension[] => {
  * @return unique widths that will need to be produced for the given device
  */
 function deviceImages(
-  sizes: SizesQuery.Object[],
+  sizes: SizesQuery[],
   device: Device /* , order: SizesQuery.Order */
-): Query.Image[] {
+): Image[] {
   let imgWidth: string = '100vw' // fallback to 100vw if no queries apply; this is the browser default
-  let orientation: Query.Orientation =
+  let orientation: Orientation =
     device.w >= device.h ? 'landscape' : 'portrait'
 
   whichSize: for (let { conditions, width } of sizes) {
@@ -57,7 +60,7 @@ function deviceImages(
     break whichSize // break loop when device matches all conditions
   }
 
-  let needImages: Query.Image[] = []
+  let needImages: Image[] = []
   let { dppx } = device
   if (dppx.indexOf(1) < 0) dppx.push(1) // always include a dppx value of one for queries, to avoid upscaling when screen resizes on larger 1dppx displays. TODO any way I can require this as part of the type?
 
@@ -90,10 +93,10 @@ function deviceImages(
  */
 
 function widthsFromSizes(
-  sizesQueryString: SizesQuery.String,
+  sizesQueryString: string,
   opt?: Partial<{
     devices: Device[]
-    // order: SizesQuery.Order
+    // order: Order
     minScale: number
   }>
 ): number[] {
@@ -111,23 +114,23 @@ function widthsFromSizes(
 }
 
 function queriesFromSizes(
-  sizesQueryString: SizesQuery.String,
+  sizesQueryString: string,
   opt?: Partial<{
     devices: Device[]
-    // order: SizesQuery.Order
+    // order: Order
     // minScale: number
   }>
-): Query.Map {
+): QueryMap {
   let { devices = defaultDevices, } = opt || {}
   let sizes = parseSizes(sizesQueryString)
 
-  const queries: Query.Map = {
+  const queries: QueryMap = {
     landscape: [],
     portrait: [],
   }
 
   devices.forEach(device => {
-    const images: Record<Query.Orientation, Query.Image[]> = {
+    const images: Record<Orientation, Image[]> = {
       landscape: [],
       portrait: [],
     }
@@ -198,9 +201,9 @@ function filterSizes(
  * @param sizesQueryString - a string representation of a valid img 'sizes' attribute
  * @return an array of SizesQuery.Object objects describing media query parameters
  */
-function parseSizes(sizesQueryString: SizesQuery.String): SizesQuery.Object[] {
+function parseSizes(sizesQueryString: string): SizesQuery[] {
   return sizesQueryString.split(/\s*,\s*/).map((descriptor: string) => {
-    let conditions: SizesQuery.Condition[] = []
+    let conditions: MediaCondition[] = []
     let parsed = descriptor.match(/^(.*)\s+(\S+)$/) // TODO get this from parser instead; last node in media-query
     if (!parsed) return { conditions, width: descriptor }
 

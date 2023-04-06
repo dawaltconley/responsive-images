@@ -1,9 +1,12 @@
 import type EleventyImage from '11ty__eleventy-img'
 import type { Value as SassValue, CustomFunction } from 'sass/types'
+import type { Device } from './types/common'
+import type { SassQuery } from './types/queries'
 
 import Image from '@11ty/eleventy-img'
 import cast from 'sass-cast'
 import defaultDevices from './data/devices'
+import { isOrientation } from './types/common'
 import { filterSizes, widthsFromSizes, queriesFromSizes } from './utilities'
 
 interface KeywordArguments extends EleventyImage.BaseImageOptions {
@@ -33,11 +36,6 @@ const assertValidImageFormat = (test: any): ValidImageFormat => {
     throw new Error(`Invalid image format: ${test}`)
   return test
 }
-
-const validOrientations: Query.Orientation[] = ['landscape', 'portrait']
-
-const isOrientation = (test: any): test is Query.Orientation =>
-  validOrientations.includes(test)
 
 export interface ResponsiveImagesOptions {
   defaults?: Partial<EleventyImage.ImageOptions>
@@ -165,7 +163,7 @@ class ResponsiveImageFunctions implements ResponsiveImagesOptions {
       widths: (number | null)[] | null
       formats: ValidImageFormat[]
       orientations: string[]
-      sizes: SizesQuery.String
+      sizes: string
     }>
   ): Promise<SassQuery[]> {
     let {

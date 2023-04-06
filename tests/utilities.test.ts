@@ -1,4 +1,5 @@
-/// <reference types="../types/common/index" />
+import type { Dimension, Device } from '../src/types/common'
+import type { SizesQuery, Image } from '../src/types/queries'
 
 import {
   parseSizes,
@@ -104,11 +105,11 @@ describe('parseSizes()', () => {
 describe('deviceImages()', () => {
   type Test = {
     device: Device
-    images: Query.Image[]
+    images: Image[]
   }
 
   let template: {
-    sizes: SizesQuery.Object[]
+    sizes: SizesQuery[]
     pass: Test
     fail: Test
   } = {
@@ -245,7 +246,7 @@ describe('deviceImages()', () => {
   })
 
   test('returns images using multiple conditions', () => {
-    let sizes: SizesQuery.Object[] = [
+    let sizes: SizesQuery[] = [
       {
         conditions: [{ mediaFeature: 'min-width', value: '1536px' }],
         width: '718.5px',
@@ -274,7 +275,7 @@ describe('deviceImages()', () => {
       dppx: [1],
       flip: false,
     }
-    let image: Query.Image = {
+    let image: Image = {
       w: 1000,
       dppx: 1,
       orientation: 'landscape',
@@ -300,7 +301,7 @@ describe('deviceImages()', () => {
   })
 
   test('handles multiple "and" media queries', () => {
-    let sizes: SizesQuery.Object[] = [
+    let sizes: SizesQuery[] = [
       {
         conditions: [
           {
@@ -969,17 +970,17 @@ describe('queriesFromSizes()', () => {
     })
   })
 
-    const customDevices: Device[] = [
-      {
-        w: 800,
-        h: 600,
-        dppx: [1, 2],
-        flip: true,
-      },
-    ]
+  const customDevices: Device[] = [
+    {
+      w: 800,
+      h: 600,
+      dppx: [1, 2],
+      flip: true,
+    },
+  ]
 
   test('calculate queries using custom devices', () => {
-    let devices = [...customDevices];
+    let devices = [...customDevices]
 
     expect(
       queriesFromSizes('(min-width(680px) 400px, 100vw', { devices })

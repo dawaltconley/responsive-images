@@ -1,3 +1,5 @@
+import type { Device } from '../types/common'
+
 const devices: Device[] = [
   {
     w: 2560,
@@ -74,3 +76,4 @@ const devices: Device[] = [
 ]
 
 export default devices
+export type { Device }
