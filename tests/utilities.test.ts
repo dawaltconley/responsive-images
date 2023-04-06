@@ -520,3 +520,89 @@ describe('filterSizes()', () => {
     expect(filterSizes(sampleDevices, 1)).toEqual(sortedDevices)
   })
 })
+
+describe('widthsFromSizes()', () => {
+  describe('calculates image widths using the default devices', () => {
+    test('using media query and assigned width', () => {
+      expect(widthsFromSizes('100vw')).toEqual([
+        3072, 2732, 2415, 2048, 1800, 1600, 1380, 1200, 1024, 824, 720, 640,
+        540, 480, 412, 360, 320,
+      ])
+      expect(widthsFromSizes('400px')).toEqual([
+        1600, 1400, 1200, 1000, 800, 600, 400,
+      ])
+      expect(widthsFromSizes('(min-width: 680px) 400px, 50vw')).toEqual([
+        1600, 1400, 1200, 1000, 864, 721, 640, 540, 480, 412, 360, 320, 270,
+        240, 206, 180, 160,
+      ])
+    })
+
+    test('using multiple media queries', () => {
+      expect(
+        widthsFromSizes(
+          '(min-width: 1536px) 718.5px, (min-width: 1280px) 590px, (min-width: 1024px) 468px, (min-width: 768px) 704px, (min-width: 640px) 576px, 100vw'
+        )
+      ).toEqual([
+        2816, 2304, 2016, 1800, 1442, 1280, 1080, 960, 824, 720, 640, 540, 480,
+        412, 360, 320,
+      ])
+    })
+
+    test('using combined media queries with the "and" keyword', () => {
+      expect(
+        widthsFromSizes(
+          '(max-width: 780px) and (max-height: 720px) 600px, 400px'
+        )
+      ).toEqual([2400, 2100, 1800, 1600, 1200, 1000, 800, 600, 400])
+    })
+  })
+
+  test('calculates image widths using custom, unsorted devices', () => {
+    let devices: Device[] = [
+      {
+        w: 800,
+        h: 600,
+        dppx: [1, 2],
+        flip: true,
+      },
+    ]
+
+    expect(widthsFromSizes('100vw', { devices })).toEqual([
+      1600, 1200, 800, 600,
+    ])
+    expect(widthsFromSizes('400px', { devices })).toEqual([800, 400])
+
+    devices.push({
+      w: 1400,
+      h: 1400,
+      dppx: [1.5],
+      flip: false,
+    })
+
+    expect(widthsFromSizes('100vw', { devices })).toEqual([
+      2100, 1600, 1400, 1200, 800, 600,
+    ])
+    expect(widthsFromSizes('400px', { devices })).toEqual([800, 600, 400])
+  })
+
+  test('calculates image widths using custom scaling factor', () => {
+    expect(widthsFromSizes('100vw', { minScale: 0.5 })).toEqual([
+      3072, 2048, 1442, 960, 640, 432,
+    ])
+    expect(widthsFromSizes('400px', { minScale: 0.6 })).toEqual([
+      1600, 1200, 800, 600, 400,
+    ])
+    expect(
+      widthsFromSizes(
+        '(min-width: 1536px) 718.5px, (min-width: 1280px) 590px, (min-width: 1024px) 468px, (min-width: 768px) 704px, (min-width: 640px) 576px, 100vw',
+        { minScale: 0.4 }
+      )
+    ).toEqual([2816, 1760, 1080, 640, 360])
+    expect(
+      widthsFromSizes(
+        '(min-width: 1536px) 718.5px, (min-width: 1280px) 590px, (min-width: 1024px) 468px, (min-width: 768px) 704px, (min-width: 640px) 576px, 100vw',
+        { minScale: 0.3 }
+      )
+    ).toEqual([2816, 1442, 720, 360])
+  })
+})
