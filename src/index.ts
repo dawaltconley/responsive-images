@@ -191,7 +191,6 @@ class ResponsiveImageFunctions implements ResponsiveImagesOptions {
 
     let queries = queriesFromSizes(sizes, {
       devices: this.devices,
-      minScale: this.scalingFactor,
     })
 
     if (!widths)

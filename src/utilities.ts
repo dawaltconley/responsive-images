@@ -93,11 +93,11 @@ function widthsFromSizes(
   sizesQueryString: SizesQuery.String,
   opt?: Partial<{
     devices: Device[]
-    order: SizesQuery.Order
+    // order: SizesQuery.Order
     minScale: number
   }>
 ): number[] {
-  let { devices = defaultDevices, order, minScale } = opt || {}
+  let { devices = defaultDevices, minScale } = opt || {}
   let sizes = parseSizes(sizesQueryString)
 
   let needWidths: Set<number> = devices.reduce((all, device) => {
@@ -114,11 +114,11 @@ function queriesFromSizes(
   sizesQueryString: SizesQuery.String,
   opt?: Partial<{
     devices: Device[]
-    order: SizesQuery.Order
-    minScale: number
+    // order: SizesQuery.Order
+    // minScale: number
   }>
 ): Query.Map {
-  let { devices = defaultDevices, order, minScale } = opt || {}
+  let { devices = defaultDevices, } = opt || {}
   let sizes = parseSizes(sizesQueryString)
 
   const queries: Query.Map = {
