@@ -21,7 +21,8 @@
   "keywords": [
     "images",
     "responsive",
-    "eleventy"
+    "eleventy",
+    "eleventy-plugin"
   ],
   "author": "Dylan Awalt-Conley",
   "license": "ISC",
