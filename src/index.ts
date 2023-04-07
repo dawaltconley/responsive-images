@@ -52,14 +52,14 @@ export interface ResponsiveImagesOptions {
   disable?: boolean
 }
 
-class ResponsiveImageFunctions implements ResponsiveImagesOptions {
+class ResponsiveImageFunctions implements Required<ResponsiveImagesOptions> {
   defaults: Partial<EleventyImage.ImageOptions>
   devices: Device[]
   sassPrefix: string
   scalingFactor: number
   disable: boolean
 
-  constructor(options?: Partial<ResponsiveImagesOptions>) {
+  constructor(options?: ResponsiveImagesOptions) {
     let {
       defaults = {},
       devices = defaultDevices,
