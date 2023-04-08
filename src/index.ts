@@ -104,7 +104,7 @@ class ResponsiveImageFunctions implements Required<ResponsiveImagesOptions> {
 
   async generatePicture(
     image: Image.ImageSource,
-    kwargs: Partial<KeywordArguments> = {}
+    kwargs: KeywordArguments
   ): Promise<string> {
     let {
       widths = this.defaults.widths,
@@ -114,15 +114,12 @@ class ResponsiveImageFunctions implements Required<ResponsiveImagesOptions> {
     delete properties.__keywords
 
     let metadata = await this.resize(image, { widths, formats })
-    return Image.generateHTML(metadata, {
-      alt: '',
-      ...properties,
-    })
+    return Image.generateHTML(metadata, properties)
   }
 
   async generateSources(
     image: Image.ImageSource,
-    kwargs: Partial<KeywordArguments> = {}
+    kwargs: KeywordArguments
   ): Promise<string> {
     let html = await this.generatePicture(image, kwargs)
     return html.replace(/(^<picture>|<\/picture>$)/g, '')
@@ -151,16 +148,16 @@ class ResponsiveImageFunctions implements Required<ResponsiveImagesOptions> {
 
   pictureFromSizes(
     image: Image.ImageSource,
-    kwargs: Partial<KeywordArguments> = {}
+    kwargs: KeywordArguments
   ): Promise<string> {
-    return this._fromSizes('generatePicture', image, { alt: '', ...kwargs })
+    return this._fromSizes('generatePicture', image, kwargs)
   }
 
   sourceFromSizes(
     image: Image.ImageSource,
-    kwargs: Partial<KeywordArguments> = {}
+    kwargs: KeywordArguments
   ): Promise<string> {
-    return this._fromSizes('generateSources', image, { alt: '', ...kwargs })
+    return this._fromSizes('generateSources', image, kwargs)
   }
 
   async generateMediaQueries(
