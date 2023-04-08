@@ -1,5 +1,4 @@
-import type { Dimension, Device } from '../src/types/common'
-import type { SizesQuery, Image } from '../src/types/queries'
+import type { Dimension, Device, SizesQuery, Image } from '../src/types'
 
 import {
   parseSizes,

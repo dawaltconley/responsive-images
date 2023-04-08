@@ -1,12 +1,11 @@
 import type EleventyImage from '11ty__eleventy-img'
 import type { Value as SassValue, CustomFunction } from 'sass/types'
-import type { Orientation, Device } from './types/common'
-import type { SassQuery } from './types/queries'
+import type { Orientation, Device, SassQuery } from './types'
 
 import Image from '@11ty/eleventy-img'
 import cast from 'sass-cast'
 import defaultDevices from './data/devices'
-import { isOrientation } from './types/common'
+import { isOrientation } from './types'
 import { filterSizes, widthsFromSizes, queriesFromSizes } from './utilities'
 
 interface KeywordArguments extends EleventyImage.BaseImageOptions {

@@ -1,5 +1,4 @@
-import type { Orientation, Dimension, Device } from './types/common'
-import type { SizesQuery, MediaCondition, Image, QueryMap } from './types/queries'
+import type { Orientation, Dimension, Device, SizesQuery, MediaCondition, Image, QueryMap  } from './types'
 
 import mediaParser from 'postcss-media-query-parser'
 import defaultDevices from './data/devices'

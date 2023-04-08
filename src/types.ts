@@ -1,4 +1,32 @@
-import type { Orientation, Dimension } from './common'
+const Orientation = ['landscape', 'portrait'] as const
+type Orientation = typeof Orientation[number]
+
+const isOrientation = (test: any): test is Orientation =>
+  Orientation.includes(test)
+
+const Order = ['min', 'max'] as const
+type Order = typeof Order[number]
+
+const isOrder = (test: any): test is Order => Order.includes(test)
+
+export { Orientation, Order, isOrientation, isOrder }
+
+export interface Dimension {
+  /** width */
+  w: number
+
+  /** height */
+  h: number
+}
+
+/** represents a supported device */
+export interface Device extends Dimension {
+  /** possible dppx for devices with these dimensions */
+  dppx: number[]
+
+  /** whether the device can be rotated and the dimensions flipped */
+  flip: boolean
+}
 
 /** represents a media query condition, such as `(min-width: 600px)` */
 export interface MediaCondition {
@@ -39,6 +67,10 @@ export interface QueryObject extends Dimension {
   images: Image[]
 }
 
+/**
+ * A data structure that pairs media queries with appropriately-sized images
+ * Media queries are based on the configured devices (@see {@link Device}).
+ */
 export type QueryMap = Record<Orientation, QueryObject[]>
 
 /** sent to sass mixin */

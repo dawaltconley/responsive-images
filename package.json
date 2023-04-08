@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "exports": {
     ".": "./dist/index.js",
+    "./types": "./dist/types.js",
     "./eleventy": "./dist/eleventy-plugin.js",
     "./devices": "./dist/data/devices.js"
   },

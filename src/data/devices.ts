@@ -1,4 +1,4 @@
-import type { Device } from '../types/common'
+import type { Device } from '../types'
 
 const devices: Device[] = [
   {
