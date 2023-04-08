@@ -8,10 +8,12 @@ import defaultDevices from './data/devices'
 import { isOrientation } from './types'
 import { filterSizes, widthsFromSizes, queriesFromSizes } from './utilities'
 
-interface KeywordArguments extends EleventyImage.BaseImageOptions {
+interface KeywordArguments
+  extends Pick<EleventyImage.BaseImageOptions, 'widths' | 'formats'> {
   alt: string
   sizes?: string
   __keywords?: true
+  [attribute: string]: unknown
 }
 
 type ImageMetadataByWidth = Record<number, EleventyImage.MetadataEntry>
