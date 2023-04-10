@@ -8,17 +8,41 @@ import defaultDevices from './data/devices'
 import { isOrientation } from './types'
 import { filterSizes, widthsFromSizes, queriesFromSizes } from './utilities'
 
-interface KeywordArguments
-  extends Pick<EleventyImage.BaseImageOptions, 'widths' | 'formats'> {
+/**
+ * Defines properties for image markup. `alt` is required.
+ * Passed to the `EleventyImage.generateHTML` function.
+ */
+export interface HtmlOptions {
   alt: string
-  sizes?: string
-  __keywords?: true
   [attribute: string]: unknown
 }
 
+/**
+ * Options passed to the EleventyImage resize function.
+ */
+export interface ResizeOptions {
+  /** @see {@link https://www.11ty.dev/docs/plugins/image/} */
+  widths?: EleventyImage.BaseImageOptions['widths']
+  /** @see {@link https://www.11ty.dev/docs/plugins/image/} */
+  formats?: EleventyImage.BaseImageOptions['formats']
+}
+
+export interface FromSizesOptions extends ResizeOptions {
+  sizes?: string
+}
+
+export interface MediaQueryOptions extends FromSizesOptions {
+  orientations?: Orientation[]
+}
+
+export interface MixedOptions extends HtmlOptions, FromSizesOptions {}
+
 type ImageMetadataByWidth = Record<number, EleventyImage.MetadataEntry>
 
-type ValidImageFormat = 'auto' | EleventyImage.ImageFormatWithAliases | null
+export type ValidImageFormat =
+  | 'auto'
+  | EleventyImage.ImageFormatWithAliases
+  | null
 
 const validImageFormats: ValidImageFormat[] = [
   'webp',
@@ -142,7 +166,7 @@ export default class ResponsiveImages
 
   async generatePicture(
     image: Image.ImageSource,
-    kwargs: KeywordArguments
+    kwargs: MixedOptions
   ): Promise<string> {
     let {
       widths = this.defaults.widths,
@@ -157,55 +181,67 @@ export default class ResponsiveImages
 
   async generateSources(
     image: Image.ImageSource,
-    kwargs: KeywordArguments
+    kwargs: MixedOptions
   ): Promise<string> {
     let html = await this.generatePicture(image, kwargs)
     return html.replace(/(^<picture>|<\/picture>$)/g, '')
   }
 
-  private _fromSizes(
-    method: 'generatePicture' | 'generateSources',
+  /**
+   * Calculates image widths from a sizes query string.
+   * Uses configured defaults for the `devices` and `scalingFactor`.
+   */
+  widthsFromSizes(sizes: string): number[] {
+    return widthsFromSizes(sizes, {
+      devices: this.devices,
+      minScale: this.scalingFactor,
+    })
+  }
+
+  /**
+   * Normalizes keyword arguments and generates widths from the sizes attribute if present.
+   * @returns a new KeywordArguments object with widths from the sizes attribute
+   */
+  private _handleKwargs(kwargs: MixedOptions): MixedOptions {
+    let { sizes, __keywords, ...generatorOptions } = kwargs
+    if (sizes)
+      generatorOptions = {
+        widths: this.widthsFromSizes(sizes),
+        sizes,
+        ...generatorOptions,
+      }
+    return generatorOptions
+  }
+
+  /** Uses a sizes attribute to parse images and returns a metadata object. Defaults to 100vw. */
+  metadataFromSizes(
     image: Image.ImageSource,
-    kwargs: KeywordArguments
-  ): Promise<string> {
-    let { sizes, ...generatorOptions } = kwargs
-    delete generatorOptions.__keywords
-    return this[method](image, {
-      ...(sizes
-        ? {
-            sizes: sizes,
-            widths: widthsFromSizes(sizes, {
-              devices: this.devices,
-              minScale: this.scalingFactor,
-            }),
-          }
-        : {}),
-      ...generatorOptions,
+    kwargs: FromSizesOptions
+  ): Promise<Image.Metadata> {
+    const { sizes = '100vw', ...resizeOptions } = kwargs
+    return this.resize(image, {
+      widths: this.widthsFromSizes(sizes),
+      ...resizeOptions,
     })
   }
 
   pictureFromSizes(
     image: Image.ImageSource,
-    kwargs: KeywordArguments
+    kwargs: MixedOptions
   ): Promise<string> {
-    return this._fromSizes('generatePicture', image, kwargs)
+    return this.generatePicture(image, this._handleKwargs(kwargs))
   }
 
   sourceFromSizes(
     image: Image.ImageSource,
-    kwargs: KeywordArguments
+    kwargs: MixedOptions
   ): Promise<string> {
-    return this._fromSizes('generateSources', image, kwargs)
+    return this.generateSources(image, this._handleKwargs(kwargs))
   }
 
   async generateMediaQueries(
     src: Image.ImageSource,
-    kwargs?: Partial<{
-      widths: (number | null)[] | null
-      formats: ValidImageFormat[]
-      orientations: Orientation[]
-      sizes: string
-    }>
+    kwargs?: MediaQueryOptions
   ): Promise<SassQuery[]> {
     let {
       widths = null,
@@ -245,7 +281,7 @@ export default class ResponsiveImages
         []
       )
     let filteredWidths = widths
-      .map(w => (w === null ? originalImage.width : w))
+      .map(w => (w === null || w === 'auto' ? originalImage.width : w))
       .filter(w => w <= originalImage.width)
     filteredWidths = filterSizes(filteredWidths, this.scalingFactor)
 
@@ -328,11 +364,11 @@ export default class ResponsiveImages
       },
       [queriesFunction]: async (args: SassValue[]): Promise<SassValue> => {
         let src = args[0].assertString('src').text
-        let widths =
-          args[1].realNull &&
-          args[1].asList
-            .toArray()
-            .map(n => n.realNull && n.assertNumber().value)
+        let widths = args[1].realNull
+          ? undefined
+          : args[1].asList
+              .toArray()
+              .map(n => n.realNull && n.assertNumber().value)
         let formats = args[2].asList
           .toArray()
           .map(s => assertValidImageFormat(s.realNull && s.assertString().text))
