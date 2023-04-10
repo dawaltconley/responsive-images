@@ -80,7 +80,9 @@ export interface ResponsiveImagesOptions {
   disable?: boolean
 }
 
-class ResponsiveImageFunctions implements Required<ResponsiveImagesOptions> {
+export default class ResponsiveImages
+  implements Required<ResponsiveImagesOptions>
+{
   /** @see ResponsiveImagesOptions {@link ResponsiveImagesOptions.defaults} */
   defaults: Partial<EleventyImage.ImageOptions>
   /** @see ResponsiveImagesOptions {@link ResponsiveImagesOptions.devices} */
@@ -352,4 +354,4 @@ class ResponsiveImageFunctions implements Required<ResponsiveImagesOptions> {
   }
 }
 
-export default ResponsiveImageFunctions
+export { ResponsiveImages }

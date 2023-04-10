@@ -1,4 +1,4 @@
-import ResponsiveImages, { ResponsiveImagesOptions } from './index'
+import { ResponsiveImages, ResponsiveImagesOptions } from './index'
 
 type CallbackFunction = (error?: any, result?: any) => void
 
@@ -15,7 +15,7 @@ const filterify =
     }
   }
 
-module.exports = function (
+export = function (
   eleventyConfig: any,
   options: ResponsiveImagesOptions | InstanceType<typeof ResponsiveImages> = {}
 ): void {
