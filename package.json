@@ -18,7 +18,8 @@
     "build": "node build.js",
     "test": "npx jest",
     "document": "npx typedoc src/index.ts src/types.ts src/eleventy-plugin.ts src/data/devices.ts",
-    "prepare": "npm run build"
+    "prepublishOnly": "npm test && npm run build && npm run document",
+    "prepack": "npm test && npm run build"
   },
   "keywords": [
     "images",
