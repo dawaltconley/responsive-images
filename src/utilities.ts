@@ -93,11 +93,11 @@ function deviceImages(
 
 function widthsFromSizes(
   sizesQueryString: string,
-  opt?: Partial<{
-    devices: Device[]
-    // order: Order
-    minScale: number
-  }>
+  opt?: {
+    devices?: Device[]
+    // order?: Order
+    minScale?: number
+  }
 ): number[] {
   let { devices = defaultDevices, minScale } = opt || {}
   let sizes = parseSizes(sizesQueryString)
@@ -114,11 +114,11 @@ function widthsFromSizes(
 
 function queriesFromSizes(
   sizesQueryString: string,
-  opt?: Partial<{
-    devices: Device[]
-    // order: Order
-    // minScale: number
-  }>
+  opt?: {
+    devices?: Device[]
+    // order?: Order
+    // minScale?: number
+  }
 ): QueryMap {
   let { devices = defaultDevices, } = opt || {}
   let sizes = parseSizes(sizesQueryString)
