@@ -216,7 +216,7 @@ export default class ResponsiveImages
   /** Uses a sizes attribute to parse images and returns a metadata object. Defaults to 100vw. */
   metadataFromSizes(
     image: Image.ImageSource,
-    kwargs: FromSizesOptions
+    kwargs: FromSizesOptions = {}
   ): Promise<Image.Metadata> {
     const { sizes = '100vw', ...resizeOptions } = kwargs
     return this.resize(image, {
