@@ -2,6 +2,8 @@
 @use 'sass:map';
 @use 'sass:meta';
 
+$prefix: image !default;
+
 // from @dawaltconley/sass/functions/_lists.scss
 @function join-str($list, $str: '') {
   $return: '';
@@ -28,7 +30,7 @@
 }
 
 @mixin bg($src, $prepend-backgrounds: (), $append-backgrounds: (), $kwargs...) {
-  $queries: image-queries($src, $kwargs...);
+  $queries: meta.call('#{$prefix}-queries', $kwargs...);
   @each $query in $queries {
     $selectors: ();
     $andQueries: ();
