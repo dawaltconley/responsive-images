@@ -1,0 +1,183 @@
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>@dawaltconley/responsive-images</title><meta name="description" content="Documentation for @dawaltconley/responsive-images"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script async src="assets/search.js" id="search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<div class="tsd-toolbar-contents container">
+<div class="table-cell" id="tsd-search" data-base=".">
+<div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
+<div class="field">
+<div id="tsd-toolbar-links"></div></div>
+<ul class="results">
+<li class="state loading">Preparing search index...</li>
+<li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">@dawaltconley/responsive-images</a></div>
+<div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="2" fill="var(--color-text)"></rect><rect x="1" y="7" width="14" height="2" fill="var(--color-text)"></rect><rect x="1" y="11" width="14" height="2" fill="var(--color-text)"></rect></svg></a></div></div></header>
+<div class="container container-main">
+<div class="col-8 col-content">
+<div class="tsd-page-title">
+<h2>@dawaltconley/responsive-images</h2></div>
+<div class="tsd-panel tsd-typography">
+<a href="#responsive-images" id="responsive-images" style="color: inherit; text-decoration: none;">
+  <h1>Responsive Images</h1>
+</a>
+<p>Functions for statically generating <a href="https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images">responsive 
+image</a>
+markup. These currently exist as a convenience wrapper around the 
+<a href="https://www.11ty.dev/docs/plugins/image/">Eleventy Image plugin</a>, 
+though it can be used with any site that has a static build step in its 
+markup generation.</p>
+<p>It determines which image sizes you need to generate by parsing a <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#sizes">sizes
+query
+string</a>
+and comparing it with a range of target devices. This means that, as
+long as you write a good sizes query, you don&#39;t need to specify the
+widths for each image you want to generate.</p>
+
+<a href="#install" id="install" style="color: inherit; text-decoration: none;">
+  <h2>Install</h2>
+</a>
+<pre><code><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-0">install</span><span class="hl-1"> @</span><span class="hl-0">dawaltconley</span><span class="hl-1">/</span><span class="hl-0">responsive</span><span class="hl-1">-</span><span class="hl-0">images</span>
+</code></pre>
+
+<a href="#configure" id="configure" style="color: inherit; text-decoration: none;">
+  <h2>Configure</h2>
+</a>
+<p>Most configuration is handled globally in the default class constructor.
+This can be exported as a singleton for use in multiple files.</p>
+<pre><code class="language-js"><span class="hl-2">import</span><span class="hl-1"> </span><span class="hl-0">ResponsiveImages</span><span class="hl-1"> </span><span class="hl-2">from</span><span class="hl-1"> </span><span class="hl-3">&#39;@dawaltconley/responsive-images&#39;</span><br/><span class="hl-1"> </span><br/><span class="hl-2">export</span><span class="hl-1"> </span><span class="hl-2">default</span><span class="hl-1"> </span><span class="hl-4">new</span><span class="hl-1"> </span><span class="hl-5">ResponsiveImages</span><span class="hl-1">({ </span><br/><span class="hl-1">  </span><span class="hl-0">scalingFactor:</span><span class="hl-1"> </span><span class="hl-6">0.6</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-0">disable:</span><span class="hl-1"> </span><span class="hl-4">false</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-0">defaults:</span><span class="hl-1"> { </span><br/><span class="hl-1">    </span><span class="hl-0">formats:</span><span class="hl-1"> [</span><span class="hl-3">&#39;webp&#39;</span><span class="hl-1">, </span><span class="hl-4">null</span><span class="hl-1">], </span><br/><span class="hl-1">    </span><span class="hl-0">urlPath:</span><span class="hl-1"> </span><span class="hl-3">&#39;/assets/generated/&#39;</span><span class="hl-1">, </span><br/><span class="hl-1">    </span><span class="hl-0">outputDir:</span><span class="hl-1"> </span><span class="hl-3">&#39;./dist/assets/generated/&#39;</span><span class="hl-1">, </span><br/><span class="hl-1">  }, </span><br/><span class="hl-1">}) </span>
+</code></pre>
+
+<a href="#options" id="options" style="color: inherit; text-decoration: none;">
+  <h2>Options</h2>
+</a>
+<p>All config options are optional.</p>
+
+<a href="#defaultsltimageoptionsgt--" id="defaultsltimageoptionsgt--" style="color: inherit; text-decoration: none;">
+  <h3><code>defaults&lt;ImageOptions&gt; = {}</code></h3>
+</a>
+<p>A set of options that gets passed to Eleventy Image whenever it is
+called. You probably want to specify at least a <code>urlPath</code> and 
+<code>outputDir</code> for the generated images. See <a href="https://www.11ty.dev/docs/plugins/image/">the Eleventy Image 
+docs</a> for all available 
+options.</p>
+
+<a href="#scalingfactorltnumbergt--08" id="scalingfactorltnumbergt--08" style="color: inherit; text-decoration: none;">
+  <h3><code>scalingFactor&lt;number&gt; = 0.8</code></h3>
+</a>
+<p>The maximum difference in size between any two images created when
+downsizing. This uses pixels to approximate a file size. At a scaling
+factor of <code>0.5</code>, for example, each image created will have no more than
+half the total pixels of the previous image.</p>
+<p>The number should be a proportional float between 0 and 1. A higher
+scaling factor creates more images with smaller gaps in their sizes. A
+lower scaling factor creates fewer images with larger gaps in their
+sizes. At very low scaling factors, some devices may need to load larger
+images than necessary.</p>
+
+<a href="#devices" id="devices" style="color: inherit; text-decoration: none;">
+  <h3><code>devices</code></h3>
+</a>
+<p>A set of devices to support when calculating image sizes from a sizes
+query string. Defaults to an internal device list that can be imported
+from <code>@dawaltconley/responsive-images/devices</code>.</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-7">ipadsOnly</span><span class="hl-1"> = </span><span class="hl-4">new</span><span class="hl-1"> </span><span class="hl-5">ResponsiveImages</span><span class="hl-1">({ </span><br/><span class="hl-1">  </span><span class="hl-0">devices:</span><span class="hl-1"> [</span><br/><span class="hl-1">    {</span><br/><span class="hl-1">      </span><span class="hl-0">w:</span><span class="hl-1"> </span><span class="hl-6">1366</span><span class="hl-1">,</span><br/><span class="hl-1">      </span><span class="hl-0">h:</span><span class="hl-1"> </span><span class="hl-6">1024</span><span class="hl-1">,</span><br/><span class="hl-1">      </span><span class="hl-0">dppx:</span><span class="hl-1"> [</span><span class="hl-6">2</span><span class="hl-1">, </span><span class="hl-6">1</span><span class="hl-1">],</span><br/><span class="hl-1">      </span><span class="hl-0">flip:</span><span class="hl-1"> </span><span class="hl-4">true</span><span class="hl-1">,</span><br/><span class="hl-1">    },</span><br/><span class="hl-1">    {</span><br/><span class="hl-1">      </span><span class="hl-0">w:</span><span class="hl-1"> </span><span class="hl-6">1024</span><span class="hl-1">,</span><br/><span class="hl-1">      </span><span class="hl-0">h:</span><span class="hl-1"> </span><span class="hl-6">768</span><span class="hl-1">,</span><br/><span class="hl-1">      </span><span class="hl-0">dppx:</span><span class="hl-1"> [</span><span class="hl-6">2</span><span class="hl-1">, </span><span class="hl-6">1</span><span class="hl-1">],</span><br/><span class="hl-1">      </span><span class="hl-0">flip:</span><span class="hl-1"> </span><span class="hl-4">true</span><span class="hl-1">,</span><br/><span class="hl-1">    },</span><br/><span class="hl-1">  ]</span><br/><span class="hl-1">}) </span>
+</code></pre>
+
+<a href="#sassprefixltstringgt--39image39" id="sassprefixltstringgt--39image39" style="color: inherit; text-decoration: none;">
+  <h3><code>sassPrefix&lt;string&gt; = &#39;image&#39;</code></h3>
+</a>
+<p>A string used to prefix the Sass <code>background-image</code> functions, which can
+be edited to avoid global namespace collisions. Defaults to <code>image</code>,
+which creates functions named <code>image-resize</code> and <code>image-queries</code>.</p>
+<pre><code class="language-js"><span class="hl-2">import</span><span class="hl-1"> </span><span class="hl-0">ResponsiveImages</span><span class="hl-1"> </span><span class="hl-2">from</span><span class="hl-1"> </span><span class="hl-3">&#39;@dawaltconley/responsive-images&#39;</span><span class="hl-1">;</span><br/><span class="hl-2">import</span><span class="hl-1"> </span><span class="hl-0">sass</span><span class="hl-1"> </span><span class="hl-2">from</span><span class="hl-1"> </span><span class="hl-3">&#39;sass&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-4">const</span><span class="hl-1"> { </span><span class="hl-7">sassFunctions</span><span class="hl-1"> } = </span><span class="hl-4">new</span><span class="hl-1"> </span><span class="hl-5">ResponsiveImages</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-0">sassPrefix:</span><span class="hl-1"> </span><span class="hl-3">&#39;custom-prefix&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-8">// only the compileAsync and compileStringAsync methods are supported</span><br/><span class="hl-0">sass</span><span class="hl-1">.</span><span class="hl-5">compileAsync</span><span class="hl-1">(</span><span class="hl-3">&#39;./styles/images.scss&#39;</span><span class="hl-1">, {</span><br/><span class="hl-1">  </span><span class="hl-0">loadPaths:</span><span class="hl-1"> [</span><span class="hl-3">&#39;./node_modules&#39;</span><span class="hl-1">],</span><br/><span class="hl-1">  </span><span class="hl-0">functions:</span><span class="hl-1"> </span><span class="hl-0">sassFunctions</span><span class="hl-1">,</span><br/><span class="hl-1">});</span>
+</code></pre>
+<p>If changed, the same prefix should be passed to the mixins when
+importing.</p>
+<pre><code class="language-scss"><span class="hl-2">@use</span><span class="hl-1"> </span><span class="hl-3">&#39;@dawaltconley/responsive-images&#39;</span><span class="hl-1"> </span><span class="hl-2">with</span><span class="hl-1"> (</span><span class="hl-9">$prefix</span><span class="hl-1">: </span><span class="hl-3">&#39;custom-prefix&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-10">.example</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-2">@include</span><span class="hl-1"> </span><span class="hl-9">responsive-images</span><span class="hl-1">.</span><span class="hl-5">bg</span><span class="hl-1">(</span><span class="hl-3">&#39;./assets/some-background.png&#39;</span><span class="hl-1">);</span><br/><span class="hl-1">}</span>
+</code></pre>
+
+<a href="#disableltbooleangt--false" id="disableltbooleangt--false" style="color: inherit; text-decoration: none;">
+  <h3><code>disable&lt;boolean&gt; = false</code></h3>
+</a>
+<p>If true, disables new image generation so that all methods output image 
+elements at their original size. Useful for avoiding repeated rebuilds 
+on development environments.</p>
+
+<a href="#plugins" id="plugins" style="color: inherit; text-decoration: none;">
+  <h2>Plugins</h2>
+</a>
+<p>This package includes a few plugins for compatible static site 
+generators.</p>
+
+<a href="#eleventy" id="eleventy" style="color: inherit; text-decoration: none;">
+  <h3>Eleventy</h3>
+</a>
+<p>The <a href="https://www.11ty.dev/docs/">Eleventy</a> plugin provides shortcodes
+for the Nunjucks and Liquid templating languages. It relies on their
+async methods to generate new images together with the responsive image
+markup.</p>
+<pre><code class="language-js"><span class="hl-8">// .eleventy.js</span><br/><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-7">responsiveImagesPlugin</span><span class="hl-1"> = </span><span class="hl-5">require</span><span class="hl-1">(</span><span class="hl-3">&#39;@dawaltconley/responsive-images/eleventy&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-11">module</span><span class="hl-1">.</span><span class="hl-11">exports</span><span class="hl-1"> = </span><span class="hl-0">eleventyConfig</span><span class="hl-1"> </span><span class="hl-4">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-0">eleventyConfig</span><span class="hl-1">.</span><span class="hl-5">addPlugin</span><span class="hl-1">(</span><span class="hl-0">responsiveImagesPlugin</span><span class="hl-1">, {</span><br/><span class="hl-1">    </span><span class="hl-0">scalingFactor:</span><span class="hl-1"> </span><span class="hl-6">0.5</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-0">defaults:</span><span class="hl-1"> {</span><br/><span class="hl-1">      </span><span class="hl-0">urlPath:</span><span class="hl-1"> </span><span class="hl-3">&#39;/assets/generated/&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">      </span><span class="hl-0">outputDir:</span><span class="hl-1"> </span><span class="hl-3">&#39;./_site/assets/generated/&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    },</span><br/><span class="hl-1">  });</span><br/><span class="hl-1">};</span>
+</code></pre>
+<p>You can also pass a configured <code>ResponsiveImages</code> class instance to the
+plugin, if you are using its methods elsewhere.</p>
+<p>Then, call the functions within your templates:</p>
+<pre><code class="language-njk">&lt;div&gt;
+  {% picture &quot;assets/example.jpg&quot;
+    alt=&quot;A responsive picture element&quot;
+    sizes=&quot;(min-width: 800px) 400px, 100vw&quot; %}
+
+  &lt;picture class=&quot;picture-class&quot;&gt;
+    {% img &quot;assets/example.jpg&quot;
+      alt=&quot;Use the img shortcode to include image sources without a picture element&quot;
+      class=&quot;passed-to-image-element&quot;
+      sizes=&quot;(min-width: 1000px) 50vw, 100vw&quot; %}
+  &lt;/picture&gt;
+
+  {% set metadata = &quot;assets/example.jpg&quot; | resize({ alt: &#39;Passed directly to EleventyImage&#39;, widths=[null] }) %}
+&lt;/div&gt;
+</code></pre>
+
+<a href="#sass" id="sass" style="color: inherit; text-decoration: none;">
+  <h3>Sass</h3>
+</a>
+<p>This package includes Sass mixins and custom functions for generating
+responsive images using media queries and the CSS <code>background-image</code>
+property.</p>
+<pre><code class="language-scss"><span class="hl-2">@use</span><span class="hl-1"> </span><span class="hl-3">&#39;./node_modules/@dawaltconley/responsive-images&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-10">.example</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-9">background-position</span><span class="hl-1">: </span><span class="hl-12">center</span><span class="hl-1">;</span><br/><span class="hl-1">  </span><span class="hl-9">background-size</span><span class="hl-1">: </span><span class="hl-12">cover</span><span class="hl-1">;</span><br/><span class="hl-1">  </span><span class="hl-9">background-repeat</span><span class="hl-1">: </span><span class="hl-12">no-repeat</span><span class="hl-1">;</span><br/><br/><span class="hl-1">  </span><span class="hl-2">@include</span><span class="hl-1"> </span><span class="hl-9">responsive-images</span><span class="hl-1">.</span><span class="hl-5">bg</span><span class="hl-1">(</span><br/><span class="hl-1">    </span><span class="hl-9">$src</span><span class="hl-1">: </span><span class="hl-3">&#39;./assets/bg.jpg&#39;</span><span class="hl-1">, </span><span class="hl-8">// can be passed as the first positional argument</span><br/><span class="hl-1">    </span><span class="hl-9">$sizes</span><span class="hl-1">: </span><span class="hl-3">&#39;(min-width: 1000px) 50vw, 100vw&#39;</span><span class="hl-1">, </span><span class="hl-8">// optional; defaults to 100vw</span><br/><span class="hl-1">    </span><span class="hl-9">$widths</span><span class="hl-1">: </span><span class="hl-6">1000</span><span class="hl-1"> </span><span class="hl-6">800</span><span class="hl-1"> </span><span class="hl-6">600</span><span class="hl-1">, </span><span class="hl-8">// optional list of manual widths. doesn&#39;t change media queries.</span><br/><span class="hl-1">    </span><span class="hl-9">$formats</span><span class="hl-1">: webp, </span><span class="hl-8">// optional; defaults to null (the original image format is preserved).</span><br/><span class="hl-1">    </span><span class="hl-9">$orientations</span><span class="hl-1">: </span><span class="hl-12">portrait</span><span class="hl-1"> </span><span class="hl-12">landscape</span><span class="hl-1">, </span><span class="hl-8">// optionally target a single viewport orientation</span><br/><span class="hl-1">  );</span><br/><span class="hl-1">}</span>
+</code></pre>
+<p>These mixins rely on custom functions, which should be passed to Sass
+via the <code>ResponsiveImages.sassFunctions</code> property.</p>
+<p>In addition to the above keyword arguments, you can pass additional
+<code>background-image</code> backgrounds (such as linear-gradient functions) using
+the <code>$prepend-backgrounds</code> and <code>$append-backgrounds</code> arguments.</p>
+<p>This currently generates a fair amount of media queries. If you are
+creating lots of responsive background images, you may want to use a
+post-processor like
+<a href="https://www.npmjs.com/package/postcss-sort-media-queries">postcss-sort-media-queries</a>.</p>
+<p>Multiple image formats are not currently supported; only the first
+format passed to the mixin will be used.</p>
+</div></div>
+<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+<div class="tsd-navigation settings">
+<details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
+<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)"></path></svg> Settings</h3></summary>
+<div class="tsd-accordion-details">
+<div class="tsd-filter-visibility">
+<h4 class="uppercase">Member Visibility</h4><form>
+<ul id="tsd-filter-options">
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-private" name="private"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Private</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></form></div>
+<div class="tsd-theme-toggle">
+<h4 class="uppercase">Theme</h4><select id="theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
+<nav class="tsd-navigation primary">
+<details class="tsd-index-accordion" open><summary class="tsd-accordion-summary">
+<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)"></path></svg> Modules</h3></summary>
+<div class="tsd-accordion-details">
+<ul>
+<li class="current selected"><a href="modules.html">@dawaltconley/responsive-<wbr/>images</a>
+<ul>
+<li class="tsd-kind-module"><a href="modules/data_devices.html">data/devices</a></li>
+<li class="tsd-kind-module"><a href="modules/eleventy_plugin.html">eleventy-<wbr/>plugin</a></li>
+<li class="tsd-kind-module"><a href="modules/index.html">index</a></li>
+<li class="tsd-kind-module"><a href="modules/types.html">types</a></li></ul></li></ul></div></details></nav></div></div>
+<div class="container tsd-generator">
+<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div>
+<div class="overlay"></div><script src="assets/main.js"></script></body></html>
