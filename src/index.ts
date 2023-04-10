@@ -46,18 +46,50 @@ const assertValidImageFormat = (test: any): ValidImageFormat => {
 }
 
 export interface ResponsiveImagesOptions {
+  /**
+   * Default options passed to EleventyImage whenever it is called.
+   * @see {@link https://www.11ty.dev/docs/plugins/image/} for available options
+   */
   defaults?: Partial<EleventyImage.ImageOptions>
+
+  /**
+   * Devices to support when calculating image sizes. Defaults to an
+   * internal device list that can be imported from `@dawaltconley/responsive-images/devices`
+   */
   devices?: Device[]
-  sassPrefix?: string
+
+  /**
+   * The maximum difference in size between any two images created when downsizing.
+   * A higher scaling factor creates more images with smaller gaps in their sizes.
+   * A lower scaling factor creates fewer images with larger gaps in their sizes. Some devices may need to load larger images than necessary.
+   * @defaultValue `0.8`
+   */
   scalingFactor?: number
+
+  /**
+   * Prefix for the generated Sass functions.
+   * @defaultValue `'image'`
+   */
+  sassPrefix?: string
+
+  /**
+   * If true, disables new image generation so that all methods output image elements at their original size.
+   * Useful for avoiding repeated rebuilds on development environments.
+   * @defaultValue `false`
+   */
   disable?: boolean
 }
 
 class ResponsiveImageFunctions implements Required<ResponsiveImagesOptions> {
+  /** @see ResponsiveImagesOptions {@link ResponsiveImagesOptions.defaults} */
   defaults: Partial<EleventyImage.ImageOptions>
+  /** @see ResponsiveImagesOptions {@link ResponsiveImagesOptions.devices} */
   devices: Device[]
+  /** @see ResponsiveImagesOptions {@link ResponsiveImagesOptions.sassPrefix} */
   sassPrefix: string
+  /** @see ResponsiveImagesOptions {@link ResponsiveImagesOptions.scalingFactor} */
   scalingFactor: number
+  /** @see ResponsiveImagesOptions {@link ResponsiveImagesOptions.disable} */
   disable: boolean
 
   constructor(options?: ResponsiveImagesOptions) {
@@ -83,9 +115,11 @@ class ResponsiveImageFunctions implements Required<ResponsiveImagesOptions> {
   }
 
   /**
-   * @param {string} image - file or url of the source image
-   * @param {Object} [options] - options used by eleventy-img
-   * @returns {Promise<Object>} - a promise resolving to a metadata object for the generated images
+   * Generates multiple new sizes for an image. This is a wrapper method around
+   * `@11ty/eleventy-img`, which just handles default options and allows disabling.
+   * @param image - file or url of the source image
+   * @param options - options passed to `@11ty/eleventy-img`
+   * @returns a promise resolving to a metadata object for the generated images
    */
   resize(
     image: EleventyImage.ImageSource,
