@@ -168,6 +168,9 @@ Then, call the functions within your templates:
     alt="A responsive picture element"
     sizes="(min-width: 800px) 400px, 100vw" %}
 
+  {% set picHtml = "assets/example.jpg" | picture({ alt: 'used as a filter', sizes: '100vw' }) #}
+  {{ picHtml | safe }}
+
   <picture class="picture-class">
     {% img "assets/example.jpg"
       alt="Use the img shortcode to include image sources without a picture element"
@@ -175,7 +178,8 @@ Then, call the functions within your templates:
       sizes="(min-width: 1000px) 50vw, 100vw" %}
   </picture>
 
-  {% set metadata = "assets/example.jpg" | resize({ alt: 'Passed directly to EleventyImage', widths=[null] }) %}
+  {# The resize filter just calls EleventyImage and returns a metadata object #}
+  {% set metadata = "assets/example.jpg" | resize({ widths: [1200, null] }) %}
 </div>
 ```
 

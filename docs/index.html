@@ -124,6 +124,9 @@ plugin, if you are using its methods elsewhere.</p>
     alt=&quot;A responsive picture element&quot;
     sizes=&quot;(min-width: 800px) 400px, 100vw&quot; %}
 
+  {% set picHtml = &quot;assets/example.jpg&quot; | picture({ alt: &#39;used as a filter&#39;, sizes: &#39;100vw&#39; }) #}
+  {{ picHtml | safe }}
+
   &lt;picture class=&quot;picture-class&quot;&gt;
     {% img &quot;assets/example.jpg&quot;
       alt=&quot;Use the img shortcode to include image sources without a picture element&quot;
@@ -131,7 +134,8 @@ plugin, if you are using its methods elsewhere.</p>
       sizes=&quot;(min-width: 1000px) 50vw, 100vw&quot; %}
   &lt;/picture&gt;
 
-  {% set metadata = &quot;assets/example.jpg&quot; | resize({ alt: &#39;Passed directly to EleventyImage&#39;, widths=[null] }) %}
+  {# The resize filter just calls EleventyImage and returns a metadata object #}
+  {% set metadata = &quot;assets/example.jpg&quot; | resize({ widths: [1200, null] }) %}
 &lt;/div&gt;
 </code></pre>
 
