@@ -30,7 +30,7 @@ $prefix: image !default;
 }
 
 @mixin bg($src, $prepend-backgrounds: (), $append-backgrounds: (), $kwargs...) {
-  $queries: meta.call('#{$prefix}-queries', $kwargs...);
+  $queries: meta.call('#{$prefix}-queries', $src, $kwargs...);
   @each $query in $queries {
     $selectors: ();
     $andQueries: ();
