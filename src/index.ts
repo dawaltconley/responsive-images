@@ -344,6 +344,10 @@ export default class ResponsiveImages
     return mediaQueries
   }
 
+  /**
+   * An object that can be passed to Sass's `compileAsync` or `compileStringAsync` methods.
+   * @see {@link https://sass-lang.com/documentation/js-api/modules#compileAsync}
+   */
   get sassFunctions(): Record<string, CustomFunction<'async'>> {
     const resizeFunction = `${this.sassPrefix}-resize($src, $widths: null, $formats: null)`
     const queriesFunction = `${this.sassPrefix}-queries($src, $widths: null, $formats: null, $orientation: landscape portrait, $sizes: '100vw')`
