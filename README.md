@@ -14,6 +14,9 @@ and comparing it with a range of target devices. This means that, as
 long as you write a good sizes query, you don't need to specify the
 widths for each image you want to generate.
 
+For all methods and options please reference the [full 
+documentation](https://dawaltconley.github.io/responsive-images/).
+
 ## Install
 
 ```
