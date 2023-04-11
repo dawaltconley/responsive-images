@@ -44,7 +44,7 @@ export = function (
   const { resize, sourceFromSizes, pictureFromSizes } = configured
 
   // Nunjucks
-  eleventyConfig.addNunjucksAsyncFilter('resize', resize)
+  eleventyConfig.addNunjucksAsyncFilter('resize', filterify(resize))
   eleventyConfig.addNunjucksAsyncFilter('img', filterify(sourceFromSizes))
   eleventyConfig.addNunjucksAsyncShortcode('img', sourceFromSizes)
   eleventyConfig.addNunjucksAsyncFilter('picture', filterify(pictureFromSizes))
