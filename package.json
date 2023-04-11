@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "compile": "npx tsc",
-    "build": "node build.js",
+    "build": "node build.mjs",
     "test": "npx jest",
     "document": "npx typedoc src/index.ts src/types.ts src/eleventy-plugin.ts src/data/devices.ts",
     "prepublishOnly": "npm test && npm run build && npm run document",
