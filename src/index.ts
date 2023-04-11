@@ -369,10 +369,10 @@ export default class ResponsiveImages
       [queriesFunction]: async (args: SassValue[]): Promise<SassValue> => {
         let src = args[0].assertString('src').text
         let widths = args[1].realNull
-          ? undefined
-          : args[1].asList
+          ? args[1].asList
               .toArray()
               .map(n => n.realNull && n.assertNumber().value)
+          : undefined
         let formats = args[2].asList
           .toArray()
           .map(s => assertValidImageFormat(s.realNull && s.assertString().text))
