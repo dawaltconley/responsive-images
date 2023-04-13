@@ -147,7 +147,7 @@ export default class ResponsiveImages
    * @param options - options passed to `@11ty/eleventy-img`
    * @returns a promise resolving to a metadata object for the generated images
    */
-  resize(
+  async resize(
     image: EleventyImage.ImageSource,
     options: Partial<EleventyImage.ImageOptions> = {}
   ): Promise<EleventyImage.Metadata> {
@@ -214,7 +214,7 @@ export default class ResponsiveImages
   }
 
   /** Uses a sizes attribute to parse images and returns a metadata object. Defaults to 100vw. */
-  metadataFromSizes(
+  async metadataFromSizes(
     image: Image.ImageSource,
     kwargs: FromSizesOptions = {}
   ): Promise<Image.Metadata> {
@@ -225,14 +225,14 @@ export default class ResponsiveImages
     })
   }
 
-  pictureFromSizes(
+  async pictureFromSizes(
     image: Image.ImageSource,
     kwargs: MixedOptions
   ): Promise<string> {
     return this.generatePicture(image, this._handleKwargs(kwargs))
   }
 
-  sourceFromSizes(
+  async sourceFromSizes(
     image: Image.ImageSource,
     kwargs: MixedOptions
   ): Promise<string> {
