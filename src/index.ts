@@ -1,8 +1,7 @@
-import type EleventyImage from '11ty__eleventy-img'
 import type { Value as SassValue, CustomFunction } from 'sass/types'
 import type { Orientation, Device, SassQuery } from './types'
 
-import Image from '@11ty/eleventy-img'
+import EleventyImage from '@11ty/eleventy-img'
 import cast from 'sass-cast'
 import defaultDevices from './data/devices'
 import { isOrientation } from './types'
@@ -37,7 +36,7 @@ export interface MediaQueryOptions extends FromSizesOptions {
 
 export interface MixedOptions extends HtmlOptions, FromSizesOptions {}
 
-export interface ImageMetadata extends Image.Metadata {
+export interface ImageMetadata extends EleventyImage.Metadata {
   sizes: string
 }
 
@@ -166,11 +165,11 @@ export default class ResponsiveImages
         widths: [null],
         formats: [null],
       }
-    return Image(image, imgOpts)
+    return EleventyImage(image, imgOpts)
   }
 
   async generatePicture(
-    image: Image.ImageSource,
+    image: EleventyImage.ImageSource,
     kwargs: MixedOptions
   ): Promise<string> {
     let {
@@ -181,11 +180,11 @@ export default class ResponsiveImages
     delete properties.__keywords
 
     let metadata = await this.resize(image, { widths, formats })
-    return Image.generateHTML(metadata, properties)
+    return EleventyImage.generateHTML(metadata, properties)
   }
 
   async generateSources(
-    image: Image.ImageSource,
+    image: EleventyImage.ImageSource,
     kwargs: MixedOptions
   ): Promise<string> {
     let html = await this.generatePicture(image, kwargs)
@@ -220,7 +219,7 @@ export default class ResponsiveImages
 
   /** Uses a sizes attribute to parse images and returns a metadata object. Defaults to 100vw. */
   async metadataFromSizes(
-    image: Image.ImageSource,
+    image: EleventyImage.ImageSource,
     kwargs: FromSizesOptions = {}
   ): Promise<ImageMetadata> {
     const { sizes = '100vw', ...resizeOptions } = kwargs
@@ -235,21 +234,21 @@ export default class ResponsiveImages
   }
 
   async pictureFromSizes(
-    image: Image.ImageSource,
+    image: EleventyImage.ImageSource,
     kwargs: MixedOptions
   ): Promise<string> {
     return this.generatePicture(image, this._handleKwargs(kwargs))
   }
 
   async sourceFromSizes(
-    image: Image.ImageSource,
+    image: EleventyImage.ImageSource,
     kwargs: MixedOptions
   ): Promise<string> {
     return this.generateSources(image, this._handleKwargs(kwargs))
   }
 
   async generateMediaQueries(
-    src: Image.ImageSource,
+    src: EleventyImage.ImageSource,
     kwargs?: MediaQueryOptions
   ): Promise<SassQuery[]> {
     let {
@@ -267,7 +266,7 @@ export default class ResponsiveImages
         )})`
       )
 
-    let originalImage = await Image(src, {
+    let originalImage = await EleventyImage(src, {
       statsOnly: true,
       widths: [null],
       formats: [null],
