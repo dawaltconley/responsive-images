@@ -35,11 +35,12 @@ const liquidKwargsTag = (cb: (...args: any[]) => string | Promise<string>) =>
 
 export = function (
   eleventyConfig: any,
-  options: ResponsiveImagesOptions | InstanceType<typeof ResponsiveImages> = {}
+  options: ResponsiveImagesOptions | ResponsiveImages = {}
 ): void {
-  let configured: InstanceType<typeof ResponsiveImages>
-  if (options instanceof ResponsiveImages) configured = options
-  else configured = new ResponsiveImages(options)
+  const configured: ResponsiveImages =
+    options instanceof ResponsiveImages
+      ? options
+      : new ResponsiveImages(options)
 
   const { resize, sourceFromSizes, pictureFromSizes } = configured
 
