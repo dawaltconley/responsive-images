@@ -1,5 +1,7 @@
 set tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
 
+let g:ctrlp_user_command = ['.git/', "cd %s && rg --files-with-matches --hidden --glob='!{docs,.git}/**' '.*'"]
+
 let g:ale_fix_on_save = 1
 let g:ale_fixers['typescript'] = ['prettier', 'eslint']
 let g:ale_fixers['yaml'] = ['prettier']
