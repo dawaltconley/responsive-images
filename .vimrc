@@ -6,6 +6,8 @@ let g:ale_fix_on_save = 1
 let g:ale_fixers['typescript'] = ['prettier', 'eslint']
 let g:ale_fixers['yaml'] = ['prettier']
 
+autocmd BufRead *tests/sass.test.ts call TemplateLiteralSyntax(['css', 'scss'])
+
 source ~/.vim/coc.vim
 
 call coc#config('tsserver.enable', v:true)
