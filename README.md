@@ -65,7 +65,9 @@ The number should be a proportional float between 0 and 1. A higher
 scaling factor creates more images with smaller gaps in their sizes. A
 lower scaling factor creates fewer images with larger gaps in their
 sizes. At very low scaling factors, some devices may need to load larger
-images than necessary.
+images than necessary. Meanwhile, at a scaling factor of `1`, a new image will 
+be created and optimized for each device supported, no matter how close it is 
+to other images.
 
 ### `devices`
 
@@ -182,6 +184,13 @@ Then, call the functions within your templates:
   {% set metadata = "assets/example.jpg" | resize({ widths: [1200, null] }) %}
 </div>
 ```
+
+### Astro.js
+
+There is not currently a plugin for Astro.js projects, but integration is 
+fairly straightforward. Refer to [this 
+guide](https://github.com/dawaltconley/responsive-images/blob/main/solutions/astro.md) 
+for more information.
 
 ### Sass
 
