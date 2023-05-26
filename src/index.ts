@@ -177,7 +177,6 @@ export default class ResponsiveImages
       formats = this.defaults.formats,
       ...properties
     } = kwargs
-    delete properties.__keywords
 
     let metadata = await this.resize(image, { widths, formats })
     return EleventyImage.generateHTML(metadata, properties)

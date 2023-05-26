@@ -6,6 +6,15 @@ import liquidArgs from 'liquid-args'
 
 type CallbackFunction = (error?: any, result?: any) => void
 
+const handleKwargs =
+  <F extends (...args: any[]) => any>(func: F) =>
+  (...args: Parameters<F>): ReturnType<F> => {
+    args.forEach(arg => {
+      if (arg.__keywords === true) delete arg.__keywords
+    })
+    return func(...args)
+  }
+
 const filterify =
   (func: Function) =>
   async (...filterArgs: any[]) => {
@@ -28,7 +37,7 @@ const liquidKwargsTag = (cb: (...args: any[]) => string | Promise<string>) =>
       render: async function (scope) {
         const evalValue = (arg: string) => engine.evalValue(arg, scope)
         const args = await Promise.all(liquidArgs(this.args, evalValue))
-        return cb(...args)
+        return handleKwargs(cb)(...args)
       },
     }
   }
@@ -47,9 +56,12 @@ export = function (
   // Nunjucks
   eleventyConfig.addNunjucksAsyncFilter('resize', filterify(resize))
   eleventyConfig.addNunjucksAsyncFilter('img', filterify(sourceFromSizes))
-  eleventyConfig.addNunjucksAsyncShortcode('img', sourceFromSizes)
+  eleventyConfig.addNunjucksAsyncShortcode('img', handleKwargs(sourceFromSizes))
   eleventyConfig.addNunjucksAsyncFilter('picture', filterify(pictureFromSizes))
-  eleventyConfig.addNunjucksAsyncShortcode('picture', pictureFromSizes)
+  eleventyConfig.addNunjucksAsyncShortcode(
+    'picture',
+    handleKwargs(pictureFromSizes)
+  )
 
   // Liquid
   eleventyConfig.addLiquidFilter('resize', resize)
