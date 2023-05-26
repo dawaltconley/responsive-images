@@ -206,15 +206,13 @@ export default class ResponsiveImages
    * Normalizes keyword arguments and generates widths from the sizes attribute if present.
    * @returns a new KeywordArguments object with widths from the sizes attribute
    */
-  private _handleKwargs(kwargs: MixedOptions): MixedOptions {
-    let { sizes, __keywords, ...generatorOptions } = kwargs
-    if (sizes)
-      generatorOptions = {
-        widths: this.widthsFromSizes(sizes),
-        sizes,
-        ...generatorOptions,
-      }
-    return generatorOptions
+  private _handleKwargs<T extends FromSizesOptions>(kwargs: T): T {
+    const processed = { ...kwargs }
+    const { sizes, widths } = processed
+    if (sizes && !widths) {
+      processed.widths = this.widthsFromSizes(sizes)
+    }
+    return processed
   }
 
   /** Uses a sizes attribute to parse images and returns a metadata object. Defaults to 100vw. */
@@ -222,11 +220,8 @@ export default class ResponsiveImages
     image: EleventyImage.ImageSource,
     kwargs: FromSizesOptions = {}
   ): Promise<ImageMetadata> {
-    const { sizes = '100vw', ...resizeOptions } = kwargs
-    const metadata = await this.resize(image, {
-      widths: this.widthsFromSizes(sizes),
-      ...resizeOptions,
-    })
+    const { sizes = '100vw', ...resizeOptions } = this._handleKwargs(kwargs)
+    const metadata = await this.resize(image, resizeOptions)
     return {
       ...metadata,
       sizes,
