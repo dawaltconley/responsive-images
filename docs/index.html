@@ -70,7 +70,9 @@ half the total pixels of the previous image.</p>
 scaling factor creates more images with smaller gaps in their sizes. A
 lower scaling factor creates fewer images with larger gaps in their
 sizes. At very low scaling factors, some devices may need to load larger
-images than necessary.</p>
+images than necessary. Meanwhile, at a scaling factor of <code>1</code>, a new image will 
+be created and optimized for each device supported, no matter how close it is 
+to other images.</p>
 
 <a href="#devices" id="devices" style="color: inherit; text-decoration: none;">
   <h3><code>devices</code></h3>
@@ -138,6 +140,14 @@ plugin, if you are using its methods elsewhere.</p>
   {% set metadata = &quot;assets/example.jpg&quot; | resize({ widths: [1200, null] }) %}
 &lt;/div&gt;
 </code></pre>
+
+<a href="#astrojs" id="astrojs" style="color: inherit; text-decoration: none;">
+  <h3>Astro.js</h3>
+</a>
+<p>There is not currently a plugin for Astro.js projects, but integration is 
+fairly straightforward. Refer to <a href="https://github.com/dawaltconley/responsive-images/blob/main/solutions/astro.md">this 
+guide</a> 
+for more information.</p>
 
 <a href="#sass" id="sass" style="color: inherit; text-decoration: none;">
   <h3>Sass</h3>
