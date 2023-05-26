@@ -36,10 +36,6 @@ export interface MediaQueryOptions extends FromSizesOptions {
 
 export interface MixedOptions extends HtmlOptions, FromSizesOptions {}
 
-export interface ImageMetadata extends EleventyImage.Metadata {
-  sizes: string
-}
-
 type ImageMetadataByWidth = Record<number, EleventyImage.MetadataEntry>
 
 export type ValidImageFormat =
@@ -218,13 +214,9 @@ export default class ResponsiveImages
   async metadataFromSizes(
     image: EleventyImage.ImageSource,
     kwargs: FromSizesOptions = {}
-  ): Promise<ImageMetadata> {
+  ): Promise<EleventyImage.Metadata> {
     const { sizes = '100vw', ...resizeOptions } = this._handleKwargs(kwargs)
-    const metadata = await this.resize(image, resizeOptions)
-    return {
-      ...metadata,
-      sizes,
-    }
+    return this.resize(image, resizeOptions)
   }
 
   async pictureFromSizes(
