@@ -3,16 +3,13 @@ env:
   commonjs: true
   es2018: true
   node: true
-parser:
-  - '@typescript-eslint/parser'
+parser: '@typescript-eslint/parser'
 plugins:
   - '@typescript-eslint'
 extends:
   - 'eslint:recommended'
   - 'plugin:@typescript-eslint/recommended'
   - 'prettier'
-parserOptions:
-  # sourceType: module
 rules:
   no-unused-vars: warn
   no-console: warn
