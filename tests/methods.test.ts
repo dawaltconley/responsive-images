@@ -1,4 +1,3 @@
-import merge from 'lodash/merge'
 import ResponsiveImages, {
   FromSizesOptions,
   MixedOptions,
@@ -13,7 +12,7 @@ const defaultConfig: ResponsiveImagesOptions = {
 }
 
 describe('_handleKwargs()', () => {
-  const images = new ResponsiveImages(merge(defaultConfig, {}))
+  const images = new ResponsiveImages(defaultConfig)
   const handleKwargs = images['_handleKwargs'].bind(
     images
   ) as (typeof images)['_handleKwargs']
