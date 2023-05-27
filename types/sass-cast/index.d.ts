@@ -1,8 +1,8 @@
 declare module 'sass-cast' {
-  import type { Value, CustomFunction } from 'sass/types';
+  import type { Value, CustomFunction } from 'sass/types'
 
   export function toSass(
-    value: any,
+    value: unknown,
     options?: {
       parseUnquotedStrings?: boolean
       resolveFunctions?: boolean
@@ -15,7 +15,7 @@ declare module 'sass-cast' {
       preserveUnits?: boolean
       rgbColors?: boolean
     }
-  ): any
+  ): unknown
 
   export const sassFunctions: Record<string, CustomFunction<'async'>>
 }

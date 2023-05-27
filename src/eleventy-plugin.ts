@@ -1,13 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { TagImplOptions } from 'liquidjs/dist/src/template'
 import type { Liquid } from 'liquidjs'
 
 import { ResponsiveImages, ResponsiveImagesOptions } from './index'
 import liquidArgs from 'liquid-args'
 
+type AnyFunction = (...args: any[]) => any
 type CallbackFunction = (error?: any, result?: any) => void
 
 const handleKwargs =
-  <F extends (...args: any[]) => any>(func: F) =>
+  <F extends AnyFunction>(func: F) =>
   (...args: Parameters<F>): ReturnType<F> => {
     args.forEach(arg => {
       if (arg.__keywords === true) delete arg.__keywords
@@ -16,12 +19,12 @@ const handleKwargs =
   }
 
 const filterify =
-  (func: Function) =>
+  (func: AnyFunction) =>
   async (...filterArgs: any[]) => {
-    let args = [...filterArgs]
-    let cb: CallbackFunction = args.pop()
+    const args = [...filterArgs]
+    const cb: CallbackFunction = args.pop()
     try {
-      let result = await func(...args)
+      const result = await func(...args)
       cb(undefined, result)
     } catch (error) {
       cb(error)

@@ -1,13 +1,13 @@
 const Orientation = ['landscape', 'portrait'] as const
-type Orientation = typeof Orientation[number]
+type Orientation = (typeof Orientation)[number]
 
-const isOrientation = (test: any): test is Orientation =>
-  Orientation.includes(test)
+const isOrientation = (test: string): test is Orientation =>
+  Orientation.includes(test as Orientation)
 
 const Order = ['min', 'max'] as const
-type Order = typeof Order[number]
+type Order = (typeof Order)[number]
 
-const isOrder = (test: any): test is Order => Order.includes(test)
+const isOrder = (test: string): test is Order => Order.includes(test as Order)
 
 export { Orientation, Order, isOrientation, isOrder }
 

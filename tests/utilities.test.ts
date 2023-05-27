@@ -107,7 +107,7 @@ describe('deviceImages()', () => {
     images: Image[]
   }
 
-  let template: {
+  const template: {
     sizes: SizesQuery[]
     pass: Test
     fail: Test
@@ -157,21 +157,21 @@ describe('deviceImages()', () => {
   }
 
   test('matches basic min-width query', () => {
-    let { sizes, pass, fail } = structuredClone(template)
+    const { sizes, pass, fail } = structuredClone(template)
     sizes[0].conditions[0].mediaFeature = 'min-width'
     expect(deviceImages(sizes, pass.device)).toEqual(pass.images)
     expect(deviceImages(sizes, fail.device)).toEqual(fail.images)
   })
 
   test('matches basic min-height query', () => {
-    let { sizes, pass, fail } = structuredClone(template)
+    const { sizes, pass, fail } = structuredClone(template)
     sizes[0].conditions[0].mediaFeature = 'min-height'
     expect(deviceImages(sizes, pass.device)).toEqual(pass.images)
     expect(deviceImages(sizes, fail.device)).toEqual(fail.images)
   })
 
   test('matches basic max-width query', () => {
-    let { sizes, pass, fail } = structuredClone(template)
+    const { sizes, pass, fail } = structuredClone(template)
     sizes[0].conditions[0].mediaFeature = 'max-width'
     // invert pass and fail widths for max conditions
     pass.images[0].w = 500
@@ -181,7 +181,7 @@ describe('deviceImages()', () => {
   })
 
   test('matches basic max-height query', () => {
-    let { sizes, pass, fail } = structuredClone(template)
+    const { sizes, pass, fail } = structuredClone(template)
     sizes[0].conditions[0].mediaFeature = 'max-height'
     // invert pass and fail widths for max conditions
     pass.images[0].w = 500
@@ -191,7 +191,7 @@ describe('deviceImages()', () => {
   })
 
   test('uses 100vw as default fallback value if none is provided', () => {
-    let { sizes, pass, fail } = structuredClone(template)
+    const { sizes, pass, fail } = structuredClone(template)
     sizes.pop()
     fail.device.w = 555
     fail.images[0].w = fail.device.w
@@ -238,14 +238,14 @@ describe('deviceImages()', () => {
   })
 
   test('rounds up subpixels', () => {
-    let { sizes, pass, fail } = structuredClone(template)
+    const { sizes, pass, fail } = structuredClone(template)
     sizes[0].width = '399.2px'
     expect(deviceImages(sizes, pass.device)).toEqual(pass.images)
     expect(deviceImages(sizes, fail.device)).toEqual(fail.images)
   })
 
   test('returns images using multiple conditions', () => {
-    let sizes: SizesQuery[] = [
+    const sizes: SizesQuery[] = [
       {
         conditions: [{ mediaFeature: 'min-width', value: '1536px' }],
         width: '718.5px',
@@ -268,13 +268,13 @@ describe('deviceImages()', () => {
       },
       { conditions: [], width: '100vw' },
     ]
-    let device: Device = {
+    const device: Device = {
       w: 1000,
       h: 400,
       dppx: [1],
       flip: false,
     }
-    let image: Image = {
+    const image: Image = {
       w: 1000,
       dppx: 1,
       orientation: 'landscape',
@@ -300,7 +300,7 @@ describe('deviceImages()', () => {
   })
 
   test('handles multiple "and" media queries', () => {
-    let sizes: SizesQuery[] = [
+    const sizes: SizesQuery[] = [
       {
         conditions: [
           {
@@ -316,7 +316,7 @@ describe('deviceImages()', () => {
       },
       { conditions: [], width: '400px' },
     ]
-    let pass: Test = {
+    const pass: Test = {
       device: {
         w: 600,
         h: 480,
@@ -332,7 +332,7 @@ describe('deviceImages()', () => {
       ],
     }
     // fail with height
-    let fail1: Test = {
+    const fail1: Test = {
       device: {
         w: 800,
         h: 600,
@@ -348,7 +348,7 @@ describe('deviceImages()', () => {
       ],
     }
     // fail with width
-    let fail2: Test = {
+    const fail2: Test = {
       ...fail1,
       device: {
         ...fail1.device,
@@ -362,7 +362,7 @@ describe('deviceImages()', () => {
   })
 
   test('handles a device with multiple resolutions', () => {
-    let { sizes, pass, fail } = structuredClone(template)
+    const { sizes, pass, fail } = structuredClone(template)
     pass.device.dppx = [4, 3.2, 2.0, 1.5, 1]
     pass.images = [
       {
@@ -425,7 +425,7 @@ describe('deviceImages()', () => {
   })
 
   test('handles a flippable device', () => {
-    let { sizes, pass, fail } = structuredClone(template)
+    const { sizes, pass, fail } = structuredClone(template)
     pass.device.flip = true
     pass.images = [
       ...pass.images,
@@ -558,7 +558,7 @@ describe('widthsFromSizes()', () => {
   })
 
   test('calculates image widths using custom, unsorted devices', () => {
-    let devices: Device[] = [
+    const devices: Device[] = [
       {
         w: 800,
         h: 600,
@@ -979,7 +979,7 @@ describe('queriesFromSizes()', () => {
   ]
 
   test('calculate queries using custom devices', () => {
-    let devices = [...customDevices]
+    const devices = [...customDevices]
 
     expect(
       queriesFromSizes('(min-width(680px) 400px, 100vw', { devices })

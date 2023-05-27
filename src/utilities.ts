@@ -4,27 +4,24 @@ import mediaParser from 'postcss-media-query-parser'
 import defaultDevices from './data/devices'
 
 /** @constant used for parsing a CSS value */
-const valueRegex: RegExp = /([\d.]+)(\D*)/
+const valueRegex = /([\d.]+)(\D*)/
 
 /** Parses a string as a value with an optional unit. */
 const cssValue = (v: string): [number, string] => {
-  let value: string = v,
-    unit: string = ''
-  let match = v.match(valueRegex)
+  let value = v, unit = ''
+  const match = v.match(valueRegex)
   if (match) [, value, unit] = match
   return [Number(value), unit]
 }
 
-const isDimension = (object: any): object is Dimension =>
-  object &&
-  typeof object.w === 'number' &&
-  typeof object.h === 'number' &&
-  object.dppx === undefined
+const isDimension = (object: unknown): object is Dimension =>
+  !!object && typeof object === 'object' &&
+  'w' in object &&
+  'h' in object &&
+  !('dppx' in object)
 
-const isDimensionArray = (array: any[]): array is Dimension[] => {
-  for (const item of array) if (!isDimension(item)) return false
-  return true
-}
+const isDimensionArray = (objects: unknown[]): objects is Dimension[] =>
+  objects.every(isDimension)
 
 /**
  * Takes a parsed img sizes attribute and a specific device,
@@ -39,16 +36,16 @@ function deviceImages(
   sizes: SizesQuery[],
   device: Device /* , order: SizesQuery.Order */
 ): Image[] {
-  let imgWidth: string = '100vw' // fallback to 100vw if no queries apply; this is the browser default
-  let orientation: Orientation =
+  let imgWidth = '100vw' // fallback to 100vw if no queries apply; this is the browser default
+  const orientation: Orientation =
     device.w >= device.h ? 'landscape' : 'portrait'
 
-  whichSize: for (let { conditions, width } of sizes) {
-    for (let { mediaFeature, value: valueString } of conditions) {
-      let [value, unit]: [number, string] = cssValue(valueString)
+  whichSize: for (const { conditions, width } of sizes) {
+    for (const { mediaFeature, value: valueString } of conditions) {
+      const [value, unit]: [number, string] = cssValue(valueString)
       if (unit !== 'px')
         throw new Error(`Invalid query unit ${unit}: only px is supported`)
-      let match: boolean =
+      const match: boolean =
         (mediaFeature === 'min-width' && device.w >= value) ||
         (mediaFeature === 'max-width' && device.w <= value) ||
         (mediaFeature === 'min-height' && device.h >= value) ||
@@ -59,17 +56,21 @@ function deviceImages(
     break whichSize // break loop when device matches all conditions
   }
 
-  let needImages: Image[] = []
-  let { dppx } = device
+  let [scaledWidth, unit = 'px'] = cssValue(imgWidth)
+  if (unit === 'vw') {
+    scaledWidth = (device.w * scaledWidth) / 100
+  } else if (unit !== 'px') {
+    throw new Error(`Invalid unit in sizes query: ${unit}\nOnly vw and px are supported.`)
+  }
+
+  const needImages: Image[] = []
+  const { dppx } = device
   if (dppx.indexOf(1) < 0) dppx.push(1) // always include a dppx value of one for queries, to avoid upscaling when screen resizes on larger 1dppx displays. TODO any way I can require this as part of the type?
 
   dppx.forEach(dppx => {
     // TODO handle flipping here...
-    let [scaledWidth, unit = 'px'] = cssValue(imgWidth)
-    if (unit === 'vw') scaledWidth = (device.w * scaledWidth) / 100
-    scaledWidth = Math.ceil(scaledWidth * dppx)
     needImages.push({
-      w: scaledWidth,
+      w: Math.ceil(scaledWidth * dppx),
       dppx,
       orientation,
     })
@@ -99,15 +100,15 @@ function widthsFromSizes(
     minScale?: number
   }
 ): number[] {
-  let { devices = defaultDevices, minScale } = opt || {}
-  let sizes = parseSizes(sizesQueryString)
+  const { devices = defaultDevices, minScale } = opt || {}
+  const sizes = parseSizes(sizesQueryString)
 
-  let needWidths: Set<number> = devices.reduce((all, device) => {
+  const needWidths: Set<number> = devices.reduce((all, device) => {
     deviceImages(sizes, device).forEach(n => all.add(n.w), all)
     return all
   }, new Set<number>())
 
-  let widthsArray: number[] = Array.from(needWidths)
+  const widthsArray: number[] = Array.from(needWidths)
 
   return filterSizes(widthsArray, minScale)
 }
@@ -120,8 +121,8 @@ function queriesFromSizes(
     // minScale?: number
   }
 ): QueryMap {
-  let { devices = defaultDevices, } = opt || {}
-  let sizes = parseSizes(sizesQueryString)
+  const { devices = defaultDevices, } = opt || {}
+  const sizes = parseSizes(sizesQueryString)
 
   const queries: QueryMap = {
     landscape: [],
@@ -167,31 +168,29 @@ function filterSizes(list: number[], factor?: number): number[]
 function filterSizes(list: Dimension[], factor?: number): Dimension[]
 function filterSizes(
   list: number[] | Dimension[],
-  factor: number = 0.8
+  factor = 0.8
 ): number[] | Dimension[] {
   // sort list from large to small
-  let sorted = isDimensionArray(list)
+  const sorted = isDimensionArray(list)
     ? [...list].sort((a, b) => b.w * b.h - a.w * a.h)
     : [...list].sort((a, b) => b - a)
-  let filtered: any[] = []
-  for (let i = 0, j = 1; i < sorted.length; ) {
-    let a = sorted[i],
+
+  const filtered: (number | Dimension)[] = []
+  for (let i = 0, j = 1; i < sorted.length; j++) {
+    const a = sorted[i],
       b = sorted[j]
     if (a && !b) {
       filtered.push(a)
       break
     }
-    let scale1 = (isDimension(b) ? b.w : b) / (isDimension(a) ? a.w : a)
-    let scale2 = (isDimension(b) ? b.h : b) / (isDimension(a) ? a.h : a)
+    const scale1 = (isDimension(b) ? b.w : b) / (isDimension(a) ? a.w : a)
+    const scale2 = (isDimension(b) ? b.h : b) / (isDimension(a) ? a.h : a)
     if (scale1 * scale2 < factor) {
       filtered.push(a)
       i = j
-      j = i + 1
-    } else {
-      j++
     }
   }
-  return filtered
+  return filtered as number[] | Dimension[]
 }
 
 /**
@@ -202,21 +201,22 @@ function filterSizes(
  */
 function parseSizes(sizesQueryString: string): SizesQuery[] {
   return sizesQueryString.split(/\s*,\s*/).map((descriptor: string) => {
-    let conditions: MediaCondition[] = []
-    let parsed = descriptor.match(/^(.*)\s+(\S+)$/) // TODO get this from parser instead; last node in media-query
+    const conditions: MediaCondition[] = []
+    const parsed = descriptor.match(/^(.*)\s+(\S+)$/) // TODO get this from parser instead; last node in media-query
     if (!parsed) return { conditions, width: descriptor }
 
-    let [, mediaCondition, width]: string[] = parsed
+    const [, mediaCondition, width]: string[] = parsed
     if (mediaCondition) {
       // TODO handle expressions wrapped in extra parenthesis
-      let mediaQuery = mediaParser(mediaCondition).nodes[0]
-      for (let node of mediaQuery.nodes) {
+      const mediaQuery = mediaParser(mediaCondition).nodes[0]
+      for (const node of mediaQuery.nodes) {
         if (node.type === 'media-feature-expression') {
-          conditions.push({
-            mediaFeature: node.nodes.find(n => n.type === 'media-feature')!
-              .value,
-            value: node.nodes.find(n => n.type === 'value')!.value, // TODO if value is null, should treat valid mediaFeatures as booleans
-          })
+          const mediaFeature = node.nodes.find(n => n.type === 'media-feature')?.value
+          const value = node.nodes.find(n => n.type === 'value')?.value
+          if (mediaFeature && value) {
+            // mediaFeature should always be truthy. value is only falsy with boolean media features, which in our case can be safely ignored.
+            conditions.push({ mediaFeature, value })
+          }
         } else if (node.type === 'keyword') {
         // } else if (node.type === 'keyword' && node.value === 'and') {
           // continue // TODO wouldn't be valid sizes attribute, but regardless this doesn't work
@@ -226,6 +226,7 @@ function parseSizes(sizesQueryString: string): SizesQuery[] {
             continue // ignore; add next valid node to the conditions list
           } else if (node.value === 'not') {
             // TODO handle not
+            // eslint-disable-next-line no-console
             console.warn(`not keyword is not yet handled; ignoring`)
             continue
           } else {
@@ -237,6 +238,7 @@ function parseSizes(sizesQueryString: string): SizesQuery[] {
           else
             throw new Error(`media type ${node.value} cannot be used in a sizes attribute`)
         } else {
+          // eslint-disable-next-line no-console
           console.error(node)
           throw new Error('unhandled node type')
         }

@@ -59,15 +59,18 @@ const validImageFormats: ValidImageFormat[] = [
   null,
 ]
 
-const assertOrientation = (test: any): Orientation => {
+const isValidImageFormat = (test: string | null): test is ValidImageFormat =>
+  validImageFormats.includes(test as ValidImageFormat)
+
+const assertOrientation = (test: string): Orientation => {
   if (!isOrientation(test)) {
     throw new Error(`Invalid orientation: ${test}`)
   }
   return test
 }
 
-const assertValidImageFormat = (test: any): ValidImageFormat => {
-  if (!validImageFormats.includes(test))
+const assertValidImageFormat = (test: string | null): ValidImageFormat => {
+  if (!isValidImageFormat(test))
     throw new Error(`Invalid image format: ${test}`)
   return test
 }
@@ -122,7 +125,7 @@ export default class ResponsiveImages
   disable: boolean
 
   constructor(options?: ResponsiveImagesOptions) {
-    let {
+    const {
       defaults = {},
       devices = defaultDevices,
       sassPrefix = 'image',
@@ -181,7 +184,7 @@ export default class ResponsiveImages
     image: EleventyImage.ImageSource,
     kwargs: MixedOptions
   ): Promise<string> {
-    let html = await this.generatePicture(image, kwargs)
+    const html = await this.generatePicture(image, kwargs)
     return html.replace(/(^<picture>|<\/picture>$)/g, '')
   }
 
@@ -255,14 +258,14 @@ export default class ResponsiveImages
 
   async generateMediaQueries(
     src: EleventyImage.ImageSource,
-    kwargs?: MediaQueryOptions
+    kwargs: MediaQueryOptions = {}
   ): Promise<SassQuery[]> {
-    let {
-      widths = null,
+    const {
       formats = [null],
       orientations = ['landscape', 'portrait'],
       sizes = '100vw',
-    } = kwargs || {}
+    } = kwargs
+    let { widths = null } = kwargs
 
     // TODO support multiple image formats using image-set and fallbacks https://developer.mozilla.org/en-US/docs/Web/CSS/image/image-set#providing_a_fallback
     if (formats.length > 1)
@@ -272,13 +275,13 @@ export default class ResponsiveImages
         )})`
       )
 
-    let originalImage = await EleventyImage(src, {
+    const originalImage = await EleventyImage(src, {
       statsOnly: true,
       widths: [null],
       formats: [null],
     }).then(metadata => Object.values(metadata)[0][0])
 
-    let queries = queriesFromSizes(sizes, {
+    const queries = queriesFromSizes(sizes, {
       devices: this.devices,
     })
 
@@ -287,7 +290,7 @@ export default class ResponsiveImages
       widths = Object.entries(queries).reduce(
         (flat: number[], [o, queries]) => {
           if (isOrientation(o) && !orientations.includes(o)) return flat
-          let widths = queries.reduce((flat: number[], { images }) => {
+          const widths = queries.reduce((flat: number[], { images }) => {
             return flat.concat(images.map(img => img.w))
           }, [])
           return flat.concat(widths)
@@ -313,6 +316,7 @@ export default class ResponsiveImages
 
     for (const o of orientations) {
       if (!isOrientation(o)) {
+        // eslint-disable-next-line no-console
         console.warn(`Unrecognized orientation "${o}", skipping`)
         continue
       }
@@ -330,8 +334,8 @@ export default class ResponsiveImages
           if (imageMeta === undefined) {
             imageMeta = originalImage
             for (let i = 0, l = metadata.length; i < l; i++) {
-              let m = metadata[i]
-              let next = metadata[i + 1]
+              const m = metadata[i]
+              const next = metadata[i + 1]
               if (m.width >= image.w && (!next || next.width < image.w)) {
                 imageMeta = m
                 break
@@ -367,35 +371,35 @@ export default class ResponsiveImages
     const queriesFunction = `${this.sassPrefix}-queries($src, $widths: null, $formats: null, $orientation: landscape portrait, $sizes: '100vw')`
     return {
       [resizeFunction]: async (args: SassValue[]): Promise<SassValue> => {
-        let src: string = args[0].assertString('src').text
-        let widths = args[1].asList
+        const src: string = args[0].assertString('src').text
+        const widths = args[1].asList
           .toArray()
           .map(n => n.realNull && n.assertNumber('widths').value)
-        let formats = args[2].asList
+        const formats = args[2].asList
           .toArray()
           .map(s =>
             assertValidImageFormat(s.realNull && s.assertString('formats').text)
           )
 
-        let metadata = await this.resize(src, { widths, formats })
+        const metadata = await this.resize(src, { widths, formats })
         return cast.toSass(metadata)
       },
       [queriesFunction]: async (args: SassValue[]): Promise<SassValue> => {
-        let src = args[0].assertString('src').text
-        let widths = args[1].realNull
+        const src = args[0].assertString('src').text
+        const widths = args[1].realNull
           ? args[1].asList
               .toArray()
               .map(n => n.realNull && n.assertNumber().value)
           : undefined
-        let formats = args[2].asList
+        const formats = args[2].asList
           .toArray()
           .map(s => assertValidImageFormat(s.realNull && s.assertString().text))
-        let orientations = args[3].asList
+        const orientations = args[3].asList
           .toArray()
           .map(s => assertOrientation(s.assertString().text))
-        let sizes = args[4].assertString('sizes').text
+        const sizes = args[4].assertString('sizes').text
 
-        let mediaQueries = await this.generateMediaQueries(src, {
+        const mediaQueries = await this.generateMediaQueries(src, {
           widths,
           formats,
           orientations,

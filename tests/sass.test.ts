@@ -2,7 +2,7 @@ import _ from 'lodash'
 import sass from 'sass'
 import ResponsiveImages, { ResponsiveImagesOptions } from '../src/index'
 
-const raw = (strings: TemplateStringsArray, ...values: any[]) =>
+const raw = (strings: TemplateStringsArray, ...values: unknown[]) =>
   String.raw({ raw: strings }, ...values)
 const scss = raw
 
