@@ -1,4 +1,12 @@
-import type { Orientation, Dimension, Device, SizesQuery, MediaCondition, Image, QueryMap  } from './types'
+import type {
+  Orientation,
+  Dimension,
+  Device,
+  SizesQuery,
+  MediaCondition,
+  Image,
+  QueryMap,
+} from './types'
 
 import mediaParser from 'postcss-media-query-parser'
 import defaultDevices from './data/devices'
@@ -8,14 +16,16 @@ const valueRegex = /([\d.]+)(\D*)/
 
 /** Parses a string as a value with an optional unit. */
 const cssValue = (v: string): [number, string] => {
-  let value = v, unit = ''
+  let value = v,
+    unit = ''
   const match = v.match(valueRegex)
   if (match) [, value, unit] = match
   return [Number(value), unit]
 }
 
 const isDimension = (object: unknown): object is Dimension =>
-  !!object && typeof object === 'object' &&
+  !!object &&
+  typeof object === 'object' &&
   'w' in object &&
   'h' in object &&
   !('dppx' in object)
@@ -60,7 +70,9 @@ function deviceImages(
   if (unit === 'vw') {
     scaledWidth = (device.w * scaledWidth) / 100
   } else if (unit !== 'px') {
-    throw new Error(`Invalid unit in sizes query: ${unit}\nOnly vw and px are supported.`)
+    throw new Error(
+      `Invalid unit in sizes query: ${unit}\nOnly vw and px are supported.`
+    )
   }
 
   const needImages: Image[] = []
@@ -77,12 +89,14 @@ function deviceImages(
   })
 
   if (device.flip)
-    needImages.push(...deviceImages(sizes, {
-      ...device,
-      w: device.h,
-      h: device.w,
-      flip: false,
-    }))
+    needImages.push(
+      ...deviceImages(sizes, {
+        ...device,
+        w: device.h,
+        h: device.w,
+        flip: false,
+      })
+    )
 
   return needImages
 }
@@ -121,7 +135,7 @@ function queriesFromSizes(
     // minScale?: number
   }
 ): QueryMap {
-  const { devices = defaultDevices, } = opt || {}
+  const { devices = defaultDevices } = opt || {}
   const sizes = parseSizes(sizesQueryString)
 
   const queries: QueryMap = {
@@ -134,9 +148,9 @@ function queriesFromSizes(
       landscape: [],
       portrait: [],
     }
-    deviceImages(sizes, device).sort((a, b) => b.dppx - a.dppx).forEach(img =>
-      images[img.orientation].push(img)
-    )
+    deviceImages(sizes, device)
+      .sort((a, b) => b.dppx - a.dppx)
+      .forEach(img => images[img.orientation].push(img))
     if (images.landscape.length)
       queries.landscape.push({
         w: device.w,
@@ -211,19 +225,22 @@ function parseSizes(sizesQueryString: string): SizesQuery[] {
       const mediaQuery = mediaParser(mediaCondition).nodes[0]
       for (const node of mediaQuery.nodes) {
         if (node.type === 'media-feature-expression') {
-          const mediaFeature = node.nodes.find(n => n.type === 'media-feature')?.value
+          const mediaFeature = node.nodes.find(
+            n => n.type === 'media-feature'
+          )?.value
           const value = node.nodes.find(n => n.type === 'value')?.value
           if (mediaFeature && value) {
             // mediaFeature should always be truthy. value is only falsy with boolean media features, which in our case can be safely ignored.
             conditions.push({ mediaFeature, value })
           }
         } else if (node.type === 'keyword') {
-        // } else if (node.type === 'keyword' && node.value === 'and') {
+          // } else if (node.type === 'keyword' && node.value === 'and') {
           // continue // TODO wouldn't be valid sizes attribute, but regardless this doesn't work
           // // maybe parse with cssValue here?
 
           if (node.value === 'and' || node.value === 'only') {
-            continue // ignore; add next valid node to the conditions list
+            // ignore; add next valid node to the conditions list
+            continue
           } else if (node.value === 'not') {
             // TODO handle not
             // eslint-disable-next-line no-console
@@ -234,9 +251,12 @@ function parseSizes(sizesQueryString: string): SizesQuery[] {
           }
         } else if (node.type === 'media-type') {
           if (node.value === 'all')
-            continue // ignore; all is the only valid media-type
+            // ignore; all is the only valid media-type
+            continue
           else
-            throw new Error(`media type ${node.value} cannot be used in a sizes attribute`)
+            throw new Error(
+              `media type ${node.value} cannot be used in a sizes attribute`
+            )
         } else {
           // eslint-disable-next-line no-console
           console.error(node)
