@@ -166,17 +166,17 @@ Then, call the functions within your templates:
 
 ```njk
 <div>
-  {% picture "assets/example.jpg"
-    alt="A responsive picture element"
-    sizes="(min-width: 800px) 400px, 100vw" %}
+  {% picture "assets/example.jpg",
+    alt="A responsive picture element",
+    sizes="(min-width: 800px) 400px, 100vw", %}
 
   {% set picHtml = "assets/example.jpg" | picture({ alt: 'used as a filter', sizes: '100vw' }) #}
   {{ picHtml | safe }}
 
   <picture class="picture-class">
-    {% img "assets/example.jpg"
-      alt="Use the img shortcode to include image sources without a picture element"
-      class="passed-to-image-element"
+    {% img "assets/example.jpg",
+      alt="Use the img shortcode to include image sources without a picture element",
+      class="passed-to-image-element",
       sizes="(min-width: 1000px) 50vw, 100vw" %}
   </picture>
 
