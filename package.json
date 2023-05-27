@@ -16,7 +16,8 @@
   "scripts": {
     "compile": "npx tsc",
     "build": "node build.mjs",
-    "test": "npx jest",
+    "lint": "npx eslint . && npx prettier -c .",
+    "test": "npx jest && npm run lint",
     "document": "npx typedoc src/index.ts src/types.ts src/eleventy-plugin.ts src/data/devices.ts",
     "prepublishOnly": "npm test && npm run build && npm run document",
     "prepack": "npm test && npm run build"
