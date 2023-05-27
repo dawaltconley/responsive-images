@@ -1,7 +1,7 @@
 # Astro.js
 
-`@dawaltconley/responsive-images` can be easily added to an Astro.js project 
-using a `.astro` component or one of their supported frameworks. This solution 
+`@dawaltconley/responsive-images` can be easily added to an Astro.js project
+using a `.astro` component or one of their supported frameworks. This solution
 is provided for projects using Astro version 2 in Node.js environments.
 
 ## Config
@@ -10,7 +10,7 @@ Import and configure the package somewhere in your project:
 
 ```javascript
 // src/lib/responsive-images.mjs
-import { ResponsiveImages } from '@dawaltconley/responsive-images';
+import { ResponsiveImages } from '@dawaltconley/responsive-images'
 
 export default new ResponsiveImages({
   defaults: {
@@ -20,21 +20,21 @@ export default new ResponsiveImages({
       : '/dist/responsive-images/',
   },
   disable: !import.meta.env.PROD,
-});
+})
 ```
 
-This setup generates images directly into your `dist` folder during build. The 
-`disable` flag is recommended to prevent multiple images from being copied over 
-while running the dev server. You will also need to include the `dist` folder 
-in the `urlPath` while running the dev server. Paths are relative to the 
-directory that `astro dev` and `astro build` are run from.
+This setup generates images directly into your `dist` folder during build. The
+`disable` flag is recommended to prevent multiple images from being copied over
+while running the dev server. You will also need to include the `dist` folder in
+the `urlPath` while running the dev server. Paths are relative to the directory
+that `astro dev` and `astro build` are run from.
 
 ## Component
 
-Here is an example component file that configures ResponsiveImages and calls 
-its `sourceFromSizes` method. You may want to import a configured instance into 
-the component instead, especially if you plan to use other methods in other 
-build contexts, like the sass mixins.
+Here is an example component file that configures ResponsiveImages and calls its
+`sourceFromSizes` method. You may want to import a configured instance into the
+component instead, especially if you plan to use other methods in other build
+contexts, like the sass mixins.
 
 ```astro
 ---
@@ -76,7 +76,7 @@ const sources = await sourceFromSizes(src, {
 </picture>
 ```
 
-You can then include the component in your pages like so. The images will be 
+You can then include the component in your pages like so. The images will be
 generated according to the `sizes` attribute.
 
 ```astro
@@ -96,19 +96,18 @@ import Image from '../components/Image.astro';
 </Layout>
 ```
 
-You should _not_ import the image you want to use, since this will give you the 
-image's url path, not the local path to the image file. The string you pass to 
-`src` should be a relative path from the directory that Astro is being run 
-from.
+You should _not_ import the image you want to use, since this will give you the
+image's url path, not the local path to the image file. The string you pass to
+`src` should be a relative path from the directory that Astro is being run from.
 
 ## Sass
 
-In order to use responsive background-images, pass the `sassFunctions` to Vite 
+In order to use responsive background-images, pass the `sassFunctions` to Vite
 in your Astro config file.
 
 ```javascript
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
+import { defineConfig } from 'astro/config'
 import images from 'src/lib/responsive-images.mjs'
 
 export default defineConfig({
@@ -121,5 +120,5 @@ export default defineConfig({
       },
     },
   },
-});
+})
 ```
