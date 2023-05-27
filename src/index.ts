@@ -168,13 +168,8 @@ export default class ResponsiveImages
     image: EleventyImage.ImageSource,
     kwargs: MixedOptions
   ): Promise<string> {
-    let {
-      widths = this.defaults.widths,
-      formats = this.defaults.formats,
-      ...properties
-    } = kwargs
-
-    let metadata = await this.resize(image, { widths, formats })
+    const [options, properties] = this._handleMixedOptions(kwargs)
+    const metadata = await this.resize(image, options)
     return EleventyImage.generateHTML(metadata, properties)
   }
 
@@ -197,17 +192,32 @@ export default class ResponsiveImages
     })
   }
 
+  private _handleMixedOptions(
+    options: MixedOptions
+  ): [ResizeOptions, HtmlOptions] {
+    const {
+      widths = this.defaults.widths,
+      formats = this.defaults.formats,
+      ...html
+    } = options
+    const resizeOpts: ResizeOptions = {}
+    if (widths) resizeOpts.widths = widths
+    if (formats) resizeOpts.formats = formats
+    return [resizeOpts, html]
+  }
+
   /**
-   * Normalizes keyword arguments and generates widths from the sizes attribute if present.
-   * @returns a new KeywordArguments object with widths from the sizes attribute
+   * Returns a copy of the config data with an undefined `widths` calculated from sizes.
+   * If sizes is not specified, it will be specified in the return config as `'100vw'`.
+   * @returns a new object with widths calculated from the sizes attribute
    */
-  private _handleKwargs<T extends FromSizesOptions>(kwargs: T): T {
+  private _handleFromSizes<T extends FromSizesOptions>(kwargs: T): T {
     const processed = { ...kwargs }
-    const { sizes, widths } = processed
-    if (sizes && !widths) {
+    const { sizes = '100vw', widths } = processed
+    if (!widths) {
       processed.widths = this.widthsFromSizes(sizes)
     }
-    return processed
+    return { sizes, ...processed }
   }
 
   /** Uses a sizes attribute to parse images and returns a metadata object. Defaults to 100vw. */
@@ -215,22 +225,22 @@ export default class ResponsiveImages
     image: EleventyImage.ImageSource,
     kwargs: FromSizesOptions = {}
   ): Promise<EleventyImage.Metadata> {
-    const { sizes = '100vw', ...resizeOptions } = this._handleKwargs(kwargs)
-    return this.resize(image, resizeOptions)
+    const options = this._handleFromSizes(kwargs)
+    return this.resize(image, options)
   }
 
   async pictureFromSizes(
     image: EleventyImage.ImageSource,
     kwargs: MixedOptions
   ): Promise<string> {
-    return this.generatePicture(image, this._handleKwargs(kwargs))
+    return this.generatePicture(image, this._handleFromSizes(kwargs))
   }
 
   async sourceFromSizes(
     image: EleventyImage.ImageSource,
     kwargs: MixedOptions
   ): Promise<string> {
-    return this.generateSources(image, this._handleKwargs(kwargs))
+    return this.generateSources(image, this._handleFromSizes(kwargs))
   }
 
   async generateMediaQueries(

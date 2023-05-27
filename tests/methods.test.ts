@@ -13,15 +13,15 @@ const defaultConfig: ResponsiveImagesOptions = {
 
 describe('_handleKwargs()', () => {
   const images = new ResponsiveImages(defaultConfig)
-  const handleKwargs = images['_handleKwargs'].bind(
+  const handleFromSizes = images['_handleFromSizes'].bind(
     images
-  ) as (typeof images)['_handleKwargs']
+  ) as (typeof images)['_handleFromSizes']
 
   test('generates widths from sizes argument', () => {
     jest.restoreAllMocks()
     const parseMethod = jest.spyOn(images, 'widthsFromSizes')
     expect(
-      handleKwargs<FromSizesOptions>({
+      handleFromSizes<FromSizesOptions>({
         sizes: '400px',
       })
     ).toEqual<FromSizesOptions>({
@@ -29,7 +29,7 @@ describe('_handleKwargs()', () => {
       sizes: '400px',
     })
     expect(
-      handleKwargs<MixedOptions>({
+      handleFromSizes<MixedOptions>({
         sizes: '(min-width: 680px) 400px, 50vw',
         alt: 'Html alt text',
         class: 'some-class',
@@ -49,7 +49,7 @@ describe('_handleKwargs()', () => {
     jest.restoreAllMocks()
     const parseMethod = jest.spyOn(images, 'widthsFromSizes')
     const kwargs = { widths: [800, 600], sizes: '600px' }
-    const output = handleKwargs(kwargs)
+    const output = handleFromSizes(kwargs)
     expect(output).toEqual(kwargs)
     expect(parseMethod).not.toHaveBeenCalled()
   })
