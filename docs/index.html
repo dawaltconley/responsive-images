@@ -16,20 +16,18 @@
 <a href="#responsive-images" id="responsive-images" style="color: inherit; text-decoration: none;">
   <h1>Responsive Images</h1>
 </a>
-<p>Functions for statically generating <a href="https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images">responsive 
-image</a>
-markup. These currently exist as a convenience wrapper around the 
-<a href="https://www.11ty.dev/docs/plugins/image/">Eleventy Image plugin</a>, 
-though it can be used with any site that has a static build step in its 
-markup generation.</p>
-<p>It determines which image sizes you need to generate by parsing a <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#sizes">sizes
-query
-string</a>
-and comparing it with a range of target devices. This means that, as
-long as you write a good sizes query, you don&#39;t need to specify the
-widths for each image you want to generate.</p>
-<p>For all methods and options please reference the <a href="https://dawaltconley.github.io/responsive-images/">full 
-documentation</a>.</p>
+<p>Functions for statically generating
+<a href="https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images">responsive image</a>
+markup. These currently exist as a convenience wrapper around the
+<a href="https://www.11ty.dev/docs/plugins/image/">Eleventy Image plugin</a>, though it can
+be used with any site that has a static build step in its markup generation.</p>
+<p>It determines which image sizes you need to generate by parsing a
+<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#sizes">sizes query string</a>
+and comparing it with a range of target devices. This means that, as long as you
+write a good sizes query, you don&#39;t need to specify the widths for each image
+you want to generate.</p>
+<p>For all methods and options please reference the
+<a href="https://dawaltconley.github.io/responsive-images/">full documentation</a>.</p>
 
 <a href="#install" id="install" style="color: inherit; text-decoration: none;">
   <h2>Install</h2>
@@ -40,9 +38,9 @@ documentation</a>.</p>
 <a href="#configure" id="configure" style="color: inherit; text-decoration: none;">
   <h2>Configure</h2>
 </a>
-<p>Most configuration is handled globally in the default class constructor.
-This can be exported as a singleton for use in multiple files.</p>
-<pre><code class="language-js"><span class="hl-2">import</span><span class="hl-1"> </span><span class="hl-0">ResponsiveImages</span><span class="hl-1"> </span><span class="hl-2">from</span><span class="hl-1"> </span><span class="hl-3">&#39;@dawaltconley/responsive-images&#39;</span><br/><span class="hl-1"> </span><br/><span class="hl-2">export</span><span class="hl-1"> </span><span class="hl-2">default</span><span class="hl-1"> </span><span class="hl-4">new</span><span class="hl-1"> </span><span class="hl-5">ResponsiveImages</span><span class="hl-1">({ </span><br/><span class="hl-1">  </span><span class="hl-0">scalingFactor:</span><span class="hl-1"> </span><span class="hl-6">0.6</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-0">disable:</span><span class="hl-1"> </span><span class="hl-4">false</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-0">defaults:</span><span class="hl-1"> { </span><br/><span class="hl-1">    </span><span class="hl-0">formats:</span><span class="hl-1"> [</span><span class="hl-3">&#39;webp&#39;</span><span class="hl-1">, </span><span class="hl-4">null</span><span class="hl-1">], </span><br/><span class="hl-1">    </span><span class="hl-0">urlPath:</span><span class="hl-1"> </span><span class="hl-3">&#39;/assets/generated/&#39;</span><span class="hl-1">, </span><br/><span class="hl-1">    </span><span class="hl-0">outputDir:</span><span class="hl-1"> </span><span class="hl-3">&#39;./dist/assets/generated/&#39;</span><span class="hl-1">, </span><br/><span class="hl-1">  }, </span><br/><span class="hl-1">}) </span>
+<p>Most configuration is handled globally in the default class constructor. This
+can be exported as a singleton for use in multiple files.</p>
+<pre><code class="language-js"><span class="hl-2">import</span><span class="hl-1"> </span><span class="hl-0">ResponsiveImages</span><span class="hl-1"> </span><span class="hl-2">from</span><span class="hl-1"> </span><span class="hl-3">&#39;@dawaltconley/responsive-images&#39;</span><br/><br/><span class="hl-2">export</span><span class="hl-1"> </span><span class="hl-2">default</span><span class="hl-1"> </span><span class="hl-4">new</span><span class="hl-1"> </span><span class="hl-5">ResponsiveImages</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-0">scalingFactor:</span><span class="hl-1"> </span><span class="hl-6">0.6</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-0">disable:</span><span class="hl-1"> </span><span class="hl-4">false</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-0">defaults:</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-0">formats:</span><span class="hl-1"> [</span><span class="hl-3">&#39;webp&#39;</span><span class="hl-1">, </span><span class="hl-4">null</span><span class="hl-1">],</span><br/><span class="hl-1">    </span><span class="hl-0">urlPath:</span><span class="hl-1"> </span><span class="hl-3">&#39;/assets/generated/&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-0">outputDir:</span><span class="hl-1"> </span><span class="hl-3">&#39;./dist/assets/generated/&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  },</span><br/><span class="hl-1">})</span>
 </code></pre>
 
 <a href="#options" id="options" style="color: inherit; text-decoration: none;">
@@ -53,86 +51,81 @@ This can be exported as a singleton for use in multiple files.</p>
 <a href="#defaultsltimageoptionsgt--" id="defaultsltimageoptionsgt--" style="color: inherit; text-decoration: none;">
   <h3><code>defaults&lt;ImageOptions&gt; = {}</code></h3>
 </a>
-<p>A set of options that gets passed to Eleventy Image whenever it is
-called. You probably want to specify at least a <code>urlPath</code> and 
-<code>outputDir</code> for the generated images. See <a href="https://www.11ty.dev/docs/plugins/image/">the Eleventy Image 
-docs</a> for all available 
-options.</p>
+<p>A set of options that gets passed to Eleventy Image whenever it is called. You
+probably want to specify at least a <code>urlPath</code> and <code>outputDir</code> for the generated
+images. See <a href="https://www.11ty.dev/docs/plugins/image/">the Eleventy Image docs</a>
+for all available options.</p>
 
 <a href="#scalingfactorltnumbergt--08" id="scalingfactorltnumbergt--08" style="color: inherit; text-decoration: none;">
   <h3><code>scalingFactor&lt;number&gt; = 0.8</code></h3>
 </a>
-<p>The maximum difference in size between any two images created when
-downsizing. This uses pixels to approximate a file size. At a scaling
-factor of <code>0.5</code>, for example, each image created will have no more than
-half the total pixels of the previous image.</p>
-<p>The number should be a proportional float between 0 and 1. A higher
-scaling factor creates more images with smaller gaps in their sizes. A
-lower scaling factor creates fewer images with larger gaps in their
-sizes. At very low scaling factors, some devices may need to load larger
-images than necessary. Meanwhile, at a scaling factor of <code>1</code>, a new image will 
-be created and optimized for each device supported, no matter how close it is 
-to other images.</p>
+<p>The maximum difference in size between any two images created when downsizing.
+This uses pixels to approximate a file size. At a scaling factor of <code>0.5</code>, for
+example, each image created will have no more than half the total pixels of the
+previous image.</p>
+<p>The number should be a proportional float between 0 and 1. A higher scaling
+factor creates more images with smaller gaps in their sizes. A lower scaling
+factor creates fewer images with larger gaps in their sizes. At very low scaling
+factors, some devices may need to load larger images than necessary. Meanwhile,
+at a scaling factor of <code>1</code>, a new image will be created and optimized for each
+device supported, no matter how close it is to other images.</p>
 
 <a href="#devices" id="devices" style="color: inherit; text-decoration: none;">
   <h3><code>devices</code></h3>
 </a>
-<p>A set of devices to support when calculating image sizes from a sizes
-query string. Defaults to an internal device list that can be imported
-from <code>@dawaltconley/responsive-images/devices</code>.</p>
-<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-7">ipadsOnly</span><span class="hl-1"> = </span><span class="hl-4">new</span><span class="hl-1"> </span><span class="hl-5">ResponsiveImages</span><span class="hl-1">({ </span><br/><span class="hl-1">  </span><span class="hl-0">devices:</span><span class="hl-1"> [</span><br/><span class="hl-1">    {</span><br/><span class="hl-1">      </span><span class="hl-0">w:</span><span class="hl-1"> </span><span class="hl-6">1366</span><span class="hl-1">,</span><br/><span class="hl-1">      </span><span class="hl-0">h:</span><span class="hl-1"> </span><span class="hl-6">1024</span><span class="hl-1">,</span><br/><span class="hl-1">      </span><span class="hl-0">dppx:</span><span class="hl-1"> [</span><span class="hl-6">2</span><span class="hl-1">, </span><span class="hl-6">1</span><span class="hl-1">],</span><br/><span class="hl-1">      </span><span class="hl-0">flip:</span><span class="hl-1"> </span><span class="hl-4">true</span><span class="hl-1">,</span><br/><span class="hl-1">    },</span><br/><span class="hl-1">    {</span><br/><span class="hl-1">      </span><span class="hl-0">w:</span><span class="hl-1"> </span><span class="hl-6">1024</span><span class="hl-1">,</span><br/><span class="hl-1">      </span><span class="hl-0">h:</span><span class="hl-1"> </span><span class="hl-6">768</span><span class="hl-1">,</span><br/><span class="hl-1">      </span><span class="hl-0">dppx:</span><span class="hl-1"> [</span><span class="hl-6">2</span><span class="hl-1">, </span><span class="hl-6">1</span><span class="hl-1">],</span><br/><span class="hl-1">      </span><span class="hl-0">flip:</span><span class="hl-1"> </span><span class="hl-4">true</span><span class="hl-1">,</span><br/><span class="hl-1">    },</span><br/><span class="hl-1">  ]</span><br/><span class="hl-1">}) </span>
+<p>A set of devices to support when calculating image sizes from a sizes query
+string. Defaults to an internal device list that can be imported from
+<code>@dawaltconley/responsive-images/devices</code>.</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-7">ipadsOnly</span><span class="hl-1"> = </span><span class="hl-4">new</span><span class="hl-1"> </span><span class="hl-5">ResponsiveImages</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-0">devices:</span><span class="hl-1"> [</span><br/><span class="hl-1">    {</span><br/><span class="hl-1">      </span><span class="hl-0">w:</span><span class="hl-1"> </span><span class="hl-6">1366</span><span class="hl-1">,</span><br/><span class="hl-1">      </span><span class="hl-0">h:</span><span class="hl-1"> </span><span class="hl-6">1024</span><span class="hl-1">,</span><br/><span class="hl-1">      </span><span class="hl-0">dppx:</span><span class="hl-1"> [</span><span class="hl-6">2</span><span class="hl-1">, </span><span class="hl-6">1</span><span class="hl-1">],</span><br/><span class="hl-1">      </span><span class="hl-0">flip:</span><span class="hl-1"> </span><span class="hl-4">true</span><span class="hl-1">,</span><br/><span class="hl-1">    },</span><br/><span class="hl-1">    {</span><br/><span class="hl-1">      </span><span class="hl-0">w:</span><span class="hl-1"> </span><span class="hl-6">1024</span><span class="hl-1">,</span><br/><span class="hl-1">      </span><span class="hl-0">h:</span><span class="hl-1"> </span><span class="hl-6">768</span><span class="hl-1">,</span><br/><span class="hl-1">      </span><span class="hl-0">dppx:</span><span class="hl-1"> [</span><span class="hl-6">2</span><span class="hl-1">, </span><span class="hl-6">1</span><span class="hl-1">],</span><br/><span class="hl-1">      </span><span class="hl-0">flip:</span><span class="hl-1"> </span><span class="hl-4">true</span><span class="hl-1">,</span><br/><span class="hl-1">    },</span><br/><span class="hl-1">  ],</span><br/><span class="hl-1">})</span>
 </code></pre>
 
 <a href="#sassprefixltstringgt--39image39" id="sassprefixltstringgt--39image39" style="color: inherit; text-decoration: none;">
   <h3><code>sassPrefix&lt;string&gt; = &#39;image&#39;</code></h3>
 </a>
-<p>A string used to prefix the Sass <code>background-image</code> functions, which can
-be edited to avoid global namespace collisions. Defaults to <code>image</code>,
-which creates functions named <code>image-resize</code> and <code>image-queries</code>.</p>
-<pre><code class="language-js"><span class="hl-2">import</span><span class="hl-1"> </span><span class="hl-0">ResponsiveImages</span><span class="hl-1"> </span><span class="hl-2">from</span><span class="hl-1"> </span><span class="hl-3">&#39;@dawaltconley/responsive-images&#39;</span><span class="hl-1">;</span><br/><span class="hl-2">import</span><span class="hl-1"> </span><span class="hl-0">sass</span><span class="hl-1"> </span><span class="hl-2">from</span><span class="hl-1"> </span><span class="hl-3">&#39;sass&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-4">const</span><span class="hl-1"> { </span><span class="hl-7">sassFunctions</span><span class="hl-1"> } = </span><span class="hl-4">new</span><span class="hl-1"> </span><span class="hl-5">ResponsiveImages</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-0">sassPrefix:</span><span class="hl-1"> </span><span class="hl-3">&#39;custom-prefix&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-8">// only the compileAsync and compileStringAsync methods are supported</span><br/><span class="hl-0">sass</span><span class="hl-1">.</span><span class="hl-5">compileAsync</span><span class="hl-1">(</span><span class="hl-3">&#39;./styles/images.scss&#39;</span><span class="hl-1">, {</span><br/><span class="hl-1">  </span><span class="hl-0">loadPaths:</span><span class="hl-1"> [</span><span class="hl-3">&#39;./node_modules&#39;</span><span class="hl-1">],</span><br/><span class="hl-1">  </span><span class="hl-0">functions:</span><span class="hl-1"> </span><span class="hl-0">sassFunctions</span><span class="hl-1">,</span><br/><span class="hl-1">});</span>
+<p>A string used to prefix the Sass <code>background-image</code> functions, which can be
+edited to avoid global namespace collisions. Defaults to <code>image</code>, which creates
+functions named <code>image-resize</code> and <code>image-queries</code>.</p>
+<pre><code class="language-js"><span class="hl-2">import</span><span class="hl-1"> </span><span class="hl-0">ResponsiveImages</span><span class="hl-1"> </span><span class="hl-2">from</span><span class="hl-1"> </span><span class="hl-3">&#39;@dawaltconley/responsive-images&#39;</span><br/><span class="hl-2">import</span><span class="hl-1"> </span><span class="hl-0">sass</span><span class="hl-1"> </span><span class="hl-2">from</span><span class="hl-1"> </span><span class="hl-3">&#39;sass&#39;</span><br/><br/><span class="hl-4">const</span><span class="hl-1"> { </span><span class="hl-7">sassFunctions</span><span class="hl-1"> } = </span><span class="hl-4">new</span><span class="hl-1"> </span><span class="hl-5">ResponsiveImages</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-0">sassPrefix:</span><span class="hl-1"> </span><span class="hl-3">&#39;custom-prefix&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">})</span><br/><br/><span class="hl-8">// only the compileAsync and compileStringAsync methods are supported</span><br/><span class="hl-0">sass</span><span class="hl-1">.</span><span class="hl-5">compileAsync</span><span class="hl-1">(</span><span class="hl-3">&#39;./styles/images.scss&#39;</span><span class="hl-1">, {</span><br/><span class="hl-1">  </span><span class="hl-0">loadPaths:</span><span class="hl-1"> [</span><span class="hl-3">&#39;./node_modules&#39;</span><span class="hl-1">],</span><br/><span class="hl-1">  </span><span class="hl-0">functions:</span><span class="hl-1"> </span><span class="hl-0">sassFunctions</span><span class="hl-1">,</span><br/><span class="hl-1">})</span>
 </code></pre>
-<p>If changed, the same prefix should be passed to the mixins when
-importing.</p>
-<pre><code class="language-scss"><span class="hl-2">@use</span><span class="hl-1"> </span><span class="hl-3">&#39;@dawaltconley/responsive-images&#39;</span><span class="hl-1"> </span><span class="hl-2">with</span><span class="hl-1"> (</span><span class="hl-9">$prefix</span><span class="hl-1">: </span><span class="hl-3">&#39;custom-prefix&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-10">.example</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-2">@include</span><span class="hl-1"> </span><span class="hl-9">responsive-images</span><span class="hl-1">.</span><span class="hl-5">bg</span><span class="hl-1">(</span><span class="hl-3">&#39;./assets/some-background.png&#39;</span><span class="hl-1">);</span><br/><span class="hl-1">}</span>
+<p>If changed, the same prefix should be passed to the mixins when importing.</p>
+<pre><code class="language-scss"><span class="hl-2">@use</span><span class="hl-1"> </span><span class="hl-3">&#39;@dawaltconley/responsive-images&#39;</span><span class="hl-1"> </span><span class="hl-2">with</span><span class="hl-1"> (</span><br/><span class="hl-1">  </span><span class="hl-9">$prefix</span><span class="hl-1">: </span><span class="hl-3">&#39;custom-prefix&#39;</span><br/><span class="hl-1">);</span><br/><br/><span class="hl-10">.example</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-2">@include</span><span class="hl-1"> </span><span class="hl-9">responsive-images</span><span class="hl-1">.</span><span class="hl-5">bg</span><span class="hl-1">(</span><span class="hl-3">&#39;./assets/some-background.png&#39;</span><span class="hl-1">);</span><br/><span class="hl-1">}</span>
 </code></pre>
 
 <a href="#disableltbooleangt--false" id="disableltbooleangt--false" style="color: inherit; text-decoration: none;">
   <h3><code>disable&lt;boolean&gt; = false</code></h3>
 </a>
-<p>If true, disables new image generation so that all methods output image 
-elements at their original size. Useful for avoiding repeated rebuilds 
-on development environments.</p>
+<p>If true, disables new image generation so that all methods output image elements
+at their original size. Useful for avoiding repeated rebuilds on development
+environments.</p>
 
 <a href="#plugins" id="plugins" style="color: inherit; text-decoration: none;">
   <h2>Plugins</h2>
 </a>
-<p>This package includes a few plugins for compatible static site 
-generators.</p>
+<p>This package includes a few plugins for compatible static site generators.</p>
 
 <a href="#eleventy" id="eleventy" style="color: inherit; text-decoration: none;">
   <h3>Eleventy</h3>
 </a>
-<p>The <a href="https://www.11ty.dev/docs/">Eleventy</a> plugin provides shortcodes
-for the Nunjucks and Liquid templating languages. It relies on their
-async methods to generate new images together with the responsive image
-markup.</p>
-<pre><code class="language-js"><span class="hl-8">// .eleventy.js</span><br/><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-7">responsiveImagesPlugin</span><span class="hl-1"> = </span><span class="hl-5">require</span><span class="hl-1">(</span><span class="hl-3">&#39;@dawaltconley/responsive-images/eleventy&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-11">module</span><span class="hl-1">.</span><span class="hl-11">exports</span><span class="hl-1"> = </span><span class="hl-0">eleventyConfig</span><span class="hl-1"> </span><span class="hl-4">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-0">eleventyConfig</span><span class="hl-1">.</span><span class="hl-5">addPlugin</span><span class="hl-1">(</span><span class="hl-0">responsiveImagesPlugin</span><span class="hl-1">, {</span><br/><span class="hl-1">    </span><span class="hl-0">scalingFactor:</span><span class="hl-1"> </span><span class="hl-6">0.5</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-0">defaults:</span><span class="hl-1"> {</span><br/><span class="hl-1">      </span><span class="hl-0">urlPath:</span><span class="hl-1"> </span><span class="hl-3">&#39;/assets/generated/&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">      </span><span class="hl-0">outputDir:</span><span class="hl-1"> </span><span class="hl-3">&#39;./_site/assets/generated/&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    },</span><br/><span class="hl-1">  });</span><br/><span class="hl-1">};</span>
+<p>The <a href="https://www.11ty.dev/docs/">Eleventy</a> plugin provides shortcodes for the
+Nunjucks and Liquid templating languages. It relies on their async methods to
+generate new images together with the responsive image markup.</p>
+<pre><code class="language-js"><span class="hl-8">// .eleventy.js</span><br/><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-7">responsiveImagesPlugin</span><span class="hl-1"> = </span><span class="hl-5">require</span><span class="hl-1">(</span><span class="hl-3">&#39;@dawaltconley/responsive-images/eleventy&#39;</span><span class="hl-1">)</span><br/><br/><span class="hl-11">module</span><span class="hl-1">.</span><span class="hl-11">exports</span><span class="hl-1"> = </span><span class="hl-0">eleventyConfig</span><span class="hl-1"> </span><span class="hl-4">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-0">eleventyConfig</span><span class="hl-1">.</span><span class="hl-5">addPlugin</span><span class="hl-1">(</span><span class="hl-0">responsiveImagesPlugin</span><span class="hl-1">, {</span><br/><span class="hl-1">    </span><span class="hl-0">scalingFactor:</span><span class="hl-1"> </span><span class="hl-6">0.5</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-0">defaults:</span><span class="hl-1"> {</span><br/><span class="hl-1">      </span><span class="hl-0">urlPath:</span><span class="hl-1"> </span><span class="hl-3">&#39;/assets/generated/&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">      </span><span class="hl-0">outputDir:</span><span class="hl-1"> </span><span class="hl-3">&#39;./_site/assets/generated/&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    },</span><br/><span class="hl-1">  })</span><br/><span class="hl-1">}</span>
 </code></pre>
-<p>You can also pass a configured <code>ResponsiveImages</code> class instance to the
-plugin, if you are using its methods elsewhere.</p>
+<p>You can also pass a configured <code>ResponsiveImages</code> class instance to the plugin,
+if you are using its methods elsewhere.</p>
 <p>Then, call the functions within your templates:</p>
 <pre><code class="language-njk">&lt;div&gt;
-  {% picture &quot;assets/example.jpg&quot;
-    alt=&quot;A responsive picture element&quot;
-    sizes=&quot;(min-width: 800px) 400px, 100vw&quot; %}
+  {% picture &quot;assets/example.jpg&quot;,
+    alt=&quot;A responsive picture element&quot;,
+    sizes=&quot;(min-width: 800px) 400px, 100vw&quot;, %}
 
   {% set picHtml = &quot;assets/example.jpg&quot; | picture({ alt: &#39;used as a filter&#39;, sizes: &#39;100vw&#39; }) #}
   {{ picHtml | safe }}
 
   &lt;picture class=&quot;picture-class&quot;&gt;
-    {% img &quot;assets/example.jpg&quot;
-      alt=&quot;Use the img shortcode to include image sources without a picture element&quot;
-      class=&quot;passed-to-image-element&quot;
+    {% img &quot;assets/example.jpg&quot;,
+      alt=&quot;Use the img shortcode to include image sources without a picture element&quot;,
+      class=&quot;passed-to-image-element&quot;,
       sizes=&quot;(min-width: 1000px) 50vw, 100vw&quot; %}
   &lt;/picture&gt;
 
@@ -144,30 +137,28 @@ plugin, if you are using its methods elsewhere.</p>
 <a href="#astrojs" id="astrojs" style="color: inherit; text-decoration: none;">
   <h3>Astro.js</h3>
 </a>
-<p>There is not currently a plugin for Astro.js projects, but integration is 
-fairly straightforward. Refer to <a href="https://github.com/dawaltconley/responsive-images/blob/main/solutions/astro.md">this 
-guide</a> 
+<p>There is not currently a plugin for Astro.js projects, but integration is fairly
+straightforward. Refer to
+<a href="https://github.com/dawaltconley/responsive-images/blob/main/solutions/astro.md">this guide</a>
 for more information.</p>
 
 <a href="#sass" id="sass" style="color: inherit; text-decoration: none;">
   <h3>Sass</h3>
 </a>
-<p>This package includes Sass mixins and custom functions for generating
-responsive images using media queries and the CSS <code>background-image</code>
-property.</p>
-<pre><code class="language-scss"><span class="hl-2">@use</span><span class="hl-1"> </span><span class="hl-3">&#39;./node_modules/@dawaltconley/responsive-images&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-10">.example</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-9">background-position</span><span class="hl-1">: </span><span class="hl-12">center</span><span class="hl-1">;</span><br/><span class="hl-1">  </span><span class="hl-9">background-size</span><span class="hl-1">: </span><span class="hl-12">cover</span><span class="hl-1">;</span><br/><span class="hl-1">  </span><span class="hl-9">background-repeat</span><span class="hl-1">: </span><span class="hl-12">no-repeat</span><span class="hl-1">;</span><br/><br/><span class="hl-1">  </span><span class="hl-2">@include</span><span class="hl-1"> </span><span class="hl-9">responsive-images</span><span class="hl-1">.</span><span class="hl-5">bg</span><span class="hl-1">(</span><br/><span class="hl-1">    </span><span class="hl-9">$src</span><span class="hl-1">: </span><span class="hl-3">&#39;./assets/bg.jpg&#39;</span><span class="hl-1">, </span><span class="hl-8">// can be passed as the first positional argument</span><br/><span class="hl-1">    </span><span class="hl-9">$sizes</span><span class="hl-1">: </span><span class="hl-3">&#39;(min-width: 1000px) 50vw, 100vw&#39;</span><span class="hl-1">, </span><span class="hl-8">// optional; defaults to 100vw</span><br/><span class="hl-1">    </span><span class="hl-9">$widths</span><span class="hl-1">: </span><span class="hl-6">1000</span><span class="hl-1"> </span><span class="hl-6">800</span><span class="hl-1"> </span><span class="hl-6">600</span><span class="hl-1">, </span><span class="hl-8">// optional list of manual widths. doesn&#39;t change media queries.</span><br/><span class="hl-1">    </span><span class="hl-9">$formats</span><span class="hl-1">: webp, </span><span class="hl-8">// optional; defaults to null (the original image format is preserved).</span><br/><span class="hl-1">    </span><span class="hl-9">$orientations</span><span class="hl-1">: </span><span class="hl-12">portrait</span><span class="hl-1"> </span><span class="hl-12">landscape</span><span class="hl-1">, </span><span class="hl-8">// optionally target a single viewport orientation</span><br/><span class="hl-1">  );</span><br/><span class="hl-1">}</span>
+<p>This package includes Sass mixins and custom functions for generating responsive
+images using media queries and the CSS <code>background-image</code> property.</p>
+<pre><code class="language-scss"><span class="hl-2">@use</span><span class="hl-1"> </span><span class="hl-3">&#39;./node_modules/@dawaltconley/responsive-images&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-10">.example</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-9">background-position</span><span class="hl-1">: </span><span class="hl-12">center</span><span class="hl-1">;</span><br/><span class="hl-1">  </span><span class="hl-9">background-size</span><span class="hl-1">: </span><span class="hl-12">cover</span><span class="hl-1">;</span><br/><span class="hl-1">  </span><span class="hl-9">background-repeat</span><span class="hl-1">: </span><span class="hl-12">no-repeat</span><span class="hl-1">;</span><br/><br/><span class="hl-1">  </span><span class="hl-2">@include</span><span class="hl-1"> </span><span class="hl-9">responsive-images</span><span class="hl-1">.</span><span class="hl-5">bg</span><span class="hl-1">(</span><br/><span class="hl-1">    </span><span class="hl-9">$src</span><span class="hl-1">: </span><span class="hl-3">&#39;./assets/bg.jpg&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-8">// can be passed as the first positional argument</span><br/><span class="hl-1">    </span><span class="hl-9">$sizes</span><span class="hl-1">: </span><span class="hl-3">&#39;(min-width: 1000px) 50vw, 100vw&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-8">// optional; defaults to 100vw</span><br/><span class="hl-1">    </span><span class="hl-9">$widths</span><span class="hl-1">: </span><span class="hl-6">1000</span><span class="hl-1"> </span><span class="hl-6">800</span><span class="hl-1"> </span><span class="hl-6">600</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-8">// optional list of manual widths. doesn&#39;t change media queries.</span><br/><span class="hl-1">    </span><span class="hl-9">$formats</span><span class="hl-1">: webp,</span><br/><span class="hl-1">    </span><span class="hl-8">// optional; defaults to null (the original image format is preserved).</span><br/><span class="hl-1">    </span><span class="hl-9">$orientations</span><span class="hl-1">: </span><span class="hl-12">portrait</span><span class="hl-1"> </span><span class="hl-12">landscape</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-8">// optionally target a single viewport orientation</span><br/><span class="hl-1">  );</span><br/><span class="hl-1">}</span>
 </code></pre>
-<p>These mixins rely on custom functions, which should be passed to Sass
-via the <code>ResponsiveImages.sassFunctions</code> property.</p>
+<p>These mixins rely on custom functions, which should be passed to Sass via the
+<code>ResponsiveImages.sassFunctions</code> property.</p>
 <p>In addition to the above keyword arguments, you can pass additional
-<code>background-image</code> backgrounds (such as linear-gradient functions) using
-the <code>$prepend-backgrounds</code> and <code>$append-backgrounds</code> arguments.</p>
-<p>This currently generates a fair amount of media queries. If you are
-creating lots of responsive background images, you may want to use a
-post-processor like
+<code>background-image</code> backgrounds (such as linear-gradient functions) using the
+<code>$prepend-backgrounds</code> and <code>$append-backgrounds</code> arguments.</p>
+<p>This currently generates a fair amount of media queries. If you are creating
+lots of responsive background images, you may want to use a post-processor like
 <a href="https://www.npmjs.com/package/postcss-sort-media-queries">postcss-sort-media-queries</a>.</p>
-<p>Multiple image formats are not currently supported; only the first
-format passed to the mixin will be used.</p>
+<p>Multiple image formats are not currently supported; only the first format passed
+to the mixin will be used.</p>
 </div></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
