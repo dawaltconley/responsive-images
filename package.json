@@ -1,6 +1,6 @@
 {
   "name": "@dawaltconley/responsive-images",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "Scripts and utilities for working with responsive images.",
   "main": "dist/index.js",
   "exports": {
