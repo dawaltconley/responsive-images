@@ -153,7 +153,7 @@ export default class ResponsiveImages
    */
   async resize(
     image: EleventyImage.ImageSource,
-    options: Partial<EleventyImage.ImageOptions> = {}
+    options: EleventyImage.ImageOptions = {}
   ): Promise<EleventyImage.Metadata> {
     let imgOpts = {
       ...this.defaults,
