@@ -14,17 +14,42 @@ const defaultConfig: ResponsiveImagesOptions = {
   },
 }
 
-const compile = (
+const compile = async (
   sassString: string,
   config: ResponsiveImagesOptions = {}
-): Promise<string> =>
-  sass
+): Promise<string> => {
+  const { sassFunctions } = new ResponsiveImages(_.merge(defaultConfig, config))
+
+  return sass
     .compileStringAsync(sassString, {
       loadPaths: ['node_modules'],
-      functions: new ResponsiveImages(_.merge(defaultConfig, config))
-        .sassFunctions,
+      functions: sassFunctions,
     })
     .then(result => result.css)
+}
+
+const compileLegacy = async (
+  sassString: string,
+  config: ResponsiveImagesOptions = {}
+): Promise<string> => {
+  const { sassLegacyFunctions } = new ResponsiveImages(
+    _.merge(defaultConfig, config)
+  )
+
+  return new Promise((resolve, reject) =>
+    sass.render(
+      {
+        data: sassString,
+        includePaths: ['node_modules'],
+        functions: sassLegacyFunctions,
+      },
+      (e, result) => {
+        if (e) reject(e)
+        if (result) resolve(result.css.toString())
+      }
+    )
+  )
+}
 
 const defaultExpected = scss`
   .bg-image {
@@ -274,6 +299,19 @@ describe('bg mixin', () => {
         }
       `),
       compile(defaultExpected),
+    ])
+    expect(output).toEqual(expected)
+  })
+
+  test('works with legacy sass apis', async () => {
+    const [output, expected] = await Promise.all([
+      compileLegacy(scss`
+        @use '../src/sass/_mixins.scss' as responsive;
+        .bg-image {
+          @include responsive.bg('./tests/assets/xlg.jpg');
+        }
+      `),
+      compileLegacy(defaultExpected),
     ])
     expect(output).toEqual(expected)
   })

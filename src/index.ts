@@ -1,8 +1,15 @@
-import type { Value as SassValue, CustomFunction } from 'sass/types'
+import type {
+  Value as SassValue,
+  CustomFunction,
+  LegacyValue,
+  LegacyAsyncFunction,
+  LegacyAsyncFunctionDone,
+} from 'sass/types'
 import type { Orientation, Device, SassQuery } from './types'
 
 import EleventyImage from '@11ty/eleventy-img'
 import cast from 'sass-cast'
+import { fromSass as fromLegacySass } from 'sass-cast/legacy'
 import defaultDevices from './data/devices'
 import { isOrientation } from './types'
 import { filterSizes, widthsFromSizes, queriesFromSizes } from './utilities'
@@ -409,6 +416,24 @@ export default class ResponsiveImages
         return cast.toSass(mediaQueries)
       },
     }
+  }
+
+  get sassLegacyFunctions(): Record<string, LegacyAsyncFunction> {
+    const legacyToModern = (value: LegacyValue): SassValue =>
+      cast.toSass(fromLegacySass(value))
+
+    return Object.entries(this.sassFunctions).reduce<
+      Record<string, LegacyAsyncFunction>
+    >(
+      (fn, [name, modernFn]) => ({
+        ...fn,
+        [name]: (...args: LegacyValue[]): void => {
+          const done = args.pop() as LegacyAsyncFunctionDone
+          Promise.resolve(modernFn(args.map(legacyToModern))).then(done)
+        },
+      }),
+      {}
+    )
   }
 }
 

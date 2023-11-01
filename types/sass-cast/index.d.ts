@@ -19,3 +19,25 @@ declare module 'sass-cast' {
 
   export const sassFunctions: Record<string, CustomFunction<'async'>>
 }
+
+declare module 'sass-cast/legacy' {
+  import type { LegacyValue, LegacyFunction } from 'sass/types' // eslint-disable-line @typescript-eslint/no-duplicate-imports
+
+  export function toSass(
+    value: unknown,
+    options?: {
+      parseUnquotedStrings?: boolean
+      resolveFunctions?: boolean
+    }
+  ): LegacyValue
+
+  export function fromSass(
+    value: object,
+    options?: {
+      preserveUnits?: boolean
+      rgbColors?: boolean
+    }
+  ): unknown
+
+  export const sassFunctions: Record<string, LegacyFunction<'async'>>
+}
