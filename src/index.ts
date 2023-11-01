@@ -418,6 +418,10 @@ export default class ResponsiveImages
     }
   }
 
+  /**
+   * Sass functions, wrapped to support Sass's legacy `render` method.
+   * @see {@link https://sass-lang.com/documentation/js-api/functions/render/}
+   */
   get sassLegacyFunctions(): Record<string, LegacyAsyncFunction> {
     const legacyToModern = (value: LegacyValue): SassValue =>
       cast.toSass(fromLegacySass(value))
