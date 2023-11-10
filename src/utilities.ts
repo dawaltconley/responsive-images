@@ -8,7 +8,7 @@ import type {
   QueryMap,
 } from './types'
 
-import { isMediaFeature } from './types'
+import { isDimension, isDimensionArray, isMediaFeature } from './types'
 import mediaParser from 'postcss-media-query-parser'
 import defaultDevices from './data/devices'
 
@@ -23,16 +23,6 @@ const cssValue = (v: string): [number, string] => {
   if (match) [, value, unit] = match
   return [Number(value), unit]
 }
-
-const isDimension = (object: unknown): object is Dimension =>
-  !!object &&
-  typeof object === 'object' &&
-  'w' in object &&
-  'h' in object &&
-  !('dppx' in object)
-
-const isDimensionArray = (objects: unknown[]): objects is Dimension[] =>
-  objects.every(isDimension)
 
 /**
  * Takes a parsed img sizes attribute and a specific device,

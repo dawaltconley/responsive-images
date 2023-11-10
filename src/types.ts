@@ -19,6 +19,16 @@ export interface Dimension {
   h: number
 }
 
+export const isDimension = (object: unknown): object is Dimension =>
+  !!object &&
+  typeof object === 'object' &&
+  'w' in object &&
+  'h' in object &&
+  !('dppx' in object)
+
+export const isDimensionArray = (objects: unknown[]): objects is Dimension[] =>
+  objects.every(isDimension)
+
 /** represents a supported device */
 export interface Device extends Dimension {
   /** possible dppx for devices with these dimensions */
