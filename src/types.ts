@@ -28,10 +28,21 @@ export interface Device extends Dimension {
   flip: boolean
 }
 
+export const MediaFeature = [
+  'max-width',
+  'max-height',
+  'min-width',
+  'min-height',
+] as const
+export type MediaFeature = (typeof MediaFeature)[number]
+
+export const isMediaFeature = (s: string): s is MediaFeature =>
+  MediaFeature.some(f => f === s)
+
 /** represents a media query condition, such as `(min-width: 600px)` */
 export interface MediaCondition {
   /** type of media query; usually 'min-width' or 'max-width' */
-  mediaFeature: string
+  mediaFeature: MediaFeature
 
   /** breakpoint where this applies */
   value: string

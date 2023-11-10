@@ -8,6 +8,7 @@ import type {
   QueryMap,
 } from './types'
 
+import { isMediaFeature } from './types'
 import mediaParser from 'postcss-media-query-parser'
 import defaultDevices from './data/devices'
 
@@ -214,58 +215,60 @@ function filterSizes(
  * @return an array of SizesQuery.Object objects describing media query parameters
  */
 function parseSizes(sizesQueryString: string): SizesQuery[] {
-  return sizesQueryString.split(/\s*,\s*/).map((descriptor: string) => {
-    const conditions: MediaCondition[] = []
-    const parsed = descriptor.match(/^(.*)\s+(\S+)$/) // TODO get this from parser instead; last node in media-query
-    if (!parsed) return { conditions, width: descriptor }
+  return sizesQueryString
+    .split(/\s*,\s*/)
+    .map<SizesQuery>((descriptor: string) => {
+      const conditions: MediaCondition[] = []
+      const parsed = descriptor.match(/^(.*)\s+(\S+)$/) // TODO get this from parser instead; last node in media-query
+      if (!parsed) return { conditions, width: descriptor }
 
-    const [, mediaCondition, width]: string[] = parsed
-    if (mediaCondition) {
-      // TODO handle expressions wrapped in extra parenthesis
-      const mediaQuery = mediaParser(mediaCondition).nodes[0]
-      for (const node of mediaQuery.nodes) {
-        if (node.type === 'media-feature-expression') {
-          const mediaFeature = node.nodes.find(
-            n => n.type === 'media-feature'
-          )?.value
-          const value = node.nodes.find(n => n.type === 'value')?.value
-          if (mediaFeature && value) {
-            // mediaFeature should always be truthy. value is only falsy with boolean media features, which in our case can be safely ignored.
-            conditions.push({ mediaFeature, value })
-          }
-        } else if (node.type === 'keyword') {
-          // } else if (node.type === 'keyword' && node.value === 'and') {
-          // continue // TODO wouldn't be valid sizes attribute, but regardless this doesn't work
-          // // maybe parse with cssValue here?
+      const [, mediaCondition, width]: string[] = parsed
+      if (mediaCondition) {
+        // TODO handle expressions wrapped in extra parenthesis
+        const mediaQuery = mediaParser(mediaCondition).nodes[0]
+        for (const node of mediaQuery.nodes) {
+          if (node.type === 'media-feature-expression') {
+            const mediaFeature = node.nodes.find(
+              n => n.type === 'media-feature'
+            )?.value
+            const value = node.nodes.find(n => n.type === 'value')?.value
+            if (mediaFeature && isMediaFeature(mediaFeature) && value) {
+              // mediaFeature should always be truthy. value is only falsy with boolean media features, which in our case can be safely ignored.
+              conditions.push({ mediaFeature, value })
+            }
+          } else if (node.type === 'keyword') {
+            // } else if (node.type === 'keyword' && node.value === 'and') {
+            // continue // TODO wouldn't be valid sizes attribute, but regardless this doesn't work
+            // // maybe parse with cssValue here?
 
-          if (node.value === 'and' || node.value === 'only') {
-            // ignore; add next valid node to the conditions list
-            continue
-          } else if (node.value === 'not') {
-            // TODO handle not
-            // eslint-disable-next-line no-console
-            console.warn(`not keyword is not yet handled; ignoring`)
-            continue
+            if (node.value === 'and' || node.value === 'only') {
+              // ignore; add next valid node to the conditions list
+              continue
+            } else if (node.value === 'not') {
+              // TODO handle not
+              // eslint-disable-next-line no-console
+              console.warn(`not keyword is not yet handled; ignoring`)
+              continue
+            } else {
+              throw new Error(`invalid media query keyword: ${node.value}`)
+            }
+          } else if (node.type === 'media-type') {
+            if (node.value === 'all')
+              // ignore; all is the only valid media-type
+              continue
+            else
+              throw new Error(
+                `media type ${node.value} cannot be used in a sizes attribute`
+              )
           } else {
-            throw new Error(`invalid media query keyword: ${node.value}`)
+            // eslint-disable-next-line no-console
+            console.error(node)
+            throw new Error('unhandled node type')
           }
-        } else if (node.type === 'media-type') {
-          if (node.value === 'all')
-            // ignore; all is the only valid media-type
-            continue
-          else
-            throw new Error(
-              `media type ${node.value} cannot be used in a sizes attribute`
-            )
-        } else {
-          // eslint-disable-next-line no-console
-          console.error(node)
-          throw new Error('unhandled node type')
         }
       }
-    }
-    return { conditions, width }
-  })
+      return { conditions, width }
+    })
 }
 
 export {
