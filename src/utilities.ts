@@ -1,10 +1,12 @@
 import type EleventyImage from '@11ty/eleventy-img'
 import type {
   Orientation,
+  UnitValue,
   Dimension,
   Device,
   SizesQuery,
   MediaCondition,
+  ImageSize,
   Image,
   QueryMap,
   ImageSet,
@@ -12,6 +14,7 @@ import type {
 } from './types'
 
 import {
+  isUnit,
   isDimension,
   isDimensionArray,
   isOrientation,
@@ -25,11 +28,14 @@ import { css } from './syntax'
 const valueRegex = /([\d.]+)(\D*)/
 
 /** Parses a string as a value with an optional unit. */
-const cssValue = (v: string): [number, string] => {
+const cssValue = (v: string): UnitValue => {
   let value = v,
     unit = ''
   const match = v.match(valueRegex)
   if (match) [, value, unit] = match
+  if (!unit) unit = 'px'
+  if (!isUnit(unit))
+    throw new Error(`Invalid unit: ${unit}\nOnly vw, vh, and px are supported.`)
   return [Number(value), unit]
 }
 
@@ -46,11 +52,11 @@ function deviceImages(
   sizes: SizesQuery[],
   device: Device /* , order: SizesQuery.Order */
 ): Image[] {
-  let imgWidth = '100vw' // fallback to 100vw if no queries apply; this is the browser default
+  let imgSize: ImageSize = { width: '100vw' } // fallback to 100vw if no queries apply; this is the browser default
   const orientation: Orientation =
     device.w >= device.h ? 'landscape' : 'portrait'
 
-  whichSize: for (const { conditions, width } of sizes) {
+  whichSize: for (const { conditions, size } of sizes) {
     for (const { mediaFeature, value: valueString } of conditions) {
       const [value, unit]: [number, string] = cssValue(valueString)
       if (unit !== 'px')
@@ -62,11 +68,11 @@ function deviceImages(
         (mediaFeature === 'max-height' && device.h <= value)
       if (!match) continue whichSize
     }
-    imgWidth = width
+    imgSize = size
     break whichSize // break loop when device matches all conditions
   }
 
-  let [scaledWidth, unit = 'px'] = cssValue(imgWidth)
+  let [scaledWidth, unit = 'px'] = cssValue(imgSize)
   if (unit === 'vw') {
     scaledWidth = (device.w * scaledWidth) / 100
   } else if (unit !== 'px') {
@@ -219,9 +225,9 @@ function parseSizes(sizesQueryString: string): SizesQuery[] {
     .map<SizesQuery>((descriptor: string) => {
       const conditions: MediaCondition[] = []
       const parsed = descriptor.match(/^(.*)\s+(\S+)$/) // TODO get this from parser instead; last node in media-query
-      if (!parsed) return { conditions, width: descriptor }
+      if (!parsed) return { conditions, size: { width: descriptor } }
 
-      const [, mediaCondition, width]: string[] = parsed
+      const [, mediaCondition, width] = parsed
       if (mediaCondition) {
         // TODO handle expressions wrapped in extra parenthesis
         const mediaQuery = mediaParser(mediaCondition).nodes[0]
@@ -266,7 +272,7 @@ function parseSizes(sizesQueryString: string): SizesQuery[] {
           }
         }
       }
-      return { conditions, width }
+      return { conditions, size: { width } }
     })
 }
 

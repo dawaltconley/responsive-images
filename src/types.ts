@@ -58,6 +58,24 @@ export interface MediaCondition {
   value: string
 }
 
+export const Unit = ['px', 'vw', 'vh'] as const
+export type Unit = (typeof Unit)[number]
+
+export const isUnit = (s: string): s is Unit => Unit.some(u => u === s)
+
+export type UnitValue<U extends Unit = Unit> = [number, U]
+
+export type SizeKeyword = 'cover' | 'contain'
+
+export type ImageSize =
+  | { width: UnitValue<'vw' | 'px'> }
+  | { height: UnitValue<'vh' | 'px'> }
+  | {
+      width: UnitValue<'vw' | 'px'>
+      height: UnitValue<'vh' | 'px'>
+      fit: SizeKeyword
+    }
+
 /**
  * represents a valid rule for the img sizes attribute,
  * such as `(min-width: 600px) 400px` or `100vw`
@@ -66,8 +84,8 @@ export interface SizesQuery {
   /** the conditions under which a sizes rule applies */
   conditions: MediaCondition[]
 
-  /** the image width applied under these conditions */
-  width: string
+  /** the image dimensions applied under these conditions */
+  size: ImageSize
 }
 
 export interface Image {
