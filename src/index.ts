@@ -339,8 +339,8 @@ export default class ResponsiveImages
           let imageMeta: EleventyImage.MetadataEntry | undefined =
             metaByWidth[image.w]
           if (imageMeta === undefined) {
-            imageMeta = originalImage
-            for (let i = 0, l = metadata.length; i < l; i++) {
+            imageMeta = metadata[0]
+            for (let i = 1, l = metadata.length; i < l; i++) {
               const m = metadata[i]
               const next = metadata[i + 1]
               if (m.width >= image.w && (!next || next.width < image.w)) {
