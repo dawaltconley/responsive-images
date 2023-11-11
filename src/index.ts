@@ -12,7 +12,12 @@ import cast from 'sass-cast'
 import { fromSass as fromLegacySass } from 'sass-cast/legacy'
 import defaultDevices from './data/devices'
 import { isOrientation } from './types'
-import { filterSizes, widthsFromSizes, queriesFromSizes } from './utilities'
+import {
+  filterSizes,
+  widthsFromSizes,
+  queriesFromSizes,
+  generateMediaQueries,
+} from './utilities'
 
 /**
  * Defines properties for image markup. `alt` is required.
@@ -46,8 +51,6 @@ export interface MixedOptions extends HtmlOptions, FromSizesOptions {}
 export interface ImageMetadata extends HtmlOptions {
   metadata: EleventyImage.Metadata
 }
-
-type ImageMetadataByWidth = Record<number, EleventyImage.MetadataEntry>
 
 export type ValidImageFormat =
   | 'auto'
@@ -309,7 +312,6 @@ export default class ResponsiveImages
       .filter(w => w <= originalImage.width)
     filteredWidths = filterSizes(filteredWidths, this.scalingFactor)
 
-    const mediaQueries: SassQuery[] = []
     let metadata = await this.resize(src, {
       widths: filteredWidths,
       formats,
@@ -319,54 +321,9 @@ export default class ResponsiveImages
     )
     metadata = metadata.sort((a, b) => b.width - a.width)
 
-    const metaByWidth: ImageMetadataByWidth = {}
-
-    for (const o of orientations) {
-      if (!isOrientation(o)) {
-        // eslint-disable-next-line no-console
-        console.warn(`Unrecognized orientation "${o}", skipping`)
-        continue
-      }
-      const orientation = orientations.length > 1 && o
-
-      queries[o].forEach(({ w, images }, i, queries) => {
-        const next = queries[i + 1]
-        const maxWidth = i > 0 && w,
-          minWidth = next && next.w
-
-        images.forEach((image, j, images) => {
-          const next = images[j + 1]
-          let imageMeta: EleventyImage.MetadataEntry | undefined =
-            metaByWidth[image.w]
-          if (imageMeta === undefined) {
-            imageMeta = metadata[0]
-            for (let i = 1, l = metadata.length; i < l; i++) {
-              const m = metadata[i]
-              const next = metadata[i + 1]
-              if (m.width >= image.w && (!next || next.width < image.w)) {
-                imageMeta = m
-                break
-              }
-            }
-            metaByWidth[image.w] = imageMeta
-          }
-          const { url, sourceType, format } = imageMeta
-          const mq: SassQuery = {
-            orientation,
-            maxWidth,
-            minWidth,
-            maxResolution: j > 0 && image.dppx,
-            minResolution: next && next.dppx,
-            url,
-            sourceType,
-            format,
-          }
-          mediaQueries.push(mq)
-        })
-      })
-    }
-
-    return mediaQueries
+    return generateMediaQueries(metadata, queries, {
+      orientations,
+    })
   }
 
   /**
