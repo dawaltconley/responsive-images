@@ -89,8 +89,9 @@ export interface SizesQuery {
 }
 
 export interface Image {
-  /** width of an actual image */
-  w: number
+  // /** width of an actual image */
+  // w: number
+  size: ImageSize
 
   /** device dppx at which this image size will apply */
   dppx: number

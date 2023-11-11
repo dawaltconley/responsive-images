@@ -52,7 +52,7 @@ function deviceImages(
   sizes: SizesQuery[],
   device: Device /* , order: SizesQuery.Order */
 ): Image[] {
-  let imgSize: ImageSize = { width: '100vw' } // fallback to 100vw if no queries apply; this is the browser default
+  let imgSize: ImageSize = { width: [100, 'vw'] } // fallback to 100vw if no queries apply; this is the browser default
   const orientation: Orientation =
     device.w >= device.h ? 'landscape' : 'portrait'
 
@@ -72,13 +72,14 @@ function deviceImages(
     break whichSize // break loop when device matches all conditions
   }
 
-  let [scaledWidth, unit = 'px'] = cssValue(imgSize)
-  if (unit === 'vw') {
-    scaledWidth = (device.w * scaledWidth) / 100
-  } else if (unit !== 'px') {
-    throw new Error(
-      `Invalid unit in sizes query: ${unit}\nOnly vw and px are supported.`
-    )
+  const scaled: Partial<Dimension> = {}
+  if ('width' in imgSize) {
+    const [w, unit = 'px'] = imgSize.width
+    scaled.w = unit === 'vw' ? (device.w * w) / 100 : w
+  }
+  if ('height' in imgSize) {
+    const [h, unit = 'px'] = imgSize.height
+    scaled.h = unit === 'vh' ? (device.h * h) / 100 : h
   }
 
   const needImages: Image[] = []
@@ -88,7 +89,7 @@ function deviceImages(
   dppx.forEach(dppx => {
     // TODO handle flipping here...
     needImages.push({
-      w: Math.ceil(scaledWidth * dppx),
+      w: Math.ceil(scaled.w * dppx), // need image dimensions to calculate width here...
       dppx,
       orientation,
     })
