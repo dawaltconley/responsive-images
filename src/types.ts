@@ -97,10 +97,10 @@ export type QueryMap = Record<Orientation, QueryObject[]>
 /** sent to sass mixin */
 export interface SassQuery {
   orientation: Orientation | false
-  maxWidth: number | boolean | undefined
-  minWidth: number | boolean | undefined
-  maxResolution: number | boolean | undefined
-  minResolution: number | boolean | undefined
+  maxWidth?: number | false
+  minWidth?: number | false
+  maxResolution?: number | false
+  minResolution?: number | false
   url: string
   sourceType: string
   format: string
