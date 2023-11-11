@@ -328,6 +328,21 @@ export const generateMediaQueries = (
   return mediaQueries
 }
 
+export const permute = <T>(
+  matrix: T[][],
+  permutations: T[][] = [],
+  a: T[] = []
+): T[][] => {
+  if (a.length === matrix.length) {
+    // if is matrix length, consider it a complete permutation and add it to perms
+    permutations.push([...a])
+    return permutations
+  }
+  const row = matrix[a.length]
+  for (const item of row) permute(matrix, permutations, [...a, item]) // call function on each row
+  return permutations
+}
+
 export {
   widthsFromSizes,
   queriesFromSizes,

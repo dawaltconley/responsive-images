@@ -6,6 +6,7 @@ import {
   widthsFromSizes,
   queriesFromSizes,
   filterSizes,
+  permute,
 } from '../src/utilities'
 
 describe('parseSizes()', () => {
@@ -1045,5 +1046,56 @@ describe('queriesFromSizes()', () => {
         },
       ],
     })
+  })
+})
+
+describe('permute()', () => {
+  test('permutes two arrays', () => {
+    expect(permute([['a', 'b'], ['c']])).toEqual([
+      ['a', 'c'],
+      ['b', 'c'],
+    ])
+    expect(
+      permute([
+        ['a', 'b'],
+        ['c', 'd', 'e'],
+      ])
+    ).toEqual([
+      ['a', 'c'],
+      ['a', 'd'],
+      ['a', 'e'],
+      ['b', 'c'],
+      ['b', 'd'],
+      ['b', 'e'],
+    ])
+  })
+
+  test('permutes three arrays', () => {
+    expect(
+      permute([
+        ['a', 'b', 'c'],
+        ['c', 'd', 'e'],
+        ['g', 'h'],
+      ])
+    ).toEqual([
+      ['a', 'c', 'g'],
+      ['a', 'c', 'h'],
+      ['a', 'd', 'g'],
+      ['a', 'd', 'h'],
+      ['a', 'e', 'g'],
+      ['a', 'e', 'h'],
+      ['b', 'c', 'g'],
+      ['b', 'c', 'h'],
+      ['b', 'd', 'g'],
+      ['b', 'd', 'h'],
+      ['b', 'e', 'g'],
+      ['b', 'e', 'h'],
+      ['c', 'c', 'g'],
+      ['c', 'c', 'h'],
+      ['c', 'd', 'g'],
+      ['c', 'd', 'h'],
+      ['c', 'e', 'g'],
+      ['c', 'e', 'h'],
+    ])
   })
 })
