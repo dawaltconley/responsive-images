@@ -344,51 +344,51 @@ export const permute = <T>(
   return permutations
 }
 
-export const queriesToCss = (
-  selector: string,
-  queries: SassQuery[]
-): string => {
-  const result: string[] = []
-  queries.forEach(q => {
-    const selectors: string[] = []
-    const andQueries: string[] = []
-    const orQueries: string[][] = []
-    const webkitResolutions: string[] = []
-    const resolutions: string[] = []
-    if (q.orientation) {
-      andQueries.push(css`(orientation: ${q.orientation})`)
-    }
-    if (q.maxWidth) {
-      andQueries.push(css`(max-width: ${q.maxWidth}px)`)
-    }
-    if (q.minWidth) {
-      orQueries.push([css`(min-width: ${q.minWidth + 1}px)`])
-    }
-    if (q.maxResolution || q.minResolution) {
-      if (q.maxResolution) {
-        webkitResolutions.push(
-          css`(-webkit-max-device-pixel-ratio: ${q.maxResolution})`
-        )
-        resolutions.push(css`(max-resolution: ${q.maxResolution * 96}dpi)`)
+export const queriesToCss = (selector: string, queries: SassQuery[]): string =>
+  queries
+    .map<string>(q => {
+      const andQueries: string[] = []
+      const orQueries: string[][] = []
+
+      if (q.orientation) {
+        andQueries.push(css`(orientation: ${q.orientation})`)
       }
-      if (q.minResolution) {
-        webkitResolutions.push(
-          css`(-webkit-min-device-pixel-ratio: ${q.minResolution + 0.01})`
-        )
-        resolutions.push(css`(min-resolution: ${q.minResolution * 96 + 1}dpi)`)
+      if (q.maxWidth) {
+        andQueries.push(css`(max-width: ${q.maxWidth}px)`)
       }
-      orQueries.push([
-        webkitResolutions.join(' and '),
-        resolutions.join(' and '),
-      ])
-    }
-    permute(orQueries).forEach(set => {
-      const q = [...andQueries, ...set].join(' and ')
-      selectors.push(q)
-    })
-    result.push(
-      css`
-        @media ${selectors.join(', ')} {
+      if (q.minWidth) {
+        orQueries.push([css`(min-width: ${q.minWidth + 1}px)`])
+      }
+
+      if (q.maxResolution || q.minResolution) {
+        const webkitResolutions: string[] = []
+        const resolutions: string[] = []
+        if (q.maxResolution) {
+          webkitResolutions.push(
+            css`(-webkit-max-device-pixel-ratio: ${q.maxResolution})`
+          )
+          resolutions.push(css`(max-resolution: ${q.maxResolution * 96}dpi)`)
+        }
+        if (q.minResolution) {
+          webkitResolutions.push(
+            css`(-webkit-min-device-pixel-ratio: ${q.minResolution + 0.01})`
+          )
+          resolutions.push(
+            css`(min-resolution: ${q.minResolution * 96 + 1}dpi)`
+          )
+        }
+        orQueries.push([
+          webkitResolutions.join(' and '),
+          resolutions.join(' and '),
+        ])
+      }
+
+      const selectors = permute(orQueries)
+        .map(set => [...andQueries, ...set].join(' and '))
+        .join(', ')
+
+      return css`
+        @media ${selectors} {
           ${selector} {
             background-image: url('${q.url}');
           }
@@ -396,10 +396,8 @@ export const queriesToCss = (
       `
         .replace(/\s+/g, ' ')
         .trim()
-    )
-  })
-  return result.join('\n')
-}
+    })
+    .join('\n')
 
 export {
   widthsFromSizes,
