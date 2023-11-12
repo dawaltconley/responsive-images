@@ -156,6 +156,7 @@ export default class ResponsiveImages
     this.metadataFromSizes = this.metadataFromSizes.bind(this)
     this.pictureFromSizes = this.pictureFromSizes.bind(this)
     this.sourceFromSizes = this.sourceFromSizes.bind(this)
+    this.generateMediaQueries = this.generateMediaQueries.bind(this)
     this.backgroundFromSizes = this.backgroundFromSizes.bind(this)
   }
 
