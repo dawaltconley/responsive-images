@@ -1,10 +1,7 @@
 import _ from 'lodash'
 import sass from 'sass'
 import ResponsiveImages, { ResponsiveImagesOptions } from '../src/index'
-
-const raw = (strings: TemplateStringsArray, ...values: unknown[]) =>
-  String.raw({ raw: strings }, ...values)
-const scss = raw
+import { scss } from '../src/syntax'
 
 const defaultConfig: ResponsiveImagesOptions = {
   scalingFactor: 0.5,
@@ -328,6 +325,25 @@ describe('bg mixin', () => {
         `,
         { sassPrefix }
       ),
+      compile(defaultExpected),
+    ])
+    expect(output).toEqual(expected)
+  })
+})
+
+describe('backgroundFromSizes()', () => {
+  const images = new ResponsiveImages({
+    ...defaultConfig,
+    scalingFactor: 0.5,
+  })
+
+  test('generates responsive background css from default values', async () => {
+    const css = await images.backgroundFromSizes(
+      '.bg-image',
+      './tests/assets/xlg.jpg'
+    )
+    const [output, expected] = await Promise.all([
+      compile(css),
       compile(defaultExpected),
     ])
     expect(output).toEqual(expected)

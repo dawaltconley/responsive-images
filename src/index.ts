@@ -17,6 +17,7 @@ import {
   widthsFromSizes,
   queriesFromSizes,
   generateMediaQueries,
+  queriesToCss,
 } from './utilities'
 
 /**
@@ -155,6 +156,7 @@ export default class ResponsiveImages
     this.metadataFromSizes = this.metadataFromSizes.bind(this)
     this.pictureFromSizes = this.pictureFromSizes.bind(this)
     this.sourceFromSizes = this.sourceFromSizes.bind(this)
+    this.backgroundFromSizes = this.backgroundFromSizes.bind(this)
   }
 
   /**
@@ -324,6 +326,19 @@ export default class ResponsiveImages
     return generateMediaQueries(metadata, queries, {
       orientations,
     })
+  }
+
+  /**
+   * Generates CSS for a responsive background image using a sizes string.
+   * @param selector - a CSS selector for the intended elements
+   */
+  async backgroundFromSizes(
+    selector: string,
+    src: EleventyImage.ImageSource,
+    kwargs: MediaQueryOptions = {}
+  ): Promise<string> {
+    const queries = await this.generateMediaQueries(src, kwargs)
+    return queriesToCss(selector, queries)
   }
 
   /**

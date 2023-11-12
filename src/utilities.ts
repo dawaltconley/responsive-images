@@ -18,6 +18,7 @@ import {
 } from './types'
 import mediaParser from 'postcss-media-query-parser'
 import defaultDevices from './data/devices'
+import { css } from './syntax'
 
 /** @constant used for parsing a CSS value */
 const valueRegex = /([\d.]+)(\D*)/
@@ -341,6 +342,63 @@ export const permute = <T>(
   const row = matrix[a.length]
   for (const item of row) permute(matrix, permutations, [...a, item]) // call function on each row
   return permutations
+}
+
+export const queriesToCss = (
+  selector: string,
+  queries: SassQuery[]
+): string => {
+  const result: string[] = []
+  queries.forEach(q => {
+    const selectors: string[] = []
+    const andQueries: string[] = []
+    const orQueries: string[][] = []
+    const webkitResolutions: string[] = []
+    const resolutions: string[] = []
+    if (q.orientation) {
+      andQueries.push(css`(orientation: ${q.orientation})`)
+    }
+    if (q.maxWidth) {
+      andQueries.push(css`(max-width: ${q.maxWidth}px)`)
+    }
+    if (q.minWidth) {
+      orQueries.push([css`(min-width: ${q.minWidth + 1}px)`])
+    }
+    if (q.maxResolution || q.minResolution) {
+      if (q.maxResolution) {
+        webkitResolutions.push(
+          css`(-webkit-max-device-pixel-ratio: ${q.maxResolution})`
+        )
+        resolutions.push(css`(max-resolution: ${q.maxResolution * 96}dpi)`)
+      }
+      if (q.minResolution) {
+        webkitResolutions.push(
+          css`(-webkit-min-device-pixel-ratio: ${q.minResolution + 0.01})`
+        )
+        resolutions.push(css`(min-resolution: ${q.minResolution * 96 + 1}dpi)`)
+      }
+      orQueries.push([
+        webkitResolutions.join(' and '),
+        resolutions.join(' and '),
+      ])
+    }
+    permute(orQueries).forEach(set => {
+      const q = [...andQueries, ...set].join(' and ')
+      selectors.push(q)
+    })
+    result.push(
+      css`
+        @media ${selectors.join(', ')} {
+          ${selector} {
+            background-image: url('${q.url}');
+          }
+        }
+      `
+        .replace(/\s+/g, ' ')
+        .trim()
+    )
+  })
+  return result.join('\n')
 }
 
 export {

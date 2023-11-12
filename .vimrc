@@ -7,7 +7,7 @@ let g:ale_fixers['typescript'] = ['prettier', 'eslint']
 let g:ale_fixers['yaml'] = ['prettier']
 let g:ale_fixers['markdown'] = ['prettier']
 
-autocmd BufRead *tests/sass.test.ts call TemplateLiteralSyntax(['css', 'scss'])
+autocmd BufRead *tests/sass.test.ts,*src/utilities.ts call TemplateLiteralSyntax(['css', 'scss'])
 
 source ~/.vim/coc.vim
 
