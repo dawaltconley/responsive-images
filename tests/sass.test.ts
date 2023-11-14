@@ -106,6 +106,77 @@ const defaultExpected = scss`
   }
 `
 
+const defaultExpectedFormats = scss`
+  .bg-image {
+    @media (orientation: landscape)  and (min-width: 1025px) {
+      @supports not (background-image: image-set(url('/img/output-2048.webp') type('image/webp'), url('/img/output-2048.jpeg') type('image/jpeg'))) {
+        background-image: url('/img/output-2048.jpeg');
+      }
+      background-image: image-set(url('/img/output-2048.webp') type('image/webp'), url('/img/output-2048.jpeg') type('image/jpeg'));
+    }
+    @media (orientation: landscape) and (max-width: 1024px) and (min-width: 769px) and (min-resolution: 97dpi) {
+      @supports not (background-image: image-set(url("/img/output-2048.webp") type('image/webp'), url("/img/output-2048.jpeg") type('image/jpeg'))) {
+        background-image: url("/img/output-2048.jpeg");
+      }
+      background-image: image-set(url("/img/output-2048.webp") type('image/webp'), url("/img/output-2048.jpeg") type('image/jpeg'));
+    }
+    @media (orientation: landscape) and (max-width: 1024px) and (min-width: 769px) and (max-resolution: 96dpi) {
+      @supports not (background-image: image-set(url("/img/output-1080.webp") type('image/webp'), url("/img/output-1080.jpeg") type('image/jpeg'))) {
+        background-image: url("/img/output-1080.jpeg");
+      }
+      background-image: image-set(url("/img/output-1080.webp") type('image/webp'), url("/img/output-1080.jpeg") type('image/jpeg'));
+    }
+    @media (orientation: landscape) and (max-width: 768px) and (min-resolution: 241dpi) {
+      @supports not (background-image: image-set(url("/img/output-3072.webp") type('image/webp'), url("/img/output-3072.jpeg") type('image/jpeg'))) {
+        background-image: url("/img/output-3072.jpeg");
+      }
+      background-image: image-set(url("/img/output-3072.webp") type('image/webp'), url("/img/output-3072.jpeg") type('image/jpeg'));
+    }
+    @media (orientation: landscape) and (max-width: 768px) and (max-resolution: 240dpi) and (min-resolution: 97dpi) {
+      @supports not (background-image: image-set(url("/img/output-2048.webp") type('image/webp'), url("/img/output-2048.jpeg") type('image/jpeg'))) {
+        background-image: url("/img/output-2048.jpeg");
+      }
+      background-image: image-set(url("/img/output-2048.webp") type('image/webp'), url("/img/output-2048.jpeg") type('image/jpeg'));
+    }
+    @media (orientation: landscape) and (max-width: 768px) and (max-resolution: 96dpi) {
+      @supports not (background-image: image-set(url("/img/output-1080.webp") type('image/webp'), url("/img/output-1080.jpeg") type('image/jpeg'))) {
+        background-image: url("/img/output-1080.jpeg");
+      }
+      background-image: image-set(url("/img/output-1080.webp") type('image/webp'), url("/img/output-1080.jpeg") type('image/jpeg'));
+    }
+    @media (orientation: portrait) and (min-width: 433px) and (min-resolution: 97dpi) {
+      @supports not (background-image: image-set(url("/img/output-2048.webp") type('image/webp'), url("/img/output-2048.jpeg") type('image/jpeg'))) {
+        background-image: url("/img/output-2048.jpeg");
+      }
+      background-image: image-set(url("/img/output-2048.webp") type('image/webp'), url("/img/output-2048.jpeg") type('image/jpeg'));
+    }
+    @media (orientation: portrait) and (min-width: 433px) and (max-resolution: 96dpi) {
+      @supports not (background-image: image-set(url("/img/output-1080.webp") type('image/webp'), url("/img/output-1080.jpeg") type('image/jpeg'))) {
+        background-image: url("/img/output-1080.jpeg");
+      }
+      background-image: image-set(url("/img/output-1080.webp") type('image/webp'), url("/img/output-1080.jpeg") type('image/jpeg'));
+    }
+    @media (orientation: portrait) and (max-width: 432px) and (min-resolution: 241dpi) {
+      @supports not (background-image: image-set(url("/img/output-2048.webp") type('image/webp'), url("/img/output-2048.jpeg") type('image/jpeg'))) {
+        background-image: url("/img/output-2048.jpeg");
+      }
+      background-image: image-set(url("/img/output-2048.webp") type('image/webp'), url("/img/output-2048.jpeg") type('image/jpeg'));
+    }
+    @media (orientation: portrait) and (max-width: 432px) and (max-resolution: 240dpi) and (min-resolution: 97dpi) {
+      @supports not (background-image: image-set(url("/img/output-1080.webp") type('image/webp'), url("/img/output-1080.jpeg") type('image/jpeg'))) {
+        background-image: url("/img/output-1080.jpeg");
+      }
+      background-image: image-set(url("/img/output-1080.webp") type('image/webp'), url("/img/output-1080.jpeg") type('image/jpeg'));
+    }
+    @media (orientation: portrait) and (max-width: 432px) and (max-resolution: 96dpi) {
+      @supports not (background-image: image-set(url("/img/output-432.webp") type('image/webp'), url("/img/output-432.jpeg") type('image/jpeg'))) {
+        background-image: url("/img/output-432.jpeg");
+      }
+      background-image: image-set(url("/img/output-432.webp") type('image/webp'), url("/img/output-432.jpeg") type('image/jpeg'));
+    }
+  }
+`
+
 describe('bg mixin', () => {
   test('generates responsive background images from default values', async () => {
     const [output, expected] = await Promise.all([
@@ -129,6 +200,19 @@ describe('bg mixin', () => {
         }
       `),
       compileLegacy(defaultExpected),
+    ])
+    expect(output).toEqual(expected)
+  })
+
+  test('generates responsive background images with multiple formats', async () => {
+    const [output, expected] = await Promise.all([
+      compile(scss`
+        @use '../src/sass/_mixins.scss' as responsive;
+        .bg-image {
+          @include responsive.bg('./tests/assets/xlg.jpg', $formats: webp null);
+        }
+      `),
+      compile(defaultExpectedFormats),
     ])
     expect(output).toEqual(expected)
   })
@@ -165,6 +249,21 @@ describe('backgroundFromSizes()', () => {
     const [output, expected] = await Promise.all([
       compile(css),
       compile(defaultExpected),
+    ])
+    expect(output).toEqual(expected)
+  })
+
+  test('generates responsive background css with multiple formats', async () => {
+    const css = await images.backgroundFromSizes(
+      '.bg-image',
+      './tests/assets/xlg.jpg',
+      {
+        formats: ['webp', null],
+      }
+    )
+    const [output, expected] = await Promise.all([
+      compile(css),
+      compile(defaultExpectedFormats),
     ])
     expect(output).toEqual(expected)
   })

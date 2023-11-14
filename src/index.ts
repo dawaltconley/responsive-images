@@ -10,6 +10,7 @@ import {
   widthsFromSizes,
   queriesFromSizes,
   generateMediaQueries,
+  toMediaQueryMap,
   queriesToCss,
 } from './utilities'
 import { toLegacyAsyncFunctions } from './legacy-sass'
@@ -274,14 +275,6 @@ export default class ResponsiveImages
     } = kwargs
     let { widths = null } = kwargs
 
-    // TODO support multiple image formats using image-set and fallbacks https://developer.mozilla.org/en-US/docs/Web/CSS/image/image-set#providing_a_fallback
-    if (formats.length > 1)
-      throw new Error(
-        `Currently only one background image format is supported, but multiple formats were specified: (${formats.join(
-          ', '
-        )})`
-      )
-
     const originalImage = await EleventyImage(src, {
       statsOnly: true,
       widths: [null],
@@ -309,14 +302,10 @@ export default class ResponsiveImages
       .filter(w => w <= originalImage.width)
     filteredWidths = filterSizes(filteredWidths, this.scalingFactor)
 
-    let metadata = await this.resize(src, {
+    const metadata = await this.resize(src, {
       widths: filteredWidths,
       formats,
-    }).then(
-      // just picking the metadata images from the first resize format, since only one can be specified
-      formats => Object.values(formats)[0] as EleventyImage.MetadataEntry[]
-    )
-    metadata = metadata.sort((a, b) => b.width - a.width)
+    }).then(formats => Object.values(formats).flat())
 
     return generateMediaQueries(metadata, queries, {
       orientations,
@@ -333,7 +322,7 @@ export default class ResponsiveImages
     kwargs: MediaQueryOptions = {}
   ): Promise<string> {
     const queries = await this.generateMediaQueries(src, kwargs)
-    return queriesToCss(selector, queries)
+    return queriesToCss(selector, toMediaQueryMap(queries))
   }
 
   /**
@@ -380,7 +369,7 @@ export default class ResponsiveImages
           sizes,
         })
 
-        return cast.toSass(mediaQueries)
+        return cast.toSass(Array.from(toMediaQueryMap(mediaQueries)))
       },
     }
   }

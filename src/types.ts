@@ -94,6 +94,19 @@ export interface QueryObject extends Dimension {
  */
 export type QueryMap = Record<Orientation, QueryObject[]>
 
+export interface ImageSource {
+  /** pixel density only, string list of srcs and dppx */
+  srcset?: string
+  type: string
+  media: string
+}
+
+export interface ImageSet {
+  image: string
+  dppx?: number
+  type?: string
+}
+
 /** sent to sass mixin */
 export interface SassQuery {
   orientation: Orientation | false

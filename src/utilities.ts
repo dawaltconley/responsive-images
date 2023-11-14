@@ -7,6 +7,7 @@ import type {
   MediaCondition,
   Image,
   QueryMap,
+  ImageSet,
   SassQuery,
 } from './types'
 
@@ -279,7 +280,14 @@ export const generateMediaQueries = (
   { orientations = ['landscape', 'portrait'] }: GenerateMediaQueriesOptions
 ): SassQuery[] => {
   const mediaQueries: SassQuery[] = []
-  const metaByWidth: Record<number, EleventyImage.MetadataEntry> = {}
+  const metaCache: Record<number, EleventyImage.MetadataEntry[]> = {}
+  const metaWidths = metadata
+    .sort((a, b) => b.width - a.width)
+    .reduce((map, m) => {
+      const sameWidth = map.get(m.width) || []
+      return map.set(m.width, [...sameWidth, m])
+    }, new Map<number, EleventyImage.MetadataEntry[]>())
+  const metaWidthsEntries = Array.from(metaWidths.entries())
 
   for (const o of orientations) {
     if (!isOrientation(o)) {
@@ -296,32 +304,32 @@ export const generateMediaQueries = (
 
       images.forEach((image, j, images) => {
         const next = images[j + 1]
-        let imageMeta: EleventyImage.MetadataEntry | undefined =
-          metaByWidth[image.w]
+        let imageMeta: EleventyImage.MetadataEntry[] | undefined =
+          metaWidths.get(image.w)
         if (imageMeta === undefined) {
-          imageMeta = metadata[0]
-          for (let i = 1, l = metadata.length; i < l; i++) {
-            const m = metadata[i]
-            const next = metadata[i + 1]
-            if (m.width >= image.w && (!next || next.width < image.w)) {
+          imageMeta = metaWidthsEntries[0][1]
+          for (let i = 1, l = metaWidthsEntries.length; i < l; i++) {
+            const [mWidth, m] = metaWidthsEntries[i]
+            const [nextWidth, next] = metaWidthsEntries[i + 1] || []
+            if (mWidth >= image.w && (!next || nextWidth < image.w)) {
               imageMeta = m
               break
             }
           }
-          metaByWidth[image.w] = imageMeta
+          metaCache[image.w] = imageMeta
         }
-        const { url, sourceType, format } = imageMeta
-        const mq: SassQuery = {
-          orientation,
-          maxWidth,
-          minWidth,
-          maxResolution: j > 0 && image.dppx,
-          minResolution: next && next.dppx,
-          url,
-          sourceType,
-          format,
-        }
-        mediaQueries.push(mq)
+        mediaQueries.push(
+          ...imageMeta.map<SassQuery>(({ url, sourceType, format }) => ({
+            orientation,
+            maxWidth,
+            minWidth,
+            maxResolution: j > 0 && image.dppx,
+            minResolution: next && next.dppx,
+            url,
+            sourceType,
+            format,
+          }))
+        )
       })
     })
   }
@@ -344,43 +352,85 @@ export const permute = <T>(
   return permutations
 }
 
-export const queriesToCss = (selector: string, queries: SassQuery[]): string =>
-  queries
-    .map<string>(q => {
-      const andQueries: string[] = []
-      const orQueries: string[][] = []
+/**
+ * @returns a map of media query selectors and the images used for image-set within a given selector.
+ */
+export const toMediaQueryMap = (
+  queries: SassQuery[]
+): Map<string, ImageSet[]> =>
+  queries.reduce((map, q) => {
+    const andQueries: string[] = []
+    const orQueries: string[][] = []
 
-      if (q.orientation) {
-        andQueries.push(css`(orientation: ${q.orientation})`)
-      }
-      if (q.maxWidth) {
-        andQueries.push(css`(max-width: ${q.maxWidth}px)`)
-      }
-      if (q.minWidth) {
-        orQueries.push([css`(min-width: ${q.minWidth + 1}px)`])
-      }
+    if (q.orientation) {
+      andQueries.push(css`(orientation: ${q.orientation})`)
+    }
+    if (q.maxWidth) {
+      andQueries.push(css`(max-width: ${q.maxWidth}px)`)
+    }
+    if (q.minWidth) {
+      orQueries.push([css`(min-width: ${q.minWidth + 1}px)`])
+    }
 
-      if (q.maxResolution || q.minResolution) {
-        const resolutions: string[] = []
-        if (q.maxResolution) {
-          resolutions.push(css`(max-resolution: ${q.maxResolution * 96}dpi)`)
-        }
-        if (q.minResolution) {
-          resolutions.push(
-            css`(min-resolution: ${q.minResolution * 96 + 1}dpi)`
-          )
-        }
-        orQueries.push([resolutions.join(' and ')])
+    if (q.maxResolution || q.minResolution) {
+      const resolutions: string[] = []
+      if (q.maxResolution) {
+        resolutions.push(css`(max-resolution: ${q.maxResolution * 96}dpi)`)
       }
+      if (q.minResolution) {
+        resolutions.push(css`(min-resolution: ${q.minResolution * 96 + 1}dpi)`)
+      }
+      orQueries.push([resolutions.join(' and ')])
+    }
 
-      const selectors = permute(orQueries)
-        .map(set => [...andQueries, ...set].join(' and '))
-        .join(', ')
+    const selectors = permute(orQueries)
+      .map(set => [...andQueries, ...set].join(' and '))
+      .join(', ')
 
+    const images = map.get(selectors) || []
+    images.push({
+      image: q.url,
+      type: q.sourceType,
+      // dppx: q.maxResolution || undefined,
+    })
+
+    return map.set(selectors, images)
+  }, new Map<string, ImageSet[]>())
+
+export const queriesToCss = (
+  selector: string,
+  queryMap: Map<string, ImageSet[]>
+): string =>
+  Array.from(queryMap.entries())
+    .map(([selectors, images]) => {
+      if (images.length === 1)
+        return css`
+          @media ${selectors} {
+            ${selector} {
+              background-image: url('${images[0].image}');
+            }
+          }
+        `
+
+      const imageSet = `image-set(${images
+        .map(({ image, type }) => `url('${image}') type('${type}')`)
+        .join(', ')})`
+      const fallback = images.reduce(
+        (fallback, img) =>
+          img.dppx && fallback.dppx && img.dppx < fallback.dppx
+            ? img
+            : fallback,
+        images[images.length - 1]
+      )
       return css`
         @media ${selectors} {
           ${selector} {
-            background-image: url('${q.url}');
+            background-image: ${imageSet};
+          }
+          @supports not (background-image: ${imageSet}) {
+            ${selector} {
+              background-image: url('${fallback.image}');
+            }
           }
         }
       `

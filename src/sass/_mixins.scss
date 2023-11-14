@@ -32,67 +32,55 @@ $image-queries: meta.get-function('#{$prefix}-queries');
 
 @mixin bg($src, $prepend-backgrounds: (), $append-backgrounds: (), $kwargs...) {
   $queries: meta.call($image-queries, $src, $kwargs...);
-  @each $query in $queries {
-    $selectors: ();
-    $andQueries: ();
-    $orQueries: ();
-    $resolutions: ();
-
-    $orientation: map.get($query, 'orientation');
-    $max-width: map.get($query, 'maxWidth');
-    $min-width: map.get($query, 'minWidth');
-    $max-resolution: map.get($query, 'maxResolution');
-    $min-resolution: map.get($query, 'minResolution');
-    $image: map.get($query, 'url');
-
-    @if $orientation {
-      $andQueries: list.append($andQueries, '(orientation: #{$orientation})');
-    }
-    @if $max-width {
-      $andQueries: list.append($andQueries, '(max-width: #{$max-width * 1px})');
-    }
-    @if $min-width {
-      $orQueries: list.append(
-        $orQueries,
-        '(min-width: #{($min-width * 1px) + 1px})'
-      );
-    }
-    @if $max-resolution or $min-resolution {
-      @if $max-resolution {
-        $resolutions: list.append(
-          $resolutions,
-          '(max-resolution: #{$max-resolution * 96dpi})'
-        );
-      }
-      @if $min-resolution {
-        $resolutions: list.append(
-          $resolutions,
-          '(min-resolution: #{($min-resolution * 96dpi) + 1dpi})'
-        );
-      }
-      $orQueries: list.append($orQueries, join-str($resolutions, ' and '));
-    }
-
-    @each $set in permute($orQueries) {
-      $q: list.join($andQueries, $set);
-      $q: join-str($q, ' and ');
-      $selectors: list.append($selectors, $q, comma);
-    }
-
+  @each $selectors, $images in $queries {
     @media #{$selectors} {
-      $backgrounds: list.join(
+      $fallback: list.nth($images, -1);
+      $fallback: url('#{map.get($fallback, 'image')}');
+      $fallback: list.join(
         $prepend-backgrounds,
-        url($image),
+        $fallback,
         $separator: comma,
         $bracketed: false
       );
-      $backgrounds: list.join(
-        $backgrounds,
+      $fallback: list.join(
+        $fallback,
         $append-backgrounds,
         $separator: comma,
         $bracketed: false
       );
-      background-image: $backgrounds;
+
+      @if list.length($images) > 1 {
+        $image-set: ();
+        @each $img in $images {
+          $url: map.get($img, image);
+          $type: map.get($img, type);
+          $image-set: list.append(
+            $image-set,
+            (url('#{$url}') type('#{$type}')),
+            $separator: comma
+          );
+        }
+        $image-set: image-set(#{$image-set});
+        $image-set: list.join(
+          $prepend-backgrounds,
+          $image-set,
+          $separator: comma,
+          $bracketed: false
+        );
+        $image-set: list.join(
+          $image-set,
+          $append-backgrounds,
+          $separator: comma,
+          $bracketed: false
+        );
+
+        background-image: $image-set;
+        @supports not (background-image: #{join-str($image-set, ', ')}) {
+          background-image: $fallback;
+        }
+      } @else {
+        background-image: $fallback;
+      }
     }
   }
 }
