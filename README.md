@@ -207,7 +207,7 @@ images using media queries and the CSS `background-image` property.
     // optional; defaults to 100vw
     $widths: 1000 800 600,
     // optional list of manual widths. doesn't change media queries.
-    $formats: webp,
+    $formats: webp null,
     // optional; defaults to null (the original image format is preserved).
     $orientations: portrait landscape,
     // optionally target a single viewport orientation
@@ -226,5 +226,7 @@ This currently generates a fair amount of media queries. If you are creating
 lots of responsive background images, you may want to use a post-processor like
 [postcss-sort-media-queries](https://www.npmjs.com/package/postcss-sort-media-queries).
 
-Multiple image formats are not currently supported; only the first format passed
-to the mixin will be used.
+This mixin makes use of the `image-set` function to serve multiple image
+formats. Formats will be used (as available) in the order provided: the last
+format in the list will be used as a fallback for browsers that don't support
+`image-set`.
