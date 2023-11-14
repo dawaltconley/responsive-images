@@ -361,26 +361,16 @@ export const queriesToCss = (selector: string, queries: SassQuery[]): string =>
       }
 
       if (q.maxResolution || q.minResolution) {
-        const webkitResolutions: string[] = []
         const resolutions: string[] = []
         if (q.maxResolution) {
-          webkitResolutions.push(
-            css`(-webkit-max-device-pixel-ratio: ${q.maxResolution})`
-          )
           resolutions.push(css`(max-resolution: ${q.maxResolution * 96}dpi)`)
         }
         if (q.minResolution) {
-          webkitResolutions.push(
-            css`(-webkit-min-device-pixel-ratio: ${q.minResolution + 0.01})`
-          )
           resolutions.push(
             css`(min-resolution: ${q.minResolution * 96 + 1}dpi)`
           )
         }
-        orQueries.push([
-          webkitResolutions.join(' and '),
-          resolutions.join(' and '),
-        ])
+        orQueries.push([resolutions.join(' and ')])
       }
 
       const selectors = permute(orQueries)

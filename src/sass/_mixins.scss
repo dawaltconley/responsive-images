@@ -36,7 +36,6 @@ $image-queries: meta.get-function('#{$prefix}-queries');
     $selectors: ();
     $andQueries: ();
     $orQueries: ();
-    $webkitResolutions: ();
     $resolutions: ();
 
     $orientation: map.get($query, 'orientation');
@@ -60,29 +59,18 @@ $image-queries: meta.get-function('#{$prefix}-queries');
     }
     @if $max-resolution or $min-resolution {
       @if $max-resolution {
-        $webkitResolutions: list.append(
-          $webkitResolutions,
-          '(-webkit-max-device-pixel-ratio: #{$max-resolution})'
-        );
         $resolutions: list.append(
           $resolutions,
           '(max-resolution: #{$max-resolution * 96dpi})'
         );
       }
       @if $min-resolution {
-        $webkitResolutions: list.append(
-          $webkitResolutions,
-          '(-webkit-min-device-pixel-ratio: #{$min-resolution + 0.01})'
-        );
         $resolutions: list.append(
           $resolutions,
           '(min-resolution: #{($min-resolution * 96dpi) + 1dpi})'
         );
       }
-      $orQueries: list.append(
-        $orQueries,
-        (join-str($webkitResolutions, ' and '), join-str($resolutions, ' and '))
-      );
+      $orQueries: list.append($orQueries, join-str($resolutions, ' and '));
     }
 
     @each $set in permute($orQueries) {
