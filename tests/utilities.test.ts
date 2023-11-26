@@ -1,5 +1,6 @@
 import type { Dimension, Device, SizesQuery, Image } from '../src/types'
 
+import U from '../src/unit-values'
 import {
   parseSizes,
   deviceImages,
@@ -16,10 +17,10 @@ describe('parseSizes()', () => {
         conditions: [
           {
             mediaFeature: 'min-width',
-            value: '680px',
+            value: new U(680, 'px'),
           },
         ],
-        width: '400px',
+        width: new U(400, 'px'),
       },
     ])
     expect(parseSizes('(max-width: 680px) 100vw')).toEqual([
@@ -27,10 +28,10 @@ describe('parseSizes()', () => {
         conditions: [
           {
             mediaFeature: 'max-width',
-            value: '680px',
+            value: new U(680, 'px'),
           },
         ],
-        width: '100vw',
+        width: new U(100, 'vw'),
       },
     ])
   })
@@ -41,12 +42,12 @@ describe('parseSizes()', () => {
         conditions: [
           {
             mediaFeature: 'min-width',
-            value: '680px',
+            value: new U(680, 'px'),
           },
         ],
-        width: '400px',
+        width: new U(400, 'px'),
       },
-      { conditions: [], width: '100vw' },
+      { conditions: [], width: new U(100, 'vw') },
     ])
   })
 
@@ -57,26 +58,26 @@ describe('parseSizes()', () => {
       )
     ).toEqual([
       {
-        conditions: [{ mediaFeature: 'min-width', value: '1536px' }],
-        width: '718.5px',
+        conditions: [{ mediaFeature: 'min-width', value: new U(1536, 'px') }],
+        width: new U(718.5, 'px'),
       },
       {
-        conditions: [{ mediaFeature: 'min-width', value: '1280px' }],
-        width: '590px',
+        conditions: [{ mediaFeature: 'min-width', value: new U(1280, 'px') }],
+        width: new U(590, 'px'),
       },
       {
-        conditions: [{ mediaFeature: 'min-width', value: '1024px' }],
-        width: '468px',
+        conditions: [{ mediaFeature: 'min-width', value: new U(1024, 'px') }],
+        width: new U(468, 'px'),
       },
       {
-        conditions: [{ mediaFeature: 'min-width', value: '768px' }],
-        width: '704px',
+        conditions: [{ mediaFeature: 'min-width', value: new U(768, 'px') }],
+        width: new U(704, 'px'),
       },
       {
-        conditions: [{ mediaFeature: 'min-width', value: '640px' }],
-        width: '576px',
+        conditions: [{ mediaFeature: 'min-width', value: new U(640, 'px') }],
+        width: new U(576, 'px'),
       },
-      { conditions: [], width: '100vw' },
+      { conditions: [], width: new U(100, 'vw') },
     ])
   })
 
@@ -88,16 +89,16 @@ describe('parseSizes()', () => {
         conditions: [
           {
             mediaFeature: 'max-width',
-            value: '780px',
+            value: new U(780, 'px'),
           },
           {
             mediaFeature: 'max-height',
-            value: '720px',
+            value: new U(720, 'px'),
           },
         ],
-        width: '600px',
+        width: new U(600, 'px'),
       },
-      { conditions: [], width: '400px' },
+      { conditions: [], width: new U(400, 'px') },
     ])
   })
 })
@@ -118,12 +119,12 @@ describe('deviceImages()', () => {
         conditions: [
           {
             mediaFeature: 'min-width',
-            value: '680px',
+            value: new U(680, 'px'),
           },
         ],
-        width: '400px',
+        width: new U(400, 'px'),
       },
-      { conditions: [], width: '500px' },
+      { conditions: [], width: new U(500, 'px') },
     ],
     pass: {
       device: {
@@ -207,12 +208,12 @@ describe('deviceImages()', () => {
         conditions: [
           {
             mediaFeature: 'min-width',
-            value: '680px',
+            value: new U(680, 'px'),
           },
         ],
-        width: '50vw',
+        width: new U(50, 'vw'),
       },
-      { conditions: [], width: '75vw' },
+      { conditions: [], width: new U(75, 'vw') },
     ]
     // pass remains the same, 400px
     fail = {
@@ -240,7 +241,7 @@ describe('deviceImages()', () => {
 
   test('rounds up subpixels', () => {
     const { sizes, pass, fail } = structuredClone(template)
-    sizes[0].width = '399.2px'
+    sizes[0].width = new U(399.2, 'px')
     expect(deviceImages(sizes, pass.device)).toEqual(pass.images)
     expect(deviceImages(sizes, fail.device)).toEqual(fail.images)
   })
@@ -248,26 +249,26 @@ describe('deviceImages()', () => {
   test('returns images using multiple conditions', () => {
     const sizes: SizesQuery[] = [
       {
-        conditions: [{ mediaFeature: 'min-width', value: '1536px' }],
-        width: '718.5px',
+        conditions: [{ mediaFeature: 'min-width', value: new U(1536, 'px') }],
+        width: new U(718.5, 'px'),
       },
       {
-        conditions: [{ mediaFeature: 'min-width', value: '1280px' }],
-        width: '590px',
+        conditions: [{ mediaFeature: 'min-width', value: new U(1280, 'px') }],
+        width: new U(590, 'px'),
       },
       {
-        conditions: [{ mediaFeature: 'min-width', value: '1024px' }],
-        width: '468px',
+        conditions: [{ mediaFeature: 'min-width', value: new U(1024, 'px') }],
+        width: new U(468, 'px'),
       },
       {
-        conditions: [{ mediaFeature: 'min-width', value: '768px' }],
-        width: '704px',
+        conditions: [{ mediaFeature: 'min-width', value: new U(768, 'px') }],
+        width: new U(704, 'px'),
       },
       {
-        conditions: [{ mediaFeature: 'min-width', value: '640px' }],
-        width: '576px',
+        conditions: [{ mediaFeature: 'min-width', value: new U(640, 'px') }],
+        width: new U(576, 'px'),
       },
-      { conditions: [], width: '100vw' },
+      { conditions: [], width: new U(100, 'vw') },
     ]
     const device: Device = {
       w: 1000,
@@ -306,16 +307,16 @@ describe('deviceImages()', () => {
         conditions: [
           {
             mediaFeature: 'max-width',
-            value: '780px',
+            value: new U(780, 'px'),
           },
           {
             mediaFeature: 'max-height',
-            value: '720px',
+            value: new U(720, 'px'),
           },
         ],
-        width: '600px',
+        width: new U(600, 'px'),
       },
-      { conditions: [], width: '400px' },
+      { conditions: [], width: new U(400, 'px') },
     ]
     const pass: Test = {
       device: {

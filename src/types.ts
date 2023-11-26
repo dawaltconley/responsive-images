@@ -1,3 +1,5 @@
+import type UnitValue from './unit-values'
+
 const Orientation = ['landscape', 'portrait'] as const
 type Orientation = (typeof Orientation)[number]
 
@@ -55,7 +57,7 @@ export interface MediaCondition {
   mediaFeature: MediaFeature
 
   /** breakpoint where this applies */
-  value: string
+  value: UnitValue<'px'>
 }
 
 /**
@@ -67,7 +69,7 @@ export interface SizesQuery {
   conditions: MediaCondition[]
 
   /** the image width applied under these conditions */
-  width: string
+  width: UnitValue
 }
 
 export interface Image {

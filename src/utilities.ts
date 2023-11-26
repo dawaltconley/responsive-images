@@ -18,20 +18,9 @@ import {
   isMediaFeature,
 } from './types'
 import mediaParser from 'postcss-media-query-parser'
+import UnitValue from './unit-values'
 import defaultDevices from './data/devices'
 import { css } from './syntax'
-
-/** @constant used for parsing a CSS value */
-const valueRegex = /([\d.]+)(\D*)/
-
-/** Parses a string as a value with an optional unit. */
-const cssValue = (v: string): [number, string] => {
-  let value = v,
-    unit = ''
-  const match = v.match(valueRegex)
-  if (match) [, value, unit] = match
-  return [Number(value), unit]
-}
 
 /**
  * Takes a parsed img sizes attribute and a specific device,
@@ -46,15 +35,13 @@ function deviceImages(
   sizes: SizesQuery[],
   device: Device /* , order: SizesQuery.Order */
 ): Image[] {
-  let imgWidth = '100vw' // fallback to 100vw if no queries apply; this is the browser default
+  let imgWidth: UnitValue = new UnitValue(100, 'vw') // fallback to 100vw if no queries apply; this is the browser default
   const orientation: Orientation =
     device.w >= device.h ? 'landscape' : 'portrait'
 
   whichSize: for (const { conditions, width } of sizes) {
-    for (const { mediaFeature, value: valueString } of conditions) {
-      const [value, unit]: [number, string] = cssValue(valueString)
-      if (unit !== 'px')
-        throw new Error(`Invalid query unit ${unit}: only px is supported`)
+    for (const { mediaFeature, value: unitValue } of conditions) {
+      const { value } = unitValue
       const match: boolean =
         (mediaFeature === 'min-width' && device.w >= value) ||
         (mediaFeature === 'max-width' && device.w <= value) ||
@@ -66,9 +53,9 @@ function deviceImages(
     break whichSize // break loop when device matches all conditions
   }
 
-  let [scaledWidth, unit = 'px'] = cssValue(imgWidth)
+  let { value: pixelWidth, unit } = imgWidth
   if (unit === 'vw') {
-    scaledWidth = (device.w * scaledWidth) / 100
+    pixelWidth = (device.w * pixelWidth) / 100
   } else if (unit !== 'px') {
     throw new Error(
       `Invalid unit in sizes query: ${unit}\nOnly vw and px are supported.`
@@ -82,7 +69,7 @@ function deviceImages(
   dppx.forEach(dppx => {
     // TODO handle flipping here...
     needImages.push({
-      w: Math.ceil(scaledWidth * dppx),
+      w: Math.ceil(pixelWidth * dppx),
       dppx,
       orientation,
     })
@@ -219,9 +206,10 @@ function parseSizes(sizesQueryString: string): SizesQuery[] {
     .map<SizesQuery>((descriptor: string) => {
       const conditions: MediaCondition[] = []
       const parsed = descriptor.match(/^(.*)\s+(\S+)$/) // TODO get this from parser instead; last node in media-query
-      if (!parsed) return { conditions, width: descriptor }
+      if (!parsed) return { conditions, width: UnitValue.parse(descriptor) }
 
-      const [, mediaCondition, width]: string[] = parsed
+      const [, mediaCondition, widthString]: string[] = parsed
+      const width = UnitValue.parse(widthString)
       if (mediaCondition) {
         // TODO handle expressions wrapped in extra parenthesis
         const mediaQuery = mediaParser(mediaCondition).nodes[0]
@@ -230,9 +218,14 @@ function parseSizes(sizesQueryString: string): SizesQuery[] {
             const mediaFeature = node.nodes.find(
               n => n.type === 'media-feature'
             )?.value
-            const value = node.nodes.find(n => n.type === 'value')?.value
-            if (mediaFeature && isMediaFeature(mediaFeature) && value) {
+            const valueString = node.nodes.find(n => n.type === 'value')?.value
+            if (mediaFeature && isMediaFeature(mediaFeature) && valueString) {
               // mediaFeature should always be truthy. value is only falsy with boolean media features, which in our case can be safely ignored.
+              const value = UnitValue.parse(valueString)
+              if (!value.uses('px'))
+                throw new Error(
+                  `Invalid query unit ${value}: only px is supported`
+                )
               conditions.push({ mediaFeature, value })
             }
           } else if (node.type === 'keyword') {
