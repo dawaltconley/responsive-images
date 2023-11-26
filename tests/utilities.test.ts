@@ -33,8 +33,6 @@ describe('deviceImages()', () => {
       device: {
         w: 800,
         h: 700,
-        dppx: [1],
-        flip: false,
       },
       images: [
         {
@@ -48,8 +46,6 @@ describe('deviceImages()', () => {
       device: {
         w: 500,
         h: 600,
-        dppx: [1],
-        flip: false,
       },
       images: [
         {
@@ -176,8 +172,6 @@ describe('deviceImages()', () => {
     const device: DeviceDefinition = {
       w: 1000,
       h: 400,
-      dppx: [1],
-      flip: false,
     }
     const image: Image = {
       w: 1000,
@@ -225,8 +219,6 @@ describe('deviceImages()', () => {
       device: {
         w: 600,
         h: 480,
-        dppx: [1],
-        flip: false,
       },
       images: [
         {
@@ -241,8 +233,6 @@ describe('deviceImages()', () => {
       device: {
         w: 800,
         h: 600,
-        dppx: [1],
-        flip: false,
       },
       images: [
         {
