@@ -1,11 +1,16 @@
 import type { Value as SassValue, CustomFunction } from 'sass/types'
-import type { Orientation, Device, SassQuery } from './types'
+import type {
+  Orientation,
+  SassQuery,
+  Device as DeviceDefinition,
+} from './types'
 
 import EleventyImage from '@11ty/eleventy-img'
 import cast from 'sass-cast'
 import defaultDevices from './data/devices'
 import { isOrientation } from './types'
 import Sizes from './sizes'
+import Device from './device'
 import {
   filterSizes,
   generateMediaQueries,
@@ -91,7 +96,7 @@ export interface ResponsiveImagesOptions {
    * Devices to support when calculating image sizes. Defaults to an
    * internal device list that can be imported from `@dawaltconley/responsive-images/devices`
    */
-  devices?: Device[]
+  devices?: DeviceDefinition[]
 
   /**
    * The maximum difference in size between any two images created when downsizing.
@@ -139,7 +144,7 @@ export default class ResponsiveImages
     } = options || {}
 
     this.defaults = defaults
-    this.devices = devices
+    this.devices = devices.map(d => new Device(d))
     this.sassPrefix = sassPrefix
     this.scalingFactor = scalingFactor
     this.disable = disable

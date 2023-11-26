@@ -1,12 +1,13 @@
-import type { Dimension, Device, Image } from '../src/types'
+import type { Dimension, Image, Device as DeviceDefinition } from '../src/types'
 import type { SizesQuery } from '../src/sizes'
 
 import U from '../src/unit-values'
+import Device from '../src/device'
 import { deviceImages, filterSizes, permute } from '../src/utilities'
 
 describe('deviceImages()', () => {
   type Test = {
-    device: Device
+    device: DeviceDefinition
     images: Image[]
   }
 
@@ -62,15 +63,15 @@ describe('deviceImages()', () => {
   test('matches basic min-width query', () => {
     const { sizes, pass, fail } = structuredClone(template)
     sizes[0].conditions[0].mediaFeature = 'min-width'
-    expect(deviceImages(sizes, pass.device)).toEqual(pass.images)
-    expect(deviceImages(sizes, fail.device)).toEqual(fail.images)
+    expect(deviceImages(sizes, new Device(pass.device))).toEqual(pass.images)
+    expect(deviceImages(sizes, new Device(fail.device))).toEqual(fail.images)
   })
 
   test('matches basic min-height query', () => {
     const { sizes, pass, fail } = structuredClone(template)
     sizes[0].conditions[0].mediaFeature = 'min-height'
-    expect(deviceImages(sizes, pass.device)).toEqual(pass.images)
-    expect(deviceImages(sizes, fail.device)).toEqual(fail.images)
+    expect(deviceImages(sizes, new Device(pass.device))).toEqual(pass.images)
+    expect(deviceImages(sizes, new Device(fail.device))).toEqual(fail.images)
   })
 
   test('matches basic max-width query', () => {
@@ -79,8 +80,8 @@ describe('deviceImages()', () => {
     // invert pass and fail widths for max conditions
     pass.images[0].w = 500
     fail.images[0].w = 400
-    expect(deviceImages(sizes, pass.device)).toEqual(pass.images)
-    expect(deviceImages(sizes, fail.device)).toEqual(fail.images)
+    expect(deviceImages(sizes, new Device(pass.device))).toEqual(pass.images)
+    expect(deviceImages(sizes, new Device(fail.device))).toEqual(fail.images)
   })
 
   test('matches basic max-height query', () => {
@@ -89,8 +90,8 @@ describe('deviceImages()', () => {
     // invert pass and fail widths for max conditions
     pass.images[0].w = 500
     fail.images[0].w = 400
-    expect(deviceImages(sizes, pass.device)).toEqual(pass.images)
-    expect(deviceImages(sizes, fail.device)).toEqual(fail.images)
+    expect(deviceImages(sizes, new Device(pass.device))).toEqual(pass.images)
+    expect(deviceImages(sizes, new Device(fail.device))).toEqual(fail.images)
   })
 
   test('uses 100vw as default fallback value if none is provided', () => {
@@ -98,8 +99,8 @@ describe('deviceImages()', () => {
     sizes.pop()
     fail.device.w = 555
     fail.images[0].w = fail.device.w
-    expect(deviceImages(sizes, pass.device)).toEqual(pass.images)
-    expect(deviceImages(sizes, fail.device)).toEqual(fail.images)
+    expect(deviceImages(sizes, new Device(pass.device))).toEqual(pass.images)
+    expect(deviceImages(sizes, new Device(fail.device))).toEqual(fail.images)
   })
 
   test('determines image width using vw and dppx', () => {
@@ -136,15 +137,15 @@ describe('deviceImages()', () => {
       ],
     }
 
-    expect(deviceImages(sizes, pass.device)).toEqual(pass.images)
-    expect(deviceImages(sizes, fail.device)).toEqual(fail.images)
+    expect(deviceImages(sizes, new Device(pass.device))).toEqual(pass.images)
+    expect(deviceImages(sizes, new Device(fail.device))).toEqual(fail.images)
   })
 
   test('rounds up subpixels', () => {
     const { sizes, pass, fail } = structuredClone(template)
     sizes[0].width = new U(399.2, 'px')
-    expect(deviceImages(sizes, pass.device)).toEqual(pass.images)
-    expect(deviceImages(sizes, fail.device)).toEqual(fail.images)
+    expect(deviceImages(sizes, new Device(pass.device))).toEqual(pass.images)
+    expect(deviceImages(sizes, new Device(fail.device))).toEqual(fail.images)
   })
 
   test('returns images using multiple conditions', () => {
@@ -171,7 +172,7 @@ describe('deviceImages()', () => {
       },
       { conditions: [], width: new U(100, 'vw') },
     ]
-    const device: Device = {
+    const device: DeviceDefinition = {
       w: 1000,
       h: 400,
       dppx: [1],
@@ -182,22 +183,22 @@ describe('deviceImages()', () => {
       dppx: 1,
       orientation: 'landscape',
     }
-    expect(deviceImages(sizes, { ...device, w: 1920 })).toEqual([
+    expect(deviceImages(sizes, new Device({ ...device, w: 1920 }))).toEqual([
       { ...image, w: 719 },
     ])
-    expect(deviceImages(sizes, { ...device, w: 1440 })).toEqual([
+    expect(deviceImages(sizes, new Device({ ...device, w: 1440 }))).toEqual([
       { ...image, w: 590 },
     ])
-    expect(deviceImages(sizes, { ...device, w: 1200 })).toEqual([
+    expect(deviceImages(sizes, new Device({ ...device, w: 1200 }))).toEqual([
       { ...image, w: 468 },
     ])
-    expect(deviceImages(sizes, { ...device, w: 820 })).toEqual([
+    expect(deviceImages(sizes, new Device({ ...device, w: 820 }))).toEqual([
       { ...image, w: 704 },
     ])
-    expect(deviceImages(sizes, { ...device, w: 680 })).toEqual([
+    expect(deviceImages(sizes, new Device({ ...device, w: 680 }))).toEqual([
       { ...image, w: 576 },
     ])
-    expect(deviceImages(sizes, { ...device, w: 600 })).toEqual([
+    expect(deviceImages(sizes, new Device({ ...device, w: 600 }))).toEqual([
       { ...image, w: 600 },
     ])
   })
@@ -259,9 +260,9 @@ describe('deviceImages()', () => {
         h: 728,
       },
     }
-    expect(deviceImages(sizes, pass.device)).toEqual(pass.images)
-    expect(deviceImages(sizes, fail1.device)).toEqual(fail1.images)
-    expect(deviceImages(sizes, fail2.device)).toEqual(fail2.images)
+    expect(deviceImages(sizes, new Device(pass.device))).toEqual(pass.images)
+    expect(deviceImages(sizes, new Device(fail1.device))).toEqual(fail1.images)
+    expect(deviceImages(sizes, new Device(fail2.device))).toEqual(fail2.images)
   })
 
   test('handles a device with multiple resolutions', () => {
@@ -323,8 +324,8 @@ describe('deviceImages()', () => {
       },
     ]
 
-    expect(deviceImages(sizes, pass.device)).toEqual(pass.images)
-    expect(deviceImages(sizes, fail.device)).toEqual(fail.images)
+    expect(deviceImages(sizes, new Device(pass.device))).toEqual(pass.images)
+    expect(deviceImages(sizes, new Device(fail.device))).toEqual(fail.images)
   })
 
   test('handles a flippable device', () => {
@@ -351,8 +352,8 @@ describe('deviceImages()', () => {
         orientation: 'landscape',
       },
     ]
-    expect(deviceImages(sizes, pass.device)).toEqual(pass.images)
-    expect(deviceImages(sizes, fail.device)).toEqual(fail.images)
+    expect(deviceImages(sizes, new Device(pass.device))).toEqual(pass.images)
+    expect(deviceImages(sizes, new Device(fail.device))).toEqual(fail.images)
   })
 })
 

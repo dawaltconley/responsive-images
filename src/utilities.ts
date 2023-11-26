@@ -2,7 +2,6 @@ import type EleventyImage from '@11ty/eleventy-img'
 import type {
   Orientation,
   Dimension,
-  Device,
   Image,
   QueryMap,
   ImageSet,
@@ -10,35 +9,23 @@ import type {
 } from './types'
 
 import { isDimension, isDimensionArray, isOrientation } from './types'
-import { type SizesQuery } from './sizes'
+import type { SizesQuery } from './sizes'
 import UnitValue from './unit-values'
+import Device from './device'
 import { css } from './syntax'
 
 /**
  * Takes a parsed img sizes attribute and a specific device,
  * returning the image dimensions needed to support that device.
  *
- * @param sizes
- * @param device - object representing an expected device
- * @param order - whether the widths should be interpreted as 'min' or 'max'
  * @return unique widths that will need to be produced for the given device
  */
-function deviceImages(
-  sizes: SizesQuery[],
-  device: Device /* , order: SizesQuery.Order */
-): Image[] {
+function deviceImages(sizes: SizesQuery[], device: Device): Image[] {
   let imgWidth: UnitValue = new UnitValue(100, 'vw') // fallback to 100vw if no queries apply; this is the browser default
-  const orientation: Orientation =
-    device.w >= device.h ? 'landscape' : 'portrait'
 
   whichSize: for (const { conditions, width } of sizes) {
-    for (const { mediaFeature, value: unitValue } of conditions) {
-      const { value } = unitValue
-      const match: boolean =
-        (mediaFeature === 'min-width' && device.w >= value) ||
-        (mediaFeature === 'max-width' && device.w <= value) ||
-        (mediaFeature === 'min-height' && device.h >= value) ||
-        (mediaFeature === 'max-height' && device.h <= value)
+    for (const condition of conditions) {
+      const match = device.matches(condition)
       if (!match) continue whichSize
     }
     imgWidth = width
@@ -63,18 +50,21 @@ function deviceImages(
     needImages.push({
       w: Math.ceil(pixelWidth * dppx),
       dppx,
-      orientation,
+      orientation: device.orientation,
     })
   })
 
   if (device.flip)
     needImages.push(
-      ...deviceImages(sizes, {
-        ...device,
-        w: device.h,
-        h: device.w,
-        flip: false,
-      })
+      ...deviceImages(
+        sizes,
+        new Device({
+          ...device,
+          w: device.h,
+          h: device.w,
+          flip: false,
+        })
+      )
     )
 
   return needImages

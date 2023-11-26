@@ -1,7 +1,9 @@
-import type { Device } from '../src/types'
-import devices from '../src/data/devices'
+import Device from '../src/device'
+import defaultDevices from '../src/data/devices'
 import Sizes from '../src/sizes'
 import U from '../src/unit-values'
+
+const devices = Device.fromDefinitions(defaultDevices)
 
 describe('Sizes.parse()', () => {
   test('parses media query and assigned width', () => {
@@ -135,24 +137,26 @@ describe('Sizes.toWidths()', () => {
   })
 
   test('calculates image widths using custom, unsorted devices', () => {
-    const devices: Device[] = [
-      {
+    const devices = [
+      new Device({
         w: 800,
         h: 600,
         dppx: [1, 2],
         flip: true,
-      },
+      }),
     ]
 
     expect(new Sizes('100vw').toWidths(devices)).toEqual([1600, 1200, 800, 600])
     expect(new Sizes('400px').toWidths(devices)).toEqual([800, 400])
 
-    devices.push({
-      w: 1400,
-      h: 1400,
-      dppx: [1.5],
-      flip: false,
-    })
+    devices.push(
+      new Device({
+        w: 1400,
+        h: 1400,
+        dppx: [1.5],
+        flip: false,
+      })
+    )
 
     expect(new Sizes('100vw').toWidths(devices)).toEqual([
       2100, 1600, 1400, 1200, 800, 600,
@@ -542,13 +546,13 @@ describe('Sizes.toQueries()', () => {
     })
   })
 
-  const customDevices: Device[] = [
-    {
+  const customDevices = [
+    new Device({
       w: 800,
       h: 600,
       dppx: [1, 2],
       flip: true,
-    },
+    }),
   ]
 
   test('calculate queries using custom devices', () => {
@@ -579,12 +583,14 @@ describe('Sizes.toQueries()', () => {
       ],
     })
 
-    devices.push({
-      w: 1400,
-      h: 1400,
-      dppx: [1.5],
-      flip: false,
-    })
+    devices.push(
+      new Device({
+        w: 1400,
+        h: 1400,
+        dppx: [1.5],
+        flip: false,
+      })
+    )
 
     expect(
       new Sizes('(min-width(680px) 400px, 100vw').toQueries(devices)

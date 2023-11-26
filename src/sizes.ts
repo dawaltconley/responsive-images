@@ -1,4 +1,5 @@
-import type { Orientation, Device, Image, QueryMap } from './types'
+import type { Orientation, Image, QueryMap } from './types'
+import type Device from './device'
 import mediaParser from 'postcss-media-query-parser'
 import UnitValue from './unit-values'
 import { deviceImages, filterSizes } from './utilities'
