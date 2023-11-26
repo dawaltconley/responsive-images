@@ -1,5 +1,3 @@
-import type UnitValue from './unit-values'
-
 const Orientation = ['landscape', 'portrait'] as const
 type Orientation = (typeof Orientation)[number]
 
@@ -40,38 +38,6 @@ export interface Device extends Dimension {
   flip: boolean
 }
 
-export const MediaFeature = [
-  'max-width',
-  'max-height',
-  'min-width',
-  'min-height',
-] as const
-export type MediaFeature = (typeof MediaFeature)[number]
-
-export const isMediaFeature = (s: string): s is MediaFeature =>
-  MediaFeature.some(f => f === s)
-
-/** represents a media query condition, such as `(min-width: 600px)` */
-export interface MediaCondition {
-  /** type of media query; usually 'min-width' or 'max-width' */
-  mediaFeature: MediaFeature
-
-  /** breakpoint where this applies */
-  value: UnitValue<'px'>
-}
-
-/**
- * represents a valid rule for the img sizes attribute,
- * such as `(min-width: 600px) 400px` or `100vw`
- */
-export interface SizesQuery {
-  /** the conditions under which a sizes rule applies */
-  conditions: MediaCondition[]
-
-  /** the image width applied under these conditions */
-  width: UnitValue
-}
-
 export interface Image {
   /** width of an actual image */
   w: number
@@ -95,6 +61,9 @@ export interface QueryObject extends Dimension {
  * Media queries are based on the configured devices (@see {@link Device}).
  */
 export type QueryMap = Record<Orientation, QueryObject[]>
+
+import type { MediaFeature, MediaCondition, SizesQuery } from './sizes'
+export type { MediaFeature, MediaCondition, SizesQuery }
 
 export interface ImageSource {
   /** pixel density only, string list of srcs and dppx */
