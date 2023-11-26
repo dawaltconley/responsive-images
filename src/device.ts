@@ -6,10 +6,10 @@ import { deviceImages } from './utilities'
 /** represents a supported device */
 export interface DeviceDefinition extends Dimension {
   /** possible dppx for devices with these dimensions */
-  dppx: number[]
+  dppx?: number[]
 
   /** whether the device can be rotated and the dimensions flipped */
-  flip: boolean
+  flip?: boolean
 }
 
 export default class Device implements DeviceDefinition {
@@ -18,11 +18,14 @@ export default class Device implements DeviceDefinition {
   dppx: number[]
   flip: boolean
 
-  constructor({ w, h, dppx, flip }: DeviceDefinition) {
+  constructor({ w, h, dppx = [1], flip = false }: DeviceDefinition) {
     this.w = w
     this.h = h
     this.dppx = dppx
     this.flip = w !== h && flip
+
+    // always include a dppx value of one for queries, to avoid upscaling when screen resizes on larger 1dppx displays.
+    if (this.dppx.indexOf(1) < 0) this.dppx.push(1)
   }
 
   get orientation(): Orientation {

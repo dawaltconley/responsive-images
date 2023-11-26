@@ -42,10 +42,8 @@ function deviceImages(sizes: SizesQuery[], device: Device): Image[] {
   }
 
   const needImages: Image[] = []
-  const { dppx } = device
-  if (dppx.indexOf(1) < 0) dppx.push(1) // always include a dppx value of one for queries, to avoid upscaling when screen resizes on larger 1dppx displays. TODO any way I can require this as part of the type?
 
-  dppx.forEach(dppx => {
+  device.dppx.forEach(dppx => {
     // TODO handle flipping here...
     needImages.push({
       w: Math.ceil(pixelWidth * dppx),
