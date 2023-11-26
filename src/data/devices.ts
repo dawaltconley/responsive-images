@@ -1,6 +1,6 @@
-import type { Device } from '../types'
+import type { DeviceDefinition } from '../device'
 
-const devices: Device[] = [
+const devices: DeviceDefinition[] = [
   {
     w: 2560,
     h: 1600,
@@ -76,4 +76,4 @@ const devices: Device[] = [
 ]
 
 export default devices
-export type { Device }
+export type { DeviceDefinition as Device }

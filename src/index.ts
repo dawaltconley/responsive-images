@@ -1,16 +1,12 @@
 import type { Value as SassValue, CustomFunction } from 'sass/types'
-import type {
-  Orientation,
-  SassQuery,
-  Device as DeviceDefinition,
-} from './types'
+import type { Orientation, SassQuery } from './types'
 
 import EleventyImage from '@11ty/eleventy-img'
 import cast from 'sass-cast'
 import defaultDevices from './data/devices'
 import { isOrientation } from './types'
 import Sizes from './sizes'
-import Device from './device'
+import Device, { DeviceDefinition } from './device'
 import {
   filterSizes,
   generateMediaQueries,

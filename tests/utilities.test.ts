@@ -1,8 +1,8 @@
-import type { Dimension, Image, Device as DeviceDefinition } from '../src/types'
+import type { Dimension, Image } from '../src/types'
 import type { SizesQuery } from '../src/sizes'
 
 import U from '../src/unit-values'
-import Device from '../src/device'
+import Device, { DeviceDefinition } from '../src/device'
 import { deviceImages, filterSizes, permute } from '../src/utilities'
 
 describe('deviceImages()', () => {

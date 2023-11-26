@@ -29,15 +29,6 @@ export const isDimension = (object: unknown): object is Dimension =>
 export const isDimensionArray = (objects: unknown[]): objects is Dimension[] =>
   objects.every(isDimension)
 
-/** represents a supported device */
-export interface Device extends Dimension {
-  /** possible dppx for devices with these dimensions */
-  dppx: number[]
-
-  /** whether the device can be rotated and the dimensions flipped */
-  flip: boolean
-}
-
 export interface Image {
   /** width of an actual image */
   w: number
@@ -61,6 +52,9 @@ export interface QueryObject extends Dimension {
  * Media queries are based on the configured devices (@see {@link Device}).
  */
 export type QueryMap = Record<Orientation, QueryObject[]>
+
+import type { DeviceDefinition } from './device'
+export type { DeviceDefinition as Device }
 
 import type { MediaFeature, MediaCondition, SizesQuery } from './sizes'
 export type { MediaFeature, MediaCondition, SizesQuery }

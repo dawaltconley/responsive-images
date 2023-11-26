@@ -1,15 +1,24 @@
-import type { Device as DeviceInterface, Orientation, Image } from './types'
+import type { Dimension, Orientation, Image } from './types'
 import type { MediaCondition } from './sizes'
 import type Sizes from './sizes'
 import { deviceImages } from './utilities'
 
-export default class Device implements DeviceInterface {
+/** represents a supported device */
+export interface DeviceDefinition extends Dimension {
+  /** possible dppx for devices with these dimensions */
+  dppx: number[]
+
+  /** whether the device can be rotated and the dimensions flipped */
+  flip: boolean
+}
+
+export default class Device implements DeviceDefinition {
   w: number
   h: number
   dppx: number[]
   flip: boolean
 
-  constructor({ w, h, dppx, flip }: DeviceInterface) {
+  constructor({ w, h, dppx, flip }: DeviceDefinition) {
     this.w = w
     this.h = h
     this.dppx = dppx
@@ -40,7 +49,7 @@ export default class Device implements DeviceInterface {
     return deviceImages(sizes.queries, this)
   }
 
-  static fromDefinitions(definitions: DeviceInterface[]): Device[] {
+  static fromDefinitions(definitions: DeviceDefinition[]): Device[] {
     return definitions.map(d => new Device(d))
   }
 }
