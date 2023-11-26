@@ -32,25 +32,18 @@ function deviceImages(sizes: SizesQuery[], device: Device): Image[] {
     break whichSize // break loop when device matches all conditions
   }
 
-  let { value: pixelWidth, unit } = imgWidth
-  if (unit === 'vw') {
-    pixelWidth = (device.w * pixelWidth) / 100
-  } else if (unit !== 'px') {
+  if (imgWidth.unit === 'vh') {
     throw new Error(
-      `Invalid unit in sizes query: ${unit}\nOnly vw and px are supported.`
+      `Invalid unit in sizes query: ${imgWidth}\nOnly vw and px are supported.`
     )
   }
 
-  const needImages: Image[] = []
-
-  device.dppx.forEach(dppx => {
-    // TODO handle flipping here...
-    needImages.push({
-      w: Math.ceil(pixelWidth * dppx),
-      dppx,
-      orientation: device.orientation,
-    })
-  })
+  const pixelWidth = imgWidth.toPixels(device)
+  const needImages: Image[] = device.dppx.map(dppx => ({
+    w: Math.ceil(pixelWidth * dppx),
+    dppx,
+    orientation: device.orientation,
+  }))
 
   if (device.flip)
     needImages.push(

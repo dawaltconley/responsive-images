@@ -4,6 +4,7 @@ import type { SizesQuery } from '../src/sizes'
 import U from '../src/unit-values'
 import Device, { DeviceDefinition } from '../src/device'
 import { deviceImages, filterSizes, permute } from '../src/utilities'
+import { cloneDeep } from 'lodash'
 
 describe('deviceImages()', () => {
   type Test = {
@@ -61,21 +62,21 @@ describe('deviceImages()', () => {
   }
 
   test('matches basic min-width query', () => {
-    const { sizes, pass, fail } = structuredClone(template)
+    const { sizes, pass, fail } = cloneDeep(template)
     sizes[0].conditions[0].mediaFeature = 'min-width'
     expect(deviceImages(sizes, new Device(pass.device))).toEqual(pass.images)
     expect(deviceImages(sizes, new Device(fail.device))).toEqual(fail.images)
   })
 
   test('matches basic min-height query', () => {
-    const { sizes, pass, fail } = structuredClone(template)
+    const { sizes, pass, fail } = cloneDeep(template)
     sizes[0].conditions[0].mediaFeature = 'min-height'
     expect(deviceImages(sizes, new Device(pass.device))).toEqual(pass.images)
     expect(deviceImages(sizes, new Device(fail.device))).toEqual(fail.images)
   })
 
   test('matches basic max-width query', () => {
-    const { sizes, pass, fail } = structuredClone(template)
+    const { sizes, pass, fail } = cloneDeep(template)
     sizes[0].conditions[0].mediaFeature = 'max-width'
     // invert pass and fail widths for max conditions
     pass.images[0].w = 500
@@ -85,7 +86,7 @@ describe('deviceImages()', () => {
   })
 
   test('matches basic max-height query', () => {
-    const { sizes, pass, fail } = structuredClone(template)
+    const { sizes, pass, fail } = cloneDeep(template)
     sizes[0].conditions[0].mediaFeature = 'max-height'
     // invert pass and fail widths for max conditions
     pass.images[0].w = 500
@@ -95,7 +96,7 @@ describe('deviceImages()', () => {
   })
 
   test('uses 100vw as default fallback value if none is provided', () => {
-    const { sizes, pass, fail } = structuredClone(template)
+    const { sizes, pass, fail } = cloneDeep(template)
     sizes.pop()
     fail.device.w = 555
     fail.images[0].w = fail.device.w
@@ -104,7 +105,7 @@ describe('deviceImages()', () => {
   })
 
   test('determines image width using vw and dppx', () => {
-    let { sizes, pass, fail } = structuredClone(template)
+    let { sizes, pass, fail } = cloneDeep(template)
     sizes = [
       {
         conditions: [
@@ -142,7 +143,7 @@ describe('deviceImages()', () => {
   })
 
   test('rounds up subpixels', () => {
-    const { sizes, pass, fail } = structuredClone(template)
+    const { sizes, pass, fail } = cloneDeep(template)
     sizes[0].width = new U(399.2, 'px')
     expect(deviceImages(sizes, new Device(pass.device))).toEqual(pass.images)
     expect(deviceImages(sizes, new Device(fail.device))).toEqual(fail.images)
@@ -266,7 +267,7 @@ describe('deviceImages()', () => {
   })
 
   test('handles a device with multiple resolutions', () => {
-    const { sizes, pass, fail } = structuredClone(template)
+    const { sizes, pass, fail } = cloneDeep(template)
     pass.device.dppx = [4, 3.2, 2.0, 1.5, 1]
     pass.images = [
       {
@@ -329,7 +330,7 @@ describe('deviceImages()', () => {
   })
 
   test('handles a flippable device', () => {
-    const { sizes, pass, fail } = structuredClone(template)
+    const { sizes, pass, fail } = cloneDeep(template)
     pass.device.flip = true
     pass.images = [
       ...pass.images,
