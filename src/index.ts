@@ -5,10 +5,9 @@ import EleventyImage from '@11ty/eleventy-img'
 import cast from 'sass-cast'
 import defaultDevices from './data/devices'
 import { isOrientation } from './types'
+import Sizes from './sizes'
 import {
   filterSizes,
-  widthsFromSizes,
-  queriesFromSizes,
   generateMediaQueries,
   toMediaQueryMap,
   queriesToCss,
@@ -201,8 +200,7 @@ export default class ResponsiveImages
    * Uses configured defaults for the `devices` and `scalingFactor`.
    */
   widthsFromSizes(sizes: string): number[] {
-    return widthsFromSizes(sizes, {
-      devices: this.devices,
+    return new Sizes(sizes).toWidths(this.devices, {
       minScale: this.scalingFactor,
     })
   }
@@ -281,9 +279,7 @@ export default class ResponsiveImages
       formats: [null],
     }).then(metadata => Object.values(metadata)[0][0])
 
-    const queries = queriesFromSizes(sizes, {
-      devices: this.devices,
-    })
+    const queries = new Sizes(sizes).toQueries(this.devices)
 
     if (!widths)
       // fallback based on queries

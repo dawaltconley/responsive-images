@@ -10,9 +10,8 @@ import type {
 } from './types'
 
 import { isDimension, isDimensionArray, isOrientation } from './types'
-import Sizes, { type SizesQuery } from './sizes'
+import { type SizesQuery } from './sizes'
 import UnitValue from './unit-values'
-import defaultDevices from './data/devices'
 import { css } from './syntax'
 
 /**
@@ -79,76 +78,6 @@ function deviceImages(
     )
 
   return needImages
-}
-
-/**
- * @param sizesQueryString - a string representation of a valid img 'sizes' attribute
- * @returns an array of dimensions, which represent image copies that should be produced to satisfy these sizes.
- */
-
-function widthsFromSizes(
-  sizesQueryString: string,
-  opt?: {
-    devices?: Device[]
-    // order?: Order
-    minScale?: number
-  }
-): number[] {
-  const { devices = defaultDevices, minScale } = opt || {}
-  const sizes = Sizes.parse(sizesQueryString)
-
-  const needWidths: Set<number> = devices.reduce((all, device) => {
-    deviceImages(sizes, device).forEach(n => all.add(n.w), all)
-    return all
-  }, new Set<number>())
-
-  const widthsArray: number[] = Array.from(needWidths)
-
-  return filterSizes(widthsArray, minScale)
-}
-
-function queriesFromSizes(
-  sizesQueryString: string,
-  opt?: {
-    devices?: Device[]
-    // order?: Order
-    // minScale?: number
-  }
-): QueryMap {
-  const { devices = defaultDevices } = opt || {}
-  const sizes = Sizes.parse(sizesQueryString)
-
-  const queries: QueryMap = {
-    landscape: [],
-    portrait: [],
-  }
-
-  devices.forEach(device => {
-    const images: Record<Orientation, Image[]> = {
-      landscape: [],
-      portrait: [],
-    }
-    deviceImages(sizes, device)
-      .sort((a, b) => b.dppx - a.dppx)
-      .forEach(img => images[img.orientation].push(img))
-    if (images.landscape.length)
-      queries.landscape.push({
-        w: device.w,
-        h: device.h,
-        images: images.landscape,
-      })
-    if (images.portrait.length)
-      queries.portrait.push({
-        w: device.h,
-        h: device.w,
-        images: images.portrait,
-      })
-  })
-
-  queries.landscape = queries.landscape.sort((a, b) => b.w - a.w)
-  queries.portrait = queries.portrait.sort((a, b) => b.w - a.w)
-
-  return queries // this works, just need to filter
 }
 
 /**
@@ -356,4 +285,4 @@ export const queriesToCss = (
     })
     .join('\n')
 
-export { widthsFromSizes, queriesFromSizes, deviceImages, filterSizes }
+export { deviceImages, filterSizes }
