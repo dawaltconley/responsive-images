@@ -269,7 +269,7 @@ export default class ResponsiveImages
     kwargs: MediaQueryOptions = {}
   ): Promise<SassQuery[]> {
     const {
-      formats = [null],
+      formats = this.defaults.formats || [null],
       orientations = ['landscape', 'portrait'],
       sizes = '100vw',
     } = kwargs
