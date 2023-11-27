@@ -576,7 +576,7 @@ describe('Sizes.toQueries()', () => {
     const devices = [...customDevices]
 
     expect(
-      new Sizes('(min-width(680px) 400px, 100vw').toQueries(devices)
+      new Sizes('(min-width: 680px) 400px, 100vw').toQueries(devices)
     ).toEqual({
       landscape: [
         {
@@ -593,8 +593,8 @@ describe('Sizes.toQueries()', () => {
           w: 600,
           h: 800,
           images: [
-            { w: 800, dppx: 2, orientation: 'portrait' },
-            { w: 400, dppx: 1, orientation: 'portrait' },
+            { w: 1200, dppx: 2, orientation: 'portrait' },
+            { w: 600, dppx: 1, orientation: 'portrait' },
           ],
         },
       ],
@@ -611,7 +611,7 @@ describe('Sizes.toQueries()', () => {
     )
 
     expect(
-      new Sizes('(min-width(680px) 400px, 100vw').toQueries(devices)
+      new Sizes('(min-width: 680px) 400px, 100vw').toQueries(devices)
     ).toEqual({
       landscape: [
         {
@@ -636,8 +636,8 @@ describe('Sizes.toQueries()', () => {
           w: 600,
           h: 800,
           images: [
-            { w: 800, dppx: 2, orientation: 'portrait' },
-            { w: 400, dppx: 1, orientation: 'portrait' },
+            { w: 1200, dppx: 2, orientation: 'portrait' },
+            { w: 600, dppx: 1, orientation: 'portrait' },
           ],
         },
       ],
