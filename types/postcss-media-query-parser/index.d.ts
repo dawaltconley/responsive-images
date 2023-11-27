@@ -1,4 +1,6 @@
-declare namespace MediaQuery {
+declare module 'postcss-media-query-parser' {
+  export default function parseMedia(queryString: string): MediaQueryList
+
   interface Node {
     type:
       | 'media-query-list' // i.e. '(max-width: 100px), not print'
@@ -23,58 +25,54 @@ declare namespace MediaQuery {
     type: undefined
   }
 
-  interface List extends Node {
+  interface MediaQueryList extends Node {
     type: 'media-query-list'
-    nodes: Query[]
+    nodes: MediaQuery[]
     parent: never
   }
 
-  interface Query extends Node {
+  interface MediaQuery extends Node {
     type: 'media-query'
-    nodes: (FeatureExpression | Keyword | Type)[]
-    parent: List
+    nodes: (MediaFeatureExpression | Keyword | MediaType | Undefined)[]
+    parent: MediaQueryList
   }
 
-  interface FeatureExpression extends Node {
+  interface MediaFeatureExpression extends Node {
     type: 'media-feature-expression'
-    nodes: [Feature, Colon, Value] | [Node] // singular if feature expression is just a set of parenthesis
-    parent: Query
+    nodes: [MediaFeature, Colon, Value] | [Node] // singular if feature expression is just a set of parenthesis
+    parent: MediaQuery
   }
 
-  interface Feature extends Node {
+  interface MediaFeature extends Node {
     type: 'media-feature'
     nodes: never
-    parent: FeatureExpression
+    parent: MediaFeatureExpression
   }
 
   interface Colon extends Node {
     type: 'colon'
     nodes: never
-    parent: FeatureExpression
+    parent: MediaFeatureExpression
     value: ':'
   }
 
   interface Value extends Node {
     type: 'value'
     nodes: never
-    parent: FeatureExpression
+    parent: MediaFeatureExpression
   }
 
-  interface Type extends Node {
+  interface MediaType extends Node {
     type: 'media-type'
     nodes: never
-    parent: Query
+    parent: MediaQuery
     // value: 'all' | 'print' | 'screen' | 'tty' | 'tv' | 'projection' | 'handheld' | 'braille' | 'embossed' | 'aural' | 'speech'
   }
 
   interface Keyword extends Node {
     type: 'keyword'
     nodes: never
-    parent: Query
+    parent: MediaQuery
     // value: 'and' | 'only' | 'not'
   }
-}
-
-declare module 'postcss-media-query-parser' {
-  export default function parseMedia(queryString: string): MediaQuery.List
 }
