@@ -28,18 +28,15 @@ export default class UnitValue<U extends Unit = Unit> {
 
   /**
    * Calculates the pixels of a relative width on a given device.
-   * Does NOT account for device dppx.
    */
   toPixels(device: Device): number {
-    switch (this.unit) {
-      case 'vw':
-        return (device.w * this.value) / 100
-      case 'vh':
-        return (device.h * this.value) / 100
-      case 'px':
-        return this.value
+    let pixels = this.value
+    if (this.unit === 'vw') {
+      pixels = (device.w * this.value) / 100
+    } else if (this.unit === 'vh') {
+      pixels = (device.h * this.value) / 100
     }
-    throw new Error(`Couldn't convert to device pixels: ${this}`)
+    return Math.ceil(pixels * device.dppx)
   }
 
   /** @constant used for parsing a CSS value */

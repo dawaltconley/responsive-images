@@ -1,55 +1,5 @@
-import type { Dimension, Image } from './types'
+import type { Dimension } from './types'
 import { isDimension, isDimensionArray } from './types'
-import type { SizesQuery } from './sizes'
-import UnitValue from './unit-values'
-import Device from './device'
-
-/**
- * Takes a parsed img sizes attribute and a specific device,
- * returning the image dimensions needed to support that device.
- *
- * @return unique widths that will need to be produced for the given device
- */
-export function deviceImages(sizes: SizesQuery[], device: Device): Image[] {
-  let imgWidth: UnitValue = new UnitValue(100, 'vw') // fallback to 100vw if no queries apply; this is the browser default
-
-  whichSize: for (const { conditions, width } of sizes) {
-    for (const condition of conditions) {
-      const match = device.matches(condition)
-      if (!match) continue whichSize
-    }
-    imgWidth = width
-    break whichSize // break loop when device matches all conditions
-  }
-
-  if (imgWidth.unit === 'vh') {
-    throw new Error(
-      `Invalid unit in sizes query: ${imgWidth}\nOnly vw and px are supported.`
-    )
-  }
-
-  const pixelWidth = imgWidth.toPixels(device)
-  const needImages: Image[] = device.dppx.map(dppx => ({
-    w: Math.ceil(pixelWidth * dppx),
-    dppx,
-    orientation: device.orientation,
-  }))
-
-  if (device.flip)
-    needImages.push(
-      ...deviceImages(
-        sizes,
-        new Device({
-          ...device,
-          w: device.h,
-          h: device.w,
-          flip: false,
-        })
-      )
-    )
-
-  return needImages
-}
 
 /**
  * Filters a dimensions list, returning only dimensions that meet a threshold for downsizing.

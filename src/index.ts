@@ -118,14 +118,26 @@ export default class ResponsiveImages
 {
   /** @see ResponsiveImagesOptions {@link ResponsiveImagesOptions.defaults} */
   defaults: Partial<EleventyImage.ImageOptions>
-  /** @see ResponsiveImagesOptions {@link ResponsiveImagesOptions.devices} */
-  devices: Device[]
   /** @see ResponsiveImagesOptions {@link ResponsiveImagesOptions.sassPrefix} */
   sassPrefix: string
   /** @see ResponsiveImagesOptions {@link ResponsiveImagesOptions.scalingFactor} */
   scalingFactor: number
   /** @see ResponsiveImagesOptions {@link ResponsiveImagesOptions.disable} */
   disable: boolean
+
+  #deviceDefinitions: DeviceDefinition[] = defaultDevices
+  #devices: Device[] = []
+
+  /** @see ResponsiveImagesOptions {@link ResponsiveImagesOptions.devices} */
+  set devices(devices: DeviceDefinition[]) {
+    this.#devices = Device.fromDefinitions(devices)
+    this.#deviceDefinitions = devices
+  }
+
+  /** @see ResponsiveImagesOptions {@link ResponsiveImagesOptions.devices} */
+  get devices() {
+    return this.#deviceDefinitions
+  }
 
   constructor(options?: ResponsiveImagesOptions) {
     const {
@@ -137,7 +149,7 @@ export default class ResponsiveImages
     } = options || {}
 
     this.defaults = defaults
-    this.devices = devices.map(d => new Device(d))
+    this.devices = devices
     this.sassPrefix = sassPrefix
     this.scalingFactor = scalingFactor
     this.disable = disable
@@ -198,7 +210,7 @@ export default class ResponsiveImages
    * Uses configured defaults for the `devices` and `scalingFactor`.
    */
   widthsFromSizes(sizes: string): number[] {
-    return new Sizes(sizes).toWidths(this.devices, {
+    return new Sizes(sizes).toWidths(this.#devices, {
       minScale: this.scalingFactor,
     })
   }
@@ -277,7 +289,7 @@ export default class ResponsiveImages
       formats: [null],
     }).then(metadata => Object.values(metadata)[0][0])
 
-    const queries = new Sizes(sizes).toQueries(this.devices)
+    const queries = new Sizes(sizes).toQueries(this.#devices)
     widths ??= queries.getImageWidths({ orientations })
     let filteredWidths = widths
       .map(w => (w === null || w === 'auto' ? originalImage.width : w))

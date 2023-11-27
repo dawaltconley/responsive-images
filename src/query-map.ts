@@ -17,28 +17,23 @@ export default class QueryMap implements Record<Orientation, QueryObject[]> {
   readonly portrait: QueryObject[] = []
 
   constructor(devices: Device[], sizes: Sizes) {
-    devices.forEach(device => {
-      const images: Record<Orientation, Image[]> = {
-        landscape: [],
-        portrait: [],
-      }
-      sizes
-        .getImages(device)
-        .sort((a, b) => b.dppx - a.dppx)
-        .forEach(img => images[img.orientation].push(img))
-      if (images.landscape.length)
-        this.landscape.push({
-          w: device.w,
-          h: device.h,
-          images: images.landscape,
-        })
-      if (images.portrait.length)
-        this.portrait.push({
-          w: device.h,
-          h: device.w,
-          images: images.portrait,
-        })
-    })
+    const sharedSizes = devices.reduce((shared, d) => {
+      const key = `${d.w},${d.h}`
+      const s = shared.get(key) || []
+      s.push(d)
+      return shared.set(key, s)
+    }, new Map<string, Device[]>())
+
+    for (const devices of sharedSizes.values()) {
+      const d = devices[0]
+      this[d.orientation].push({
+        w: d.w,
+        h: d.h,
+        images: devices
+          .sort((a, b) => b.dppx - a.dppx)
+          .map(d => d.getImage(sizes)),
+      })
+    }
 
     this.landscape = this.landscape.sort((a, b) => b.w - a.w)
     this.portrait = this.portrait.sort((a, b) => b.w - a.w)

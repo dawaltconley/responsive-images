@@ -50,8 +50,8 @@ export default class Sizes {
     return this.string
   }
 
-  getImages(device: Device): Image[] {
-    return device.getImages(this)
+  getImages(devices: Device[]): Image[] {
+    return devices.map(d => d.getImage(this))
   }
 
   /**
@@ -61,14 +61,8 @@ export default class Sizes {
     devices: Device[],
     { minScale }: { minScale?: number } = {}
   ): number[] {
-    const needWidths: Set<number> = devices.reduce((all, device) => {
-      this.getImages(device).forEach(n => all.add(n.w), all)
-      return all
-    }, new Set<number>())
-
-    const widthsArray: number[] = Array.from(needWidths)
-
-    return filterSizes(widthsArray, minScale)
+    const needWidths = new Set<number>(devices.map(d => d.getImage(this).w))
+    return filterSizes(Array.from(needWidths), minScale)
   }
 
   toQueries(devices: Device[]): QueryMap {

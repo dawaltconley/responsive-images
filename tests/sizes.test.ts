@@ -137,25 +137,27 @@ describe('Sizes.toWidths()', () => {
   })
 
   test('calculates image widths using custom, unsorted devices', () => {
-    const devices = [
-      new Device({
+    const devices = Device.fromDefinitions([
+      {
         w: 800,
         h: 600,
         dppx: [1, 2],
         flip: true,
-      }),
-    ]
+      },
+    ])
 
     expect(new Sizes('100vw').toWidths(devices)).toEqual([1600, 1200, 800, 600])
     expect(new Sizes('400px').toWidths(devices)).toEqual([800, 400])
 
     devices.push(
-      new Device({
-        w: 1400,
-        h: 1400,
-        dppx: [1.5],
-        flip: false,
-      })
+      ...Device.fromDefinitions([
+        {
+          w: 1400,
+          h: 1400,
+          dppx: [1.5],
+          flip: true,
+        },
+      ])
     )
 
     expect(new Sizes('100vw').toWidths(devices)).toEqual([
@@ -546,14 +548,14 @@ describe('Sizes.toQueries()', () => {
     })
   })
 
-  const customDevices = [
-    new Device({
+  const customDevices = Device.fromDefinitions([
+    {
       w: 800,
       h: 600,
       dppx: [1, 2],
       flip: true,
-    }),
-  ]
+    },
+  ])
 
   test('calculate queries using custom devices', () => {
     const devices = [...customDevices]
@@ -584,12 +586,13 @@ describe('Sizes.toQueries()', () => {
     })
 
     devices.push(
-      new Device({
-        w: 1400,
-        h: 1400,
-        dppx: [1.5],
-        flip: false,
-      })
+      ...Device.fromDefinitions([
+        {
+          w: 1400,
+          h: 1400,
+          dppx: [1.5],
+        },
+      ])
     )
 
     expect(
