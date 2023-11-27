@@ -1,18 +1,8 @@
-import type EleventyImage from '@11ty/eleventy-img'
-import type {
-  Orientation,
-  Dimension,
-  Image,
-  QueryMap,
-  ImageSet,
-  SassQuery,
-} from './types'
-
-import { isDimension, isDimensionArray, isOrientation } from './types'
+import type { Dimension, Image } from './types'
+import { isDimension, isDimensionArray } from './types'
 import type { SizesQuery } from './sizes'
 import UnitValue from './unit-values'
 import Device from './device'
-import { css } from './syntax'
 
 /**
  * Takes a parsed img sizes attribute and a specific device,
@@ -20,7 +10,7 @@ import { css } from './syntax'
  *
  * @return unique widths that will need to be produced for the given device
  */
-function deviceImages(sizes: SizesQuery[], device: Device): Image[] {
+export function deviceImages(sizes: SizesQuery[], device: Device): Image[] {
   let imgWidth: UnitValue = new UnitValue(100, 'vw') // fallback to 100vw if no queries apply; this is the browser default
 
   whichSize: for (const { conditions, width } of sizes) {
@@ -68,9 +58,9 @@ function deviceImages(sizes: SizesQuery[], device: Device): Image[] {
  * @param factor - the maximum value for downscaling; i.e. 0.8 means any values that reduce an images pixels by less than 20% will be removed from the list
  * @return filtered array of dimensions
  */
-function filterSizes(list: number[], factor?: number): number[]
-function filterSizes(list: Dimension[], factor?: number): Dimension[]
-function filterSizes(
+export function filterSizes(list: number[], factor?: number): number[]
+export function filterSizes(list: Dimension[], factor?: number): Dimension[]
+export function filterSizes(
   list: number[] | Dimension[],
   factor = 0.8
 ): number[] | Dimension[] {
@@ -97,73 +87,6 @@ function filterSizes(
   return filtered as number[] | Dimension[]
 }
 
-interface GenerateMediaQueriesOptions {
-  orientations?: Orientation[]
-}
-
-export const generateMediaQueries = (
-  metadata: EleventyImage.MetadataEntry[],
-  queries: QueryMap,
-  { orientations = ['landscape', 'portrait'] }: GenerateMediaQueriesOptions
-): SassQuery[] => {
-  const mediaQueries: SassQuery[] = []
-  const metaCache: Record<number, EleventyImage.MetadataEntry[]> = {}
-  const metaWidths = metadata
-    .sort((a, b) => b.width - a.width)
-    .reduce((map, m) => {
-      const sameWidth = map.get(m.width) || []
-      return map.set(m.width, [...sameWidth, m])
-    }, new Map<number, EleventyImage.MetadataEntry[]>())
-  const metaWidthsEntries = Array.from(metaWidths.entries())
-
-  for (const o of orientations) {
-    if (!isOrientation(o)) {
-      // eslint-disable-next-line no-console
-      console.warn(`Unrecognized orientation "${o}", skipping`)
-      continue
-    }
-    const orientation = orientations.length > 1 && o
-
-    queries[o].forEach(({ w, images }, i, queries) => {
-      const next = queries[i + 1]
-      const maxWidth = i > 0 && w,
-        minWidth = next && next.w
-
-      images.forEach((image, j, images) => {
-        const next = images[j + 1]
-        let imageMeta: EleventyImage.MetadataEntry[] | undefined =
-          metaWidths.get(image.w)
-        if (imageMeta === undefined) {
-          imageMeta = metaWidthsEntries[0][1]
-          for (let i = 1, l = metaWidthsEntries.length; i < l; i++) {
-            const [mWidth, m] = metaWidthsEntries[i]
-            const [nextWidth, next] = metaWidthsEntries[i + 1] || []
-            if (mWidth >= image.w && (!next || nextWidth < image.w)) {
-              imageMeta = m
-              break
-            }
-          }
-          metaCache[image.w] = imageMeta
-        }
-        mediaQueries.push(
-          ...imageMeta.map<SassQuery>(({ url, sourceType, format }) => ({
-            orientation,
-            maxWidth,
-            minWidth,
-            maxResolution: j > 0 && image.dppx,
-            minResolution: next && next.dppx,
-            url,
-            sourceType,
-            format,
-          }))
-        )
-      })
-    })
-  }
-
-  return mediaQueries
-}
-
 export const permute = <T>(
   matrix: T[][],
   permutations: T[][] = [],
@@ -178,92 +101,3 @@ export const permute = <T>(
   for (const item of row) permute(matrix, permutations, [...a, item]) // call function on each row
   return permutations
 }
-
-/**
- * @returns a map of media query selectors and the images used for image-set within a given selector.
- */
-export const toMediaQueryMap = (
-  queries: SassQuery[]
-): Map<string, ImageSet[]> =>
-  queries.reduce((map, q) => {
-    const andQueries: string[] = []
-    const orQueries: string[][] = []
-
-    if (q.orientation) {
-      andQueries.push(css`(orientation: ${q.orientation})`)
-    }
-    if (q.maxWidth) {
-      andQueries.push(css`(max-width: ${q.maxWidth}px)`)
-    }
-    if (q.minWidth) {
-      orQueries.push([css`(min-width: ${q.minWidth + 1}px)`])
-    }
-
-    if (q.maxResolution || q.minResolution) {
-      const resolutions: string[] = []
-      if (q.maxResolution) {
-        resolutions.push(css`(max-resolution: ${q.maxResolution * 96}dpi)`)
-      }
-      if (q.minResolution) {
-        resolutions.push(css`(min-resolution: ${q.minResolution * 96 + 1}dpi)`)
-      }
-      orQueries.push([resolutions.join(' and ')])
-    }
-
-    const selectors = permute(orQueries)
-      .map(set => [...andQueries, ...set].join(' and '))
-      .join(', ')
-
-    const images = map.get(selectors) || []
-    images.push({
-      image: q.url,
-      type: q.sourceType,
-      // dppx: q.maxResolution || undefined,
-    })
-
-    return map.set(selectors, images)
-  }, new Map<string, ImageSet[]>())
-
-export const queriesToCss = (
-  selector: string,
-  queryMap: Map<string, ImageSet[]>
-): string =>
-  Array.from(queryMap.entries())
-    .map(([selectors, images]) => {
-      if (images.length === 1)
-        return css`
-          @media ${selectors} {
-            ${selector} {
-              background-image: url('${images[0].image}');
-            }
-          }
-        `
-
-      const imageSet = `image-set(${images
-        .map(({ image, type }) => `url('${image}') type('${type}')`)
-        .join(', ')})`
-      const fallback = images.reduce(
-        (fallback, img) =>
-          img.dppx && fallback.dppx && img.dppx < fallback.dppx
-            ? img
-            : fallback,
-        images[images.length - 1]
-      )
-      return css`
-        @media ${selectors} {
-          ${selector} {
-            background-image: ${imageSet};
-          }
-          @supports not (background-image: ${imageSet}) {
-            ${selector} {
-              background-image: url('${fallback.image}');
-            }
-          }
-        }
-      `
-        .replace(/\s+/g, ' ')
-        .trim()
-    })
-    .join('\n')
-
-export { deviceImages, filterSizes }

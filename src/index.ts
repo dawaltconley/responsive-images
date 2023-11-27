@@ -1,5 +1,7 @@
 import type { Value as SassValue, CustomFunction } from 'sass/types'
-import type { Orientation, SassQuery } from './types'
+import type { Orientation } from './types'
+import type { MediaQuery } from './media-queries'
+import type MediaQueries from './media-queries'
 
 import EleventyImage from '@11ty/eleventy-img'
 import cast from 'sass-cast'
@@ -7,12 +9,7 @@ import defaultDevices from './data/devices'
 import { isOrientation } from './types'
 import Sizes from './sizes'
 import Device, { DeviceDefinition } from './device'
-import {
-  filterSizes,
-  generateMediaQueries,
-  toMediaQueryMap,
-  queriesToCss,
-} from './utilities'
+import { filterSizes } from './utilities'
 import { toLegacyAsyncFunctions } from './legacy-sass'
 
 /**
@@ -263,10 +260,10 @@ export default class ResponsiveImages
     return this.generateSources(image, this._handleFromSizes(kwargs))
   }
 
-  async generateMediaQueries(
+  async #generateMediaQueries(
     src: EleventyImage.ImageSource,
     kwargs: MediaQueryOptions = {}
-  ): Promise<SassQuery[]> {
+  ): Promise<MediaQueries> {
     const {
       formats = this.defaults.formats || [null],
       orientations = ['landscape', 'portrait'],
@@ -281,19 +278,7 @@ export default class ResponsiveImages
     }).then(metadata => Object.values(metadata)[0][0])
 
     const queries = new Sizes(sizes).toQueries(this.devices)
-
-    if (!widths)
-      // fallback based on queries
-      widths = Object.entries(queries).reduce(
-        (flat: number[], [o, queries]) => {
-          if (isOrientation(o) && !orientations.includes(o)) return flat
-          const widths = queries.reduce((flat: number[], { images }) => {
-            return flat.concat(images.map(img => img.w))
-          }, [])
-          return flat.concat(widths)
-        },
-        []
-      )
+    widths ??= queries.getImageWidths({ orientations })
     let filteredWidths = widths
       .map(w => (w === null || w === 'auto' ? originalImage.width : w))
       .filter(w => w <= originalImage.width)
@@ -304,9 +289,16 @@ export default class ResponsiveImages
       formats,
     }).then(formats => Object.values(formats).flat())
 
-    return generateMediaQueries(metadata, queries, {
+    return queries.toMediaQueries(metadata, {
       orientations,
     })
+  }
+
+  async generateMediaQueries(
+    src: EleventyImage.ImageSource,
+    kwargs: MediaQueryOptions = {}
+  ): Promise<MediaQuery[]> {
+    return this.#generateMediaQueries(src, kwargs).then(q => q.queries)
   }
 
   /**
@@ -318,8 +310,8 @@ export default class ResponsiveImages
     src: EleventyImage.ImageSource,
     kwargs: MediaQueryOptions = {}
   ): Promise<string> {
-    const queries = await this.generateMediaQueries(src, kwargs)
-    return queriesToCss(selector, toMediaQueryMap(queries))
+    const queries = await this.#generateMediaQueries(src, kwargs)
+    return queries.toCss(selector)
   }
 
   /**
@@ -359,14 +351,14 @@ export default class ResponsiveImages
           .map(s => assertOrientation(s.assertString().text))
         const sizes = args[4].assertString('sizes').text
 
-        const mediaQueries = await this.generateMediaQueries(src, {
+        const mediaQueries = await this.#generateMediaQueries(src, {
           widths,
           formats,
           orientations,
           sizes,
         })
 
-        return cast.toSass(Array.from(toMediaQueryMap(mediaQueries)))
+        return cast.toSass(mediaQueries.imageSet)
       },
     }
   }

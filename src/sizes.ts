@@ -1,8 +1,9 @@
-import type { Orientation, Image, QueryMap } from './types'
+import type { Image } from './types'
 import type Device from './device'
 import mediaParser from 'postcss-media-query-parser'
 import UnitValue from './unit-values'
-import { deviceImages, filterSizes } from './utilities'
+import QueryMap from './query-map'
+import { filterSizes } from './utilities'
 
 export const MediaFeature = [
   'max-width',
@@ -49,6 +50,10 @@ export default class Sizes {
     return this.string
   }
 
+  getImages(device: Device): Image[] {
+    return device.getImages(this)
+  }
+
   /**
    * @returns an array of dimensions, which represent image copies that should be produced to satisfy these sizes.
    */
@@ -57,7 +62,7 @@ export default class Sizes {
     { minScale }: { minScale?: number } = {}
   ): number[] {
     const needWidths: Set<number> = devices.reduce((all, device) => {
-      deviceImages(this.queries, device).forEach(n => all.add(n.w), all)
+      this.getImages(device).forEach(n => all.add(n.w), all)
       return all
     }, new Set<number>())
 
@@ -67,37 +72,7 @@ export default class Sizes {
   }
 
   toQueries(devices: Device[]): QueryMap {
-    const queries: QueryMap = {
-      landscape: [],
-      portrait: [],
-    }
-
-    devices.forEach(device => {
-      const images: Record<Orientation, Image[]> = {
-        landscape: [],
-        portrait: [],
-      }
-      deviceImages(this.queries, device)
-        .sort((a, b) => b.dppx - a.dppx)
-        .forEach(img => images[img.orientation].push(img))
-      if (images.landscape.length)
-        queries.landscape.push({
-          w: device.w,
-          h: device.h,
-          images: images.landscape,
-        })
-      if (images.portrait.length)
-        queries.portrait.push({
-          w: device.h,
-          h: device.w,
-          images: images.portrait,
-        })
-    })
-
-    queries.landscape = queries.landscape.sort((a, b) => b.w - a.w)
-    queries.portrait = queries.portrait.sort((a, b) => b.w - a.w)
-
-    return queries // this works, just need to filter
+    return new QueryMap(devices, this)
   }
 
   /**

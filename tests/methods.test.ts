@@ -1,4 +1,4 @@
-import type { SassQuery } from '../src/types'
+import type { MediaQuery } from '../src/media-queries'
 import ResponsiveImages, {
   FromSizesOptions,
   MixedOptions,
@@ -64,7 +64,7 @@ describe('generateMediaQueries()', () => {
 
   test('generates media query data from sizes', async () => {
     const queries = await images.generateMediaQueries('./tests/assets/xlg.jpg')
-    expect(queries).toEqual<SassQuery[]>([
+    expect(queries).toEqual<MediaQuery[]>([
       {
         orientation: 'landscape',
         maxWidth: false,
@@ -632,7 +632,7 @@ describe('generateMediaQueries()', () => {
     const queries = await images.generateMediaQueries(
       './tests/assets/landscape.jpeg'
     )
-    expect(queries).toEqual<SassQuery[]>([
+    expect(queries).toEqual<MediaQuery[]>([
       {
         orientation: 'landscape',
         maxWidth: false,

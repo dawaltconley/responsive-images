@@ -43,43 +43,15 @@ export interface Image {
   use?: Omit<Image, 'use'>
 }
 
-export interface QueryObject extends Dimension {
-  images: Image[]
-}
-
-/**
- * A data structure that pairs media queries with appropriately-sized images
- * Media queries are based on the configured devices (@see {@link Device}).
- */
-export type QueryMap = Record<Orientation, QueryObject[]>
-
 import type { DeviceDefinition } from './device'
 export type { DeviceDefinition as Device }
 
 import type { MediaFeature, MediaCondition, SizesQuery } from './sizes'
 export type { MediaFeature, MediaCondition, SizesQuery }
 
-export interface ImageSource {
-  /** pixel density only, string list of srcs and dppx */
-  srcset?: string
-  type: string
-  media: string
-}
+import type { QueryObject } from './query-map'
+import type QueryMap from './query-map'
+export type { QueryObject, QueryMap }
 
-export interface ImageSet {
-  image: string
-  dppx?: number
-  type?: string
-}
-
-/** sent to sass mixin */
-export interface SassQuery {
-  orientation: Orientation | false
-  maxWidth?: number | false
-  minWidth?: number | false
-  maxResolution?: number | false
-  minResolution?: number | false
-  url: string
-  sourceType: string
-  format: string
-}
+import type { ImageSet, ImageSource, MediaQuery } from './media-queries'
+export type { ImageSet, ImageSource, MediaQuery as SassQuery }
