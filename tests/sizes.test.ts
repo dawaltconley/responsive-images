@@ -96,6 +96,21 @@ describe('Sizes.parse()', () => {
       { conditions: [], width: new U(400, 'px') },
     ])
   })
+
+  test('parses queries that resolve to the vh unit', () => {
+    expect(Sizes.parse('(max-width: 600px) 50vh, 100vw')).toEqual([
+      {
+        conditions: [
+          {
+            mediaFeature: 'max-width',
+            value: new U(600, 'px'),
+          },
+        ],
+        width: new U(50, 'vh'),
+      },
+      { conditions: [], width: new U(100, 'vw') },
+    ])
+  })
 })
 
 describe('Sizes.toWidths()', () => {

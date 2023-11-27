@@ -59,12 +59,6 @@ export default class Device implements Dimension {
       break whichSize // break loop when device matches all conditions
     }
 
-    if (imgWidth.unit === 'vh') {
-      throw new Error(
-        `Invalid unit in sizes query: ${imgWidth}\nOnly vw and px are supported.`
-      )
-    }
-
     return imgWidth
   }
 

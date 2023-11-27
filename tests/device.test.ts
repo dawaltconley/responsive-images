@@ -145,6 +145,38 @@ describe('Device.getImage()', () => {
     run(fail, sizes)
   })
 
+  test('determines image width using vh and dppx', () => {
+    let { pass, fail } = cloneDeep(template)
+    const sizes = new Sizes('(min-width: 680px) 50vh, 75vh')
+    pass.images = [
+      {
+        w: 350,
+        dppx: 1,
+        orientation: 'landscape',
+      },
+    ]
+    fail = {
+      device: {
+        ...fail.device,
+        dppx: [2, 1],
+      },
+      images: [
+        {
+          w: 900,
+          dppx: 2,
+          orientation: 'portrait',
+        },
+        {
+          w: 450,
+          dppx: 1,
+          orientation: 'portrait',
+        },
+      ],
+    }
+    run(pass, sizes)
+    run(fail, sizes)
+  })
+
   test('rounds up subpixels', () => {
     const { sizes, pass, fail } = cloneDeep(template)
     sizes[0].width = new U(399.2, 'px')
