@@ -1,57 +1,55 @@
 import type { Image } from '../src/types'
-import type { SizesQuery } from '../src/sizes'
 
 import Device, { DeviceDefinition } from '../src/device'
 import Sizes from '../src/sizes'
 import { cloneDeep } from 'lodash'
 
-type Test = {
-  device: DeviceDefinition
-  images: Image[]
-}
-
-const template: {
-  sizes: Sizes
-  pass: Test
-  fail: Test
-} = {
-  sizes: new Sizes('(min-width: 680px) 400px, 500px'),
-  pass: {
-    device: {
-      w: 800,
-      h: 700,
-    },
-    images: [
-      {
-        w: 400,
-        dppx: 1,
-        orientation: 'landscape',
-      },
-    ],
-  },
-  fail: {
-    device: {
-      w: 500,
-      h: 600,
-    },
-    images: [
-      {
-        w: 500,
-        dppx: 1,
-        orientation: 'portrait',
-      },
-    ],
-  },
-}
-
-function run({ device, images }: Test, queries: Sizes | SizesQuery[]): void {
-  const sizes = 'queries' in queries ? queries : ({ queries } as Sizes)
-  expect(Device.fromDefinitions([device]).map(d => d.getImage(sizes))).toEqual(
-    images
-  )
-}
-
 describe('Device.getImage()', () => {
+  type Test = {
+    device: DeviceDefinition
+    images: Image[]
+  }
+
+  const template: {
+    sizes: Sizes
+    pass: Test
+    fail: Test
+  } = {
+    sizes: new Sizes('(min-width: 680px) 400px, 500px'),
+    pass: {
+      device: {
+        w: 800,
+        h: 700,
+      },
+      images: [
+        {
+          w: 400,
+          dppx: 1,
+          orientation: 'landscape',
+        },
+      ],
+    },
+    fail: {
+      device: {
+        w: 500,
+        h: 600,
+      },
+      images: [
+        {
+          w: 500,
+          dppx: 1,
+          orientation: 'portrait',
+        },
+      ],
+    },
+  }
+
+  function run({ device, images }: Test, sizes: Sizes): void {
+    expect(
+      Device.fromDefinitions([device]).map(d => d.getImage(sizes))
+    ).toEqual(images)
+  }
+
   test('matches basic min-width query', () => {
     const { sizes, pass, fail } = template
     run(pass, sizes)
