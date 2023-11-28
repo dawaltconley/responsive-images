@@ -1,7 +1,6 @@
 import type { Image } from '../src/types'
 import type { SizesQuery } from '../src/sizes'
 
-import U from '../src/unit-values'
 import Device, { DeviceDefinition } from '../src/device'
 import Sizes from '../src/sizes'
 import { cloneDeep } from 'lodash'
@@ -12,22 +11,11 @@ type Test = {
 }
 
 const template: {
-  sizes: SizesQuery[]
+  sizes: Sizes
   pass: Test
   fail: Test
 } = {
-  sizes: [
-    {
-      conditions: [
-        {
-          mediaFeature: 'min-width',
-          value: new U(680, 'px'),
-        },
-      ],
-      width: new U(400, 'px'),
-    },
-    { conditions: [], width: new U(500, 'px') },
-  ],
+  sizes: new Sizes('(min-width: 680px) 400px, 500px'),
   pass: {
     device: {
       w: 800,
@@ -65,22 +53,21 @@ function run({ device, images }: Test, queries: Sizes | SizesQuery[]): void {
 
 describe('Device.getImage()', () => {
   test('matches basic min-width query', () => {
-    const { sizes, pass, fail } = cloneDeep(template)
-    sizes[0].conditions[0].mediaFeature = 'min-width'
+    const { sizes, pass, fail } = template
     run(pass, sizes)
     run(fail, sizes)
   })
 
   test('matches basic min-height query', () => {
-    const { sizes, pass, fail } = cloneDeep(template)
-    sizes[0].conditions[0].mediaFeature = 'min-height'
+    const { pass, fail } = template
+    const sizes = new Sizes('(min-height: 680px) 400px, 500px')
     run(pass, sizes)
     run(fail, sizes)
   })
 
   test('matches basic max-width query', () => {
-    const { sizes, pass, fail } = cloneDeep(template)
-    sizes[0].conditions[0].mediaFeature = 'max-width'
+    let { sizes, pass, fail } = cloneDeep(template)
+    sizes = new Sizes('(max-width: 680px) 400px, 500px')
     // invert pass and fail widths for max conditions
     pass.images[0].w = 500
     fail.images[0].w = 400
@@ -89,8 +76,8 @@ describe('Device.getImage()', () => {
   })
 
   test('matches basic max-height query', () => {
-    const { sizes, pass, fail } = cloneDeep(template)
-    sizes[0].conditions[0].mediaFeature = 'max-height'
+    let { sizes, pass, fail } = cloneDeep(template)
+    sizes = new Sizes('(max-height: 680px) 400px, 500px')
     // invert pass and fail widths for max conditions
     pass.images[0].w = 500
     fail.images[0].w = 400
@@ -100,7 +87,7 @@ describe('Device.getImage()', () => {
 
   test('uses 100vw as default fallback value if none is provided', () => {
     const { sizes, pass, fail } = cloneDeep(template)
-    sizes.pop()
+    sizes.queries.pop()
     fail.device.w = 555
     fail.images[0].w = fail.device.w
     run(pass, sizes)
@@ -109,19 +96,7 @@ describe('Device.getImage()', () => {
 
   test('determines image width using vw and dppx', () => {
     let { pass, fail } = cloneDeep(template)
-    const sizes: SizesQuery[] = [
-      {
-        conditions: [
-          {
-            mediaFeature: 'min-width',
-            value: new U(680, 'px'),
-          },
-        ],
-        width: new U(50, 'vw'),
-      },
-      { conditions: [], width: new U(75, 'vw') },
-    ]
-    // pass remains the same, 400px
+    const sizes = new Sizes('(min-width: 680px) 50vw, 75vw')
     fail = {
       device: {
         ...fail.device,
@@ -140,7 +115,6 @@ describe('Device.getImage()', () => {
         },
       ],
     }
-
     run(pass, sizes)
     run(fail, sizes)
   })
@@ -178,38 +152,16 @@ describe('Device.getImage()', () => {
   })
 
   test('rounds up subpixels', () => {
-    const { sizes, pass, fail } = cloneDeep(template)
-    sizes[0].width = new U(399.2, 'px')
+    const { pass, fail } = template
+    const sizes = new Sizes('(min-width: 680px) 399.2px, 500px')
     run(pass, sizes)
     run(fail, sizes)
   })
 
   test('returns images using multiple conditions', () => {
-    const sizes = {
-      queries: [
-        {
-          conditions: [{ mediaFeature: 'min-width', value: new U(1536, 'px') }],
-          width: new U(718.5, 'px'),
-        },
-        {
-          conditions: [{ mediaFeature: 'min-width', value: new U(1280, 'px') }],
-          width: new U(590, 'px'),
-        },
-        {
-          conditions: [{ mediaFeature: 'min-width', value: new U(1024, 'px') }],
-          width: new U(468, 'px'),
-        },
-        {
-          conditions: [{ mediaFeature: 'min-width', value: new U(768, 'px') }],
-          width: new U(704, 'px'),
-        },
-        {
-          conditions: [{ mediaFeature: 'min-width', value: new U(640, 'px') }],
-          width: new U(576, 'px'),
-        },
-        { conditions: [], width: new U(100, 'vw') },
-      ],
-    } as Sizes
+    const sizes = new Sizes(
+      '(min-width: 1536px) 718.5px, (min-width: 1280px) 590px, (min-width: 1024px) 468px, (min-width: 768px) 704px, (min-width: 640px) 576px, 100vw'
+    )
     const device = new Device({
       w: 1000,
       h: 400,
@@ -234,22 +186,9 @@ describe('Device.getImage()', () => {
   })
 
   test('handles multiple "and" media queries', () => {
-    const sizes: SizesQuery[] = [
-      {
-        conditions: [
-          {
-            mediaFeature: 'max-width',
-            value: new U(780, 'px'),
-          },
-          {
-            mediaFeature: 'max-height',
-            value: new U(720, 'px'),
-          },
-        ],
-        width: new U(600, 'px'),
-      },
-      { conditions: [], width: new U(400, 'px') },
-    ]
+    const sizes = new Sizes(
+      '(max-width: 780px) and (max-height: 720px) 600px, 400px'
+    )
     const pass: Test = {
       device: {
         w: 600,

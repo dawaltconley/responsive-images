@@ -2,6 +2,7 @@ import Device from '../src/device'
 import defaultDevices from '../src/data/devices'
 import Sizes from '../src/sizes'
 import U from '../src/unit-values'
+import { set, cloneDeep } from 'lodash'
 
 const devices = Device.fromDefinitions(defaultDevices)
 
@@ -9,23 +10,43 @@ describe('Sizes.parse()', () => {
   test('parses media query and assigned width', () => {
     expect(Sizes.parse('(min-width: 680px) 400px')).toEqual([
       {
-        conditions: [
-          {
-            mediaFeature: 'min-width',
-            value: new U(680, 'px'),
-          },
-        ],
+        conditions: {
+          operator: null,
+          children: [
+            {
+              context: 'value',
+              prefix: 'min',
+              feature: 'width',
+              value: {
+                type: '<dimension-token>',
+                value: 680,
+                unit: 'px',
+                flag: 'number',
+              },
+            },
+          ],
+        },
         width: new U(400, 'px'),
       },
     ])
     expect(Sizes.parse('(max-width: 680px) 100vw')).toEqual([
       {
-        conditions: [
-          {
-            mediaFeature: 'max-width',
-            value: new U(680, 'px'),
-          },
-        ],
+        conditions: {
+          operator: null,
+          children: [
+            {
+              context: 'value',
+              prefix: 'max',
+              feature: 'width',
+              value: {
+                type: '<dimension-token>',
+                value: 680,
+                unit: 'px',
+                flag: 'number',
+              },
+            },
+          ],
+        },
         width: new U(100, 'vw'),
       },
     ])
@@ -34,81 +55,110 @@ describe('Sizes.parse()', () => {
   test('parses media query with fallback value', () => {
     expect(Sizes.parse('(min-width: 680px) 400px, 100vw')).toEqual([
       {
-        conditions: [
-          {
-            mediaFeature: 'min-width',
-            value: new U(680, 'px'),
-          },
-        ],
+        conditions: {
+          operator: null,
+          children: [
+            {
+              context: 'value',
+              prefix: 'min',
+              feature: 'width',
+              value: {
+                type: '<dimension-token>',
+                value: 680,
+                unit: 'px',
+                flag: 'number',
+              },
+            },
+          ],
+        },
         width: new U(400, 'px'),
       },
-      { conditions: [], width: new U(100, 'vw') },
+      { conditions: null, width: new U(100, 'vw') },
     ])
   })
 
   test('parses multiple media queries', () => {
+    const condition = {
+      operator: null,
+      children: [
+        {
+          context: 'value',
+          prefix: 'min',
+          feature: 'width',
+          value: {
+            type: '<dimension-token>',
+            value: 680,
+            unit: 'px',
+            flag: 'number',
+          },
+        },
+      ],
+    }
+
     expect(
       Sizes.parse(
         '(min-width: 1536px) 718.5px, (min-width: 1280px) 590px, (min-width: 1024px) 468px, (min-width: 768px) 704px, (min-width: 640px) 576px, 100vw'
       )
     ).toEqual([
       {
-        conditions: [{ mediaFeature: 'min-width', value: new U(1536, 'px') }],
+        conditions: set(cloneDeep(condition), 'children[0].value.value', 1536),
         width: new U(718.5, 'px'),
       },
       {
-        conditions: [{ mediaFeature: 'min-width', value: new U(1280, 'px') }],
+        conditions: set(cloneDeep(condition), 'children[0].value.value', 1280),
         width: new U(590, 'px'),
       },
       {
-        conditions: [{ mediaFeature: 'min-width', value: new U(1024, 'px') }],
+        conditions: set(cloneDeep(condition), 'children[0].value.value', 1024),
         width: new U(468, 'px'),
       },
       {
-        conditions: [{ mediaFeature: 'min-width', value: new U(768, 'px') }],
+        conditions: set(cloneDeep(condition), 'children[0].value.value', 768),
         width: new U(704, 'px'),
       },
       {
-        conditions: [{ mediaFeature: 'min-width', value: new U(640, 'px') }],
+        conditions: set(cloneDeep(condition), 'children[0].value.value', 640),
         width: new U(576, 'px'),
       },
-      { conditions: [], width: new U(100, 'vw') },
+      { conditions: null, width: new U(100, 'vw') },
     ])
   })
 
   test('parses combined media queries with the "and" keyword', () => {
     expect(
-      Sizes.parse('(max-width: 780px) and (max-height: 720px) 600px, 400px')
+      Sizes.parse('(max-width: 780px) and (max-height: 720px) 60vh, 400px')
     ).toEqual([
       {
-        conditions: [
-          {
-            mediaFeature: 'max-width',
-            value: new U(780, 'px'),
-          },
-          {
-            mediaFeature: 'max-height',
-            value: new U(720, 'px'),
-          },
-        ],
-        width: new U(600, 'px'),
+        conditions: {
+          operator: 'and',
+          children: [
+            {
+              context: 'value',
+              prefix: 'max',
+              feature: 'width',
+              value: {
+                type: '<dimension-token>',
+                value: 780,
+                unit: 'px',
+                flag: 'number',
+              },
+            },
+            {
+              context: 'value',
+              prefix: 'max',
+              feature: 'height',
+              value: {
+                type: '<dimension-token>',
+                value: 720,
+                unit: 'px',
+                flag: 'number',
+              },
+            },
+          ],
+        },
+        width: new U(60, 'vh'),
       },
-      { conditions: [], width: new U(400, 'px') },
-    ])
-  })
-
-  test('parses queries that resolve to the vh unit', () => {
-    expect(Sizes.parse('(max-width: 600px) 50vh, 100vw')).toEqual([
-      {
-        conditions: [
-          {
-            mediaFeature: 'max-width',
-            value: new U(600, 'px'),
-          },
-        ],
-        width: new U(50, 'vh'),
-      },
-      { conditions: [], width: new U(100, 'vw') },
+      { conditions: null, width: new U(400, 'px') },
     ])
   })
 })
