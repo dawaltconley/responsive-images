@@ -34,7 +34,7 @@ export default class Device implements Dimension {
   /**
    * @returns whether a {@link MediaFeature} applies to this device
    */
-  matches(mediaFeature: MediaFeature): boolean {
+  matchesFeature(mediaFeature: MediaFeature): boolean {
     if (mediaFeature.context === 'value') {
       const { prefix, feature, value } = mediaFeature
       if (value.type === '<dimension-token>' && value.unit === 'px') {
@@ -50,24 +50,20 @@ export default class Device implements Dimension {
     throw new Error(`Unhandled media feature: ${mediaFeature.feature}`)
   }
 
-  evaluate({ operator, children }: MediaCondition): boolean {
-    const evaluate = (child: (typeof children)[number]) =>
-      'feature' in child ? this.matches(child) : this.evaluate(child)
-    switch (operator) {
-      case 'or':
-        return children.reduce(
-          (match, child) => match || evaluate(child),
-          false
-        )
-      case 'not':
-        return !children.reduce(
-          (match, child) => match && evaluate(child),
-          true
-        )
-      case 'and':
-      // fallthrough
-      default:
-        return children.reduce((match, child) => match && evaluate(child), true)
+  matchesCondition({ operator, children }: MediaCondition): boolean {
+    if (operator === 'or') {
+      return children.some(child => this.matches(child))
+    }
+    // if not "or", treat as "and." should not matter for "not" and null
+    const and = children.every(child => this.matches(child))
+    return operator === 'not' ? !and : and
+  }
+
+  matches(condition: MediaCondition | MediaFeature): boolean {
+    if ('feature' in condition) {
+      return this.matchesFeature(condition)
+    } else {
+      return this.matchesCondition(condition)
     }
   }
 
@@ -78,7 +74,7 @@ export default class Device implements Dimension {
     let imgWidth: UnitValue = new UnitValue(100, 'vw') // fallback to 100vw if no queries apply; this is the browser default
 
     whichSize: for (const { conditions, width } of sizes.queries) {
-      if (conditions && !this.evaluate(conditions)) continue
+      if (conditions && !this.matches(conditions)) continue
       imgWidth = width
       break whichSize // break loop when device matches all conditions
     }
