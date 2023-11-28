@@ -220,7 +220,6 @@ describe('Device.getImage()', () => {
     const fail2: Test = {
       ...fail1,
       device: {
-        ...fail1.device,
         w: 772,
         h: 728,
       },
@@ -228,6 +227,51 @@ describe('Device.getImage()', () => {
     run(pass, sizes)
     run(fail1, sizes)
     run(fail2, sizes)
+  })
+
+  test('handles multiple "or" media queries', () => {
+    const sizes = new Sizes(
+      '(min-width: 900px) or ((max-width: 780px) and (max-height: 720px)) 600px, 400px'
+    )
+    // pass with max width/height
+    const pass1: Test = {
+      device: {
+        w: 600,
+        h: 480,
+      },
+      images: [
+        {
+          w: 600,
+          dppx: 1,
+          orientation: 'landscape',
+        },
+      ],
+    }
+    // pass with min-width
+    const pass2: Test = {
+      ...pass1,
+      device: {
+        w: 920,
+        h: 600,
+      },
+    }
+    // fail
+    const fail: Test = {
+      device: {
+        w: 772,
+        h: 728,
+      },
+      images: [
+        {
+          w: 400,
+          dppx: 1,
+          orientation: 'landscape',
+        },
+      ],
+    }
+    run(pass1, sizes)
+    run(pass2, sizes)
+    run(fail, sizes)
   })
 
   test('handles a device with multiple resolutions', () => {
