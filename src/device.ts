@@ -1,5 +1,5 @@
 import type { Dimension, Orientation, Image } from './types'
-import type { MediaCondition } from './sizes'
+import type { MediaCondition, MediaFeature } from 'media-query-parser'
 import type Sizes from './sizes'
 import UnitValue from './unit-values'
 
@@ -32,16 +32,43 @@ export default class Device implements Dimension {
   }
 
   /**
-   * @returns whether a {@link MediaCondition} applies to this device
+   * @returns whether a {@link MediaFeature} applies to this device
    */
-  matches({ mediaFeature, value: unitValue }: MediaCondition): boolean {
-    const { value } = unitValue
-    return (
-      (mediaFeature === 'min-width' && this.w >= value) ||
-      (mediaFeature === 'max-width' && this.w <= value) ||
-      (mediaFeature === 'min-height' && this.h >= value) ||
-      (mediaFeature === 'max-height' && this.h <= value)
-    )
+  matches(mediaFeature: MediaFeature): boolean {
+    if (mediaFeature.context === 'value') {
+      const { prefix, feature, value } = mediaFeature
+      if (value.type === '<dimension-token>' && value.unit === 'px') {
+        const pixels = value.value
+        return (
+          (feature === 'width' && prefix === 'min' && this.w >= pixels) ||
+          (feature === 'width' && prefix === 'max' && this.w <= pixels) ||
+          (feature === 'height' && prefix === 'min' && this.h >= pixels) ||
+          (feature === 'height' && prefix === 'max' && this.h <= pixels)
+        )
+      }
+    }
+    throw new Error(`Unhandled media feature: ${mediaFeature.feature}`)
+  }
+
+  evaluate({ operator, children }: MediaCondition): boolean {
+    const evaluate = (child: (typeof children)[number]) =>
+      'feature' in child ? this.matches(child) : this.evaluate(child)
+    switch (operator) {
+      case 'or':
+        return children.reduce(
+          (match, child) => match || evaluate(child),
+          false
+        )
+      case 'not':
+        return !children.reduce(
+          (match, child) => match && evaluate(child),
+          true
+        )
+      case 'and':
+      // fallthrough
+      default:
+        return children.reduce((match, child) => match && evaluate(child), true)
+    }
   }
 
   /**
@@ -51,10 +78,7 @@ export default class Device implements Dimension {
     let imgWidth: UnitValue = new UnitValue(100, 'vw') // fallback to 100vw if no queries apply; this is the browser default
 
     whichSize: for (const { conditions, width } of sizes.queries) {
-      for (const condition of conditions) {
-        const match = this.matches(condition)
-        if (!match) continue whichSize
-      }
+      if (conditions && !this.evaluate(conditions)) continue
       imgWidth = width
       break whichSize // break loop when device matches all conditions
     }

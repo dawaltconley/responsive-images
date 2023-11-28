@@ -34,8 +34,7 @@
     "@11ty/eleventy-img": "^3.1.0",
     "@types/11ty__eleventy-img": "^2.0.1",
     "liquid-args": "^1.1.0",
-    "lodash": "^4.17.21",
-    "postcss-media-query-parser": "^0.2.3",
+    "media-query-parser": "^2.0.2",
     "sass-cast": "^0.4.1"
   },
   "optionalDependencies": {
@@ -51,6 +50,7 @@
     "eslint-config-prettier": "^8.5.0",
     "jest": "^28.1.1",
     "liquidjs": "^10.7.0",
+    "lodash": "^4.17.21",
     "node-typescript-compiler": "^3.0.0",
     "prettier": "^2.6.2",
     "sass": "^1.62.1",
