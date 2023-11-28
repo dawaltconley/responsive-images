@@ -50,13 +50,13 @@ describe('Device.getImage()', () => {
     ).toEqual(images)
   }
 
-  test('matches basic min-width query', () => {
+  test('matches min-width query', () => {
     const { sizes, pass, fail } = template
     run(pass, sizes)
     run(fail, sizes)
   })
 
-  test('matches basic max-width query', () => {
+  test('matches max-width query', () => {
     const { pass, fail } = cloneDeep(template)
     const sizes = new Sizes('(max-width: 680px) 400px, 500px')
     // invert pass and fail widths for max conditions
@@ -73,14 +73,14 @@ describe('Device.getImage()', () => {
     run(fail, sizes)
   })
 
-  test('matches basic min-height query', () => {
+  test('matches min-height query', () => {
     const { pass, fail } = template
     const sizes = new Sizes('(min-height: 680px) 400px, 500px')
     run(pass, sizes)
     run(fail, sizes)
   })
 
-  test('matches basic max-height query', () => {
+  test('matches max-height query', () => {
     let { sizes, pass, fail } = cloneDeep(template)
     sizes = new Sizes('(max-height: 680px) 400px, 500px')
     // invert pass and fail widths for max conditions
@@ -93,6 +93,62 @@ describe('Device.getImage()', () => {
   test('matches exact height query', () => {
     const { pass, fail } = template
     const sizes = new Sizes('(height: 700px) 400px, 500px')
+    run(pass, sizes)
+    run(fail, sizes)
+  })
+
+  test('matches orientation query', () => {
+    const { pass, fail } = template
+    const sizes = new Sizes('(orientation: landscape) 400px, 500px')
+    run(pass, sizes)
+    run(fail, sizes)
+  })
+
+  test('matches min-aspect-ratio query using ratio', () => {
+    const { pass, fail } = template
+    const sizes = new Sizes('(min-aspect-ratio: 6/7) 400px, 500px')
+    run(pass, sizes)
+    run(fail, sizes)
+  })
+
+  test('matches min-aspect-ratio query using number', () => {
+    const { pass, fail } = template
+    const sizes = new Sizes('(min-aspect-ratio: 0.92) 400px, 500px')
+    run(pass, sizes)
+    run(fail, sizes)
+  })
+
+  test('matches max-aspect-ratio query using ratio', () => {
+    const { pass, fail } = cloneDeep(template)
+    const sizes = new Sizes('(max-aspect-ratio: 9/8) 400px, 500px')
+    // invert pass and fail widths for max conditions
+    pass.images[0].w = 500
+    fail.images[0].w = 400
+    run(pass, sizes)
+    run(fail, sizes)
+  })
+
+  test('matches max-aspect-ratio query using number', () => {
+    const { pass, fail } = cloneDeep(template)
+    const sizes = new Sizes('(max-aspect-ratio: 1.1) 400px, 500px')
+    // invert pass and fail widths for max conditions
+    pass.images[0].w = 500
+    fail.images[0].w = 400
+    run(pass, sizes)
+    run(fail, sizes)
+  })
+
+  test('matches exact aspect-ratio query using ratio', () => {
+    const { pass, fail } = template
+    const sizes = new Sizes('(aspect-ratio: 8/7) 400px, 500px')
+    run(pass, sizes)
+    run(fail, sizes)
+  })
+
+  test('matches exact aspect-ratio query using number', () => {
+    const { pass, fail } = cloneDeep(template)
+    const sizes = new Sizes('(aspect-ratio: 1.6) 400px, 500px')
+    pass.device.h = 500
     run(pass, sizes)
     run(fail, sizes)
   })

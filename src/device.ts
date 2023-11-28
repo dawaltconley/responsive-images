@@ -31,6 +31,10 @@ export default class Device implements Dimension {
     return this.w >= this.h ? 'landscape' : 'portrait'
   }
 
+  get aspectRatio(): number {
+    return this.w / this.h
+  }
+
   /**
    * @returns whether a {@link MediaFeature} applies to this device
    */
@@ -38,17 +42,22 @@ export default class Device implements Dimension {
     if (mediaFeature.context === 'value') {
       const { prefix, feature, value } = mediaFeature
       if (value.type === '<dimension-token>' && value.unit === 'px') {
-        const pixels = value.value
         return (
-          (feature === 'width' &&
-            ((prefix === 'min' && this.w >= pixels) ||
-              (prefix === 'max' && this.w <= pixels) ||
-              this.w === pixels)) ||
-          (feature === 'height' &&
-            ((prefix === 'min' && this.h >= pixels) ||
-              (prefix === 'max' && this.h <= pixels) ||
-              this.h === pixels))
+          (feature === 'width' && compare(this.w, value.value, prefix)) ||
+          (feature === 'height' && compare(this.h, value.value, prefix))
         )
+      }
+      if (feature === 'aspect-ratio') {
+        if (value.type === '<ratio-token>' || value.type === '<number-token>') {
+          const ratio =
+            value.type === '<ratio-token>'
+              ? value.numerator / value.denominator
+              : value.value
+          return compare(this.aspectRatio, ratio, prefix)
+        }
+      }
+      if (feature === 'orientation' && value.type === '<ident-token>') {
+        return this.orientation === value.value
       }
     }
     throw new Error(`Unhandled media feature: ${mediaFeature.feature}`)
@@ -118,4 +127,23 @@ export default class Device implements Dimension {
     })
     return devices
   }
+}
+
+/**
+ * Compares a device value with a feature value based on a feature prefix
+ * @param device - a device value
+ * @param feature - a feature value
+ * @param prefix - a feature prefix
+ */
+
+function compare(
+  device: number,
+  feature: number,
+  prefix: 'max' | 'min' | null = null
+): boolean {
+  return (
+    (prefix === 'min' && device >= feature) ||
+    (prefix === 'max' && device <= feature) ||
+    device === feature
+  )
 }
