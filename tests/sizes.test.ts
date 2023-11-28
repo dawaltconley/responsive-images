@@ -161,6 +161,30 @@ describe('Sizes.parse()', () => {
       { conditions: null, width: new U(400, 'px') },
     ])
   })
+
+  test('ignores excess parentheses', () => {
+    expect(Sizes.parse('((((min-width: 680px)))) 400px')).toEqual([
+      {
+        conditions: {
+          operator: null,
+          children: [
+            {
+              context: 'value',
+              prefix: 'min',
+              feature: 'width',
+              value: {
+                type: '<dimension-token>',
+                value: 680,
+                unit: 'px',
+                flag: 'number',
+              },
+            },
+          ],
+        },
+        width: new U(400, 'px'),
+      },
+    ])
+  })
 })
 
 describe('Sizes.toWidths()', () => {
