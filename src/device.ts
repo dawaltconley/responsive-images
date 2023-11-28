@@ -40,10 +40,14 @@ export default class Device implements Dimension {
       if (value.type === '<dimension-token>' && value.unit === 'px') {
         const pixels = value.value
         return (
-          (feature === 'width' && prefix === 'min' && this.w >= pixels) ||
-          (feature === 'width' && prefix === 'max' && this.w <= pixels) ||
-          (feature === 'height' && prefix === 'min' && this.h >= pixels) ||
-          (feature === 'height' && prefix === 'max' && this.h <= pixels)
+          (feature === 'width' &&
+            ((prefix === 'min' && this.w >= pixels) ||
+              (prefix === 'max' && this.w <= pixels) ||
+              this.w === pixels)) ||
+          (feature === 'height' &&
+            ((prefix === 'min' && this.h >= pixels) ||
+              (prefix === 'max' && this.h <= pixels) ||
+              this.h === pixels))
         )
       }
     }
