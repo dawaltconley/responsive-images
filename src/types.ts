@@ -42,16 +42,3 @@ export interface Image {
   /** if present treats this image as an alias for another image */
   use?: Omit<Image, 'use'>
 }
-
-import type { DeviceDefinition } from './device'
-export type { DeviceDefinition as Device }
-
-import type { MediaFeature, MediaCondition, SizesQuery } from './sizes'
-export type { MediaFeature, MediaCondition, SizesQuery }
-
-import type { QueryObject } from './query-map'
-import type QueryMap from './query-map'
-export type { QueryObject, QueryMap }
-
-import type { ImageSet, ImageSource, MediaQuery } from './media-queries'
-export type { ImageSet, ImageSource, MediaQuery as SassQuery }
