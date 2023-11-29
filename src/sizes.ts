@@ -91,37 +91,34 @@ export default class Sizes {
             break
           }
         }
-        const queryString = tokens.join(' ')
-        let query: MediaQuery
-        try {
-          query = toAST(queryString)[0]
-        } catch (e) {
-          let message = ''
-          if (e instanceof Error) {
-            message = '\n' + e.message
-          }
-          throw new Error(
-            `Couldn't parse sizes query: ${queryString}${message}`
-          )
-        }
-        if (query.mediaType !== 'all') {
-          throw new Error(
-            `Invalid media type, only "all" is allowed: ${sizeQuery}`
-          )
-        }
-        if (query.mediaPrefix === 'not') {
-          // this should only fire for 'not all', which can be ignored
-          return null
-        }
-        const conditions = query.mediaCondition
-        const width = parseImageSize(imageSize)
         return {
-          conditions,
-          width,
+          conditions: parseConditions(tokens.join(' ')),
+          width: parseImageSize(imageSize),
         }
       })
       .filter((s): s is SizesQuery => s !== null)
   }
+}
+
+function parseConditions(queryString: string): MediaCondition | null {
+  let query: MediaQuery
+  try {
+    query = toAST(queryString)[0]
+  } catch (e) {
+    let message = ''
+    if (e instanceof Error) {
+      message = '\n' + e.message
+    }
+    throw new Error(`Couldn't parse sizes query: ${queryString}${message}`)
+  }
+  if (query.mediaType !== 'all') {
+    throw new Error(`Invalid media type, only "all" is allowed: ${queryString}`)
+  }
+  if (query.mediaPrefix === 'not') {
+    // this should only fire for 'not all', which can be ignored
+    return null
+  }
+  return query.mediaCondition
 }
 
 type SizeKeyword = 'cover' | 'contain'
