@@ -41,9 +41,17 @@ export default class Device implements Dimension {
   }
 
   /**
-   * @returns whether a {@link MediaFeature} applies to this device
+   * @returns true if a single media condition applies to this device
    */
-  matchesFeature(mediaFeature: MediaFeature): boolean {
+  matches(condition: MediaCondition | MediaFeature): boolean {
+    if ('feature' in condition) {
+      return this.#matchesFeature(condition)
+    } else {
+      return this.#matchesCondition(condition)
+    }
+  }
+
+  #matchesFeature(mediaFeature: MediaFeature): boolean {
     if (mediaFeature.context === 'value') {
       const { prefix, feature, value } = mediaFeature
       if (value.type === '<dimension-token>' && value.unit === 'px') {
@@ -77,21 +85,13 @@ export default class Device implements Dimension {
     throw new Error(`Unhandled media feature: ${mediaFeature.feature}`)
   }
 
-  matchesCondition({ operator, children }: MediaCondition): boolean {
+  #matchesCondition({ operator, children }: MediaCondition): boolean {
     if (operator === 'or') {
       return children.some(child => this.matches(child))
     }
     // if not "or", treat as "and." should not matter for "not" and null
     const and = children.every(child => this.matches(child))
     return operator === 'not' ? !and : and
-  }
-
-  matches(condition: MediaCondition | MediaFeature): boolean {
-    if ('feature' in condition) {
-      return this.matchesFeature(condition)
-    } else {
-      return this.matchesCondition(condition)
-    }
   }
 
   /**
