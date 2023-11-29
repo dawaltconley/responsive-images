@@ -1,7 +1,7 @@
 import type { Image } from './types'
 import type Device from './device'
 import { toAST, type MediaQuery, type MediaCondition } from 'media-query-parser'
-import UnitValue from './unit-values'
+import { ImageSize } from './unit-values'
 import QueryMap from './query-map'
 import { filterSizes } from './utilities'
 
@@ -28,7 +28,7 @@ export interface SizesQuery {
   conditions: MediaCondition | null
 
   /** the image width applied under these conditions */
-  width: UnitValue
+  width: ImageSize
 }
 
 export default class Sizes {
@@ -73,7 +73,7 @@ export default class Sizes {
     return sizesQueryString
       .split(/\s*,\s*/)
       .map<SizesQuery | null>(sizeQuery => {
-        const imageSize: (SizeKeyword | Dimension | UnitValue)[] = []
+        const imageSize: (SizeKeyword | Dimension | ImageSize)[] = []
         const tokens = sizeQuery.split(/\s+/)
         while (tokens.length) {
           const t = tokens.pop()
@@ -83,7 +83,7 @@ export default class Sizes {
             continue
           }
           try {
-            const u = UnitValue.parse(t)
+            const u = ImageSize.parse(t)
             imageSize.unshift(u)
             continue
           } catch (e) {
@@ -132,13 +132,13 @@ type Dimension = 'width' | 'height'
 const isDimension = (str: string): str is SizeKeyword =>
   str === 'width' || str === 'height'
 
-function parseImageSize(tokens: (string | UnitValue)[]): UnitValue {
-  if (tokens.length === 1 && tokens[0] instanceof UnitValue) {
+function parseImageSize(tokens: (string | ImageSize)[]): ImageSize {
+  if (tokens.length === 1 && ImageSize.isUnitValue(tokens[0])) {
     return tokens[0]
   }
   if (tokens.length === 2) {
     const [d, l] = tokens
-    if (d === 'width' && l instanceof UnitValue) {
+    if (d === 'width' && ImageSize.isUnitValue(l)) {
       return l
     }
   }

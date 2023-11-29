@@ -1,7 +1,7 @@
 import type { Dimension, Orientation, Image } from './types'
 import type { MediaCondition, MediaFeature } from 'media-query-parser'
 import type Sizes from './sizes'
-import UnitValue from './unit-values'
+import { ImageSize, toDevicePixels } from './unit-values'
 
 /** represents a supported device */
 export interface DeviceDefinition extends Dimension {
@@ -83,8 +83,8 @@ export default class Device implements Dimension {
   /**
    * @returns the image size recommended for this device by a sizes string
    */
-  resolve(sizes: Sizes): UnitValue {
-    let imgWidth: UnitValue = new UnitValue(100, 'vw') // fallback to 100vw if no queries apply; this is the browser default
+  resolve(sizes: Sizes): ImageSize {
+    let imgWidth: ImageSize = new ImageSize(100, 'vw') // fallback to 100vw if no queries apply; this is the browser default
 
     whichSize: for (const { conditions, width } of sizes.queries) {
       if (conditions && !this.matches(conditions)) continue
@@ -100,7 +100,7 @@ export default class Device implements Dimension {
    */
   getImage(sizes: Sizes): Image {
     return {
-      w: this.resolve(sizes).toPixels(this),
+      w: toDevicePixels(this.resolve(sizes), this),
       dppx: this.dppx,
       orientation: this.orientation,
     }
