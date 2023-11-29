@@ -1,8 +1,8 @@
-# Astro.js
+# Astro
 
-`@dawaltconley/responsive-images` can be easily added to an Astro.js project
-using a `.astro` component or one of their supported frameworks. This solution
-is provided for projects using Astro version 2 in Node.js environments.
+`@dawaltconley/responsive-images` can be easily added to an Astro project using
+a `.astro` component or one of their supported frameworks. This solution is
+provided for projects using Astro version 2 in Node.js environments.
 
 ## Config
 

@@ -180,9 +180,9 @@ Then, call the functions within your templates:
 </div>
 ```
 
-### Astro.js
+### Astro
 
-There is not currently a plugin for Astro.js projects, but integration is fairly
+There is not currently a plugin for Astro projects, but integration is fairly
 straightforward. Refer to
 [this guide](https://github.com/dawaltconley/responsive-images/blob/main/solutions/astro.md)
 for more information.
