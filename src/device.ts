@@ -1,7 +1,12 @@
 import type { Dimension, Orientation, Image } from './types'
 import type { MediaCondition, MediaFeature } from 'media-query-parser'
 import type Sizes from './sizes'
-import { ImageSize, toDevicePixels } from './unit-values'
+import UnitValue, {
+  ImageSize,
+  toDevicePixels,
+  toDppx,
+  isUnit,
+} from './unit-values'
 
 /** represents a supported device */
 export interface DeviceDefinition extends Dimension {
@@ -46,6 +51,15 @@ export default class Device implements Dimension {
           (feature === 'width' && compare(this.w, value.value, prefix)) ||
           (feature === 'height' && compare(this.h, value.value, prefix))
         )
+      }
+      if (feature === 'resolution') {
+        if (value.type === '<dimension-token>' && isUnit(value.unit)) {
+          const res = new UnitValue(value.value, value.unit)
+          return (
+            res.uses('dpi', 'dpcm', 'dppx', 'x') &&
+            compare(this.dppx, toDppx(res).value, prefix)
+          )
+        }
       }
       if (feature === 'aspect-ratio') {
         if (value.type === '<ratio-token>' || value.type === '<number-token>') {

@@ -153,6 +153,42 @@ describe('Device.getImage()', () => {
     run(fail, sizes)
   })
 
+  test('matches min-resolution query', () => {
+    const { fail } = cloneDeep(template)
+    const sizes = new Sizes('(min-resolution: 100dpi) 400px, 500px')
+    // pass
+    expect(new Device({ w: 100, h: 100, dppx: 1.5 }).getImage(sizes)).toEqual({
+      dppx: 1.5,
+      orientation: 'landscape',
+      w: 600,
+    })
+    run(fail, sizes)
+  })
+
+  test('matches max-resolution query', () => {
+    const { pass } = cloneDeep(template)
+    const sizes = new Sizes('(max-resolution: 2dppx) 400px, 500px')
+    run(pass, sizes)
+    // fail
+    expect(new Device({ w: 100, h: 100, dppx: 3 }).getImage(sizes)).toEqual({
+      dppx: 3,
+      orientation: 'landscape',
+      w: 1500,
+    })
+  })
+
+  test('matches exact resolution query', () => {
+    const { fail } = cloneDeep(template)
+    const sizes = new Sizes('(resolution: 96dpcm) 400px, 500px')
+    // pass
+    expect(new Device({ w: 100, h: 100, dppx: 2.54 }).getImage(sizes)).toEqual({
+      dppx: 2.54,
+      orientation: 'landscape',
+      w: 1016,
+    })
+    run(fail, sizes)
+  })
+
   test('uses 100vw as default fallback value if none is provided', () => {
     const { sizes, pass, fail } = cloneDeep(template)
     sizes.queries.pop()
