@@ -3,7 +3,7 @@
 import type { TagImplOptions } from 'liquidjs/dist/src/template'
 import type { Liquid } from 'liquidjs'
 
-import { ResponsiveImages, ResponsiveImagesOptions } from './index'
+import { ResponsiveImages, ConfigOptions } from './index'
 import liquidArgs from 'liquid-args'
 
 type AnyFunction = (...args: any[]) => any
@@ -47,7 +47,7 @@ const liquidKwargsTag = (cb: (...args: any[]) => string | Promise<string>) =>
 
 export = function (
   eleventyConfig: any,
-  options: ResponsiveImagesOptions | ResponsiveImages = {}
+  options: ConfigOptions | ResponsiveImages = {}
 ): void {
   const configured: ResponsiveImages =
     options instanceof ResponsiveImages

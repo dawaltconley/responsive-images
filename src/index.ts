@@ -5,10 +5,9 @@ import type MediaQueries from './media-queries'
 
 import EleventyImage from '@11ty/eleventy-img'
 import cast from 'sass-cast'
-import defaultDevices from './data/devices'
 import { isOrientation } from './types'
+import Config, { ConfigOptions } from './config'
 import Sizes from './sizes'
-import Device, { DeviceDefinition } from './device'
 import { filterSizes } from './utilities'
 import { toLegacyAsyncFunctions } from './legacy-sass'
 
@@ -78,81 +77,11 @@ const assertValidImageFormat = (test: string | null): ValidImageFormat => {
   return test
 }
 
-export interface ResponsiveImagesOptions {
-  /**
-   * Default options passed to EleventyImage whenever it is called.
-   * @see {@link https://www.11ty.dev/docs/plugins/image/} for available options
-   */
-  defaults?: Partial<EleventyImage.ImageOptions>
+export type { ConfigOptions }
 
-  /**
-   * Devices to support when calculating image sizes. Defaults to an
-   * internal device list that can be imported from `@dawaltconley/responsive-images/devices`
-   */
-  devices?: DeviceDefinition[]
-
-  /**
-   * The maximum difference in size between any two images created when downsizing.
-   * A higher scaling factor creates more images with smaller gaps in their sizes.
-   * A lower scaling factor creates fewer images with larger gaps in their sizes. Some devices may need to load larger images than necessary.
-   * @defaultValue `0.8`
-   */
-  scalingFactor?: number
-
-  /**
-   * Prefix for the generated Sass functions.
-   * @defaultValue `'image'`
-   */
-  sassPrefix?: string
-
-  /**
-   * If true, disables new image generation so that all methods output image elements at their original size.
-   * Useful for avoiding repeated rebuilds on development environments.
-   * @defaultValue `false`
-   */
-  disable?: boolean
-}
-
-export default class ResponsiveImages
-  implements Required<ResponsiveImagesOptions>
-{
-  /** @see ResponsiveImagesOptions {@link ResponsiveImagesOptions.defaults} */
-  defaults: Partial<EleventyImage.ImageOptions>
-  /** @see ResponsiveImagesOptions {@link ResponsiveImagesOptions.sassPrefix} */
-  sassPrefix: string
-  /** @see ResponsiveImagesOptions {@link ResponsiveImagesOptions.scalingFactor} */
-  scalingFactor: number
-  /** @see ResponsiveImagesOptions {@link ResponsiveImagesOptions.disable} */
-  disable: boolean
-
-  #deviceDefinitions: DeviceDefinition[] = defaultDevices
-  #devices: Device[] = []
-
-  /** @see ResponsiveImagesOptions {@link ResponsiveImagesOptions.devices} */
-  set devices(devices: DeviceDefinition[]) {
-    this.#devices = Device.fromDefinitions(devices)
-    this.#deviceDefinitions = devices
-  }
-
-  /** @see ResponsiveImagesOptions {@link ResponsiveImagesOptions.devices} */
-  get devices() {
-    return this.#deviceDefinitions
-  }
-
-  constructor(options?: ResponsiveImagesOptions) {
-    const {
-      defaults = {},
-      devices = defaultDevices,
-      sassPrefix = 'image',
-      scalingFactor = 0.8,
-      disable = false,
-    } = options || {}
-
-    this.defaults = defaults
-    this.devices = devices
-    this.sassPrefix = sassPrefix
-    this.scalingFactor = scalingFactor
-    this.disable = disable
+export default class ResponsiveImages extends Config {
+  constructor(options?: ConfigOptions) {
+    super(options)
 
     this.resize = this.resize.bind(this)
     this.generatePicture = this.generatePicture.bind(this)
@@ -210,7 +139,7 @@ export default class ResponsiveImages
    * Uses configured defaults for the `devices` and `scalingFactor`.
    */
   widthsFromSizes(sizes: string): number[] {
-    return new Sizes(sizes).toWidths(this.#devices, {
+    return new Sizes(sizes).toWidths(this.devices, {
       minScale: this.scalingFactor,
     })
   }
@@ -289,7 +218,7 @@ export default class ResponsiveImages
       formats: [null],
     }).then(metadata => Object.values(metadata)[0][0])
 
-    const queries = new Sizes(sizes).toQueries(this.#devices)
+    const queries = new Sizes(sizes).toQueries(this.devices)
     widths ??= queries.getImageWidths({ orientations })
     let filteredWidths = widths
       .map(w => (w === null || w === 'auto' ? originalImage.width : w))

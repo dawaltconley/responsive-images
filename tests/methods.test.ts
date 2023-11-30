@@ -2,10 +2,10 @@ import type { MediaQuery } from '../src/media-queries'
 import ResponsiveImages, {
   FromSizesOptions,
   MixedOptions,
-  ResponsiveImagesOptions,
+  ConfigOptions,
 } from '../src/index'
 
-const defaultConfig: ResponsiveImagesOptions = {
+const defaultConfig: ConfigOptions = {
   defaults: {
     dryRun: true,
     filenameFormat: (_id, _src, width, format) => `output-${width}.${format}`,

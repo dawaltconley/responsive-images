@@ -1,9 +1,9 @@
 import _ from 'lodash'
 import sass from 'sass'
-import ResponsiveImages, { ResponsiveImagesOptions } from '../src/index'
+import ResponsiveImages, { ConfigOptions } from '../src/index'
 import { scss } from '../src/syntax'
 
-const defaultConfig: ResponsiveImagesOptions = {
+const defaultConfig: ConfigOptions = {
   scalingFactor: 0.5,
   defaults: {
     dryRun: true,
@@ -33,7 +33,7 @@ const defaultConfig: ResponsiveImagesOptions = {
 
 const compile = async (
   sassString: string,
-  config: ResponsiveImagesOptions = {}
+  config: ConfigOptions = {}
 ): Promise<string> => {
   const { sassFunctions } = new ResponsiveImages(_.merge(defaultConfig, config))
 
@@ -47,7 +47,7 @@ const compile = async (
 
 const compileLegacy = async (
   sassString: string,
-  config: ResponsiveImagesOptions = {}
+  config: ConfigOptions = {}
 ): Promise<string> => {
   const { sassLegacyFunctions } = new ResponsiveImages(
     _.merge(defaultConfig, config)

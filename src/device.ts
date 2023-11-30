@@ -120,9 +120,10 @@ export default class Device implements Dimension {
     }
   }
 
-  static fromDefinitions(definitions: DeviceDefinition[]): Device[] {
+  static fromDefinitions(definitions: (Device | DeviceDefinition)[]): Device[] {
     const devices: Device[] = []
     definitions.forEach(def => {
+      if (def instanceof Device) return devices.push(def)
       const dppx = def.dppx ? [...def.dppx] : [1]
       if (dppx.indexOf(1) < 0) dppx.push(1) // always include a dppx value of one for queries, to avoid upscaling when screen resizes on larger 1dppx displays.
       devices.push(...dppx.map(dppx => new Device({ ...def, dppx })))
@@ -140,6 +141,10 @@ export default class Device implements Dimension {
       }
     })
     return devices
+  }
+
+  static sort(a: Device, b: Device): number {
+    return b.w - a.w || b.h - a.h || b.dppx - a.dppx
   }
 }
 
