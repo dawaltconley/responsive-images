@@ -38,6 +38,7 @@ export default class Sizes {
   }
 
   /**
+   * @deprecated
    * @returns an array of dimensions, which represent image copies that should be produced to satisfy these sizes.
    */
   toWidths(
@@ -48,6 +49,7 @@ export default class Sizes {
     return filterSizes(Array.from(needWidths), minScale)
   }
 
+  /** @deprecated */
   toQueries(devices: Device[]): QueryMap {
     return new QueryMap(devices, this)
   }

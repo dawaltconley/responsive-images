@@ -7,8 +7,9 @@ import EleventyImage from '@11ty/eleventy-img'
 import cast from 'sass-cast'
 import { assertOrientation, assertValidImageFormat } from './types'
 import Config, { ConfigOptions } from './config'
+import Image, { ConfiguredImage } from './image'
 import Sizes from './sizes'
-import { filterSizes } from './utilities'
+import DeviceSizes from './device-sizes'
 import { toLegacyAsyncFunctions } from './legacy-sass'
 
 /**
@@ -17,6 +18,7 @@ import { toLegacyAsyncFunctions } from './legacy-sass'
  */
 export interface HtmlOptions {
   alt: string
+  sizes?: string
   [attribute: string]: unknown
 }
 
@@ -84,6 +86,10 @@ export default class ResponsiveImages extends Config {
     return EleventyImage(image, imgOpts)
   }
 
+  responsive(image: EleventyImage.ImageSource): ConfiguredImage {
+    return new ConfiguredImage(image, this)
+  }
+
   async generatePicture(
     image: EleventyImage.ImageSource,
     kwargs: MixedOptions
@@ -144,10 +150,12 @@ export default class ResponsiveImages extends Config {
     image: EleventyImage.ImageSource,
     kwargs: MixedOptions
   ): Promise<ImageMetadata> {
-    const [options, properties] = this._handleMixedOptions(
-      this._handleFromSizes(kwargs)
-    )
-    const metadata = await this.resize(image, options)
+    const [options, { sizes = '100vw', ...properties }] =
+      this._handleMixedOptions(kwargs)
+    const metadata = await new DeviceSizes(
+      new Sizes(sizes),
+      this.devices
+    ).resize(new Image(image), options)
     return {
       ...properties,
       metadata,
@@ -173,33 +181,22 @@ export default class ResponsiveImages extends Config {
     kwargs: MediaQueryOptions = {}
   ): Promise<MediaQueries> {
     const {
+      widths = null,
       formats = this.defaults.formats || [null],
       orientations = ['landscape', 'portrait'],
       sizes = '100vw',
     } = kwargs
-    let { widths = null } = kwargs
 
-    const originalImage = await EleventyImage(src, {
-      statsOnly: true,
-      widths: [null],
-      formats: [null],
-    }).then(metadata => Object.values(metadata)[0][0])
 
-    const queries = new Sizes(sizes).toQueries(this.devices)
-    widths ??= queries.getImageWidths({ orientations })
-    let filteredWidths = widths
-      .map(w => (w === null || w === 'auto' ? originalImage.width : w))
-      .filter(w => w <= originalImage.width)
-    filteredWidths = filterSizes(filteredWidths, this.scalingFactor)
-
-    const metadata = await this.resize(src, {
-      widths: filteredWidths,
-      formats,
-    }).then(formats => Object.values(formats).flat())
-
-    return queries.toMediaQueries(metadata, {
-      orientations,
-    })
+    const image = this.responsive(src)
+    const deviceImages = new DeviceSizes(new Sizes(sizes), this.devices)
+    const images = widths
+      ? await image.resize({ widths, formats })
+      : await deviceImages.resize(image, {
+          formats,
+          minScale: this.scalingFactor,
+        })
+    return deviceImages.toMediaQueries(images, { orientations })
   }
 
   async generateMediaQueries(

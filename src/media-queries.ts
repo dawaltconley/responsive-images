@@ -1,6 +1,4 @@
-import type EleventyImage from '@11ty/eleventy-img'
-import type QueryMap from './query-map'
-import { isOrientation, type Orientation } from './types'
+import { type Orientation } from './types'
 import { permute } from './utilities'
 import { css } from './syntax'
 
@@ -37,64 +35,8 @@ export interface MediaQueriesOptions {
 export default class MediaQueries {
   readonly queries: MediaQuery[] = []
 
-  constructor(
-    metadata: EleventyImage.MetadataEntry[],
-    queries: QueryMap,
-    { orientations = ['landscape', 'portrait'] }: MediaQueriesOptions
-  ) {
-    const metaCache: Record<number, EleventyImage.MetadataEntry[]> = {}
-    const metaWidths = metadata
-      .sort((a, b) => b.width - a.width)
-      .reduce((map, m) => {
-        const sameWidth = map.get(m.width) || []
-        return map.set(m.width, [...sameWidth, m])
-      }, new Map<number, EleventyImage.MetadataEntry[]>())
-    const metaWidthsEntries = Array.from(metaWidths.entries())
-
-    for (const o of orientations) {
-      if (!isOrientation(o)) {
-        // eslint-disable-next-line no-console
-        console.warn(`Unrecognized orientation "${o}", skipping`)
-        continue
-      }
-      const orientation = orientations.length > 1 && o
-
-      queries[o].forEach(({ w, images }, i, queries) => {
-        const next = queries[i + 1]
-        const maxWidth = i > 0 && w,
-          minWidth = next && next.w
-
-        images.forEach((image, j, images) => {
-          const next = images[j + 1]
-          let imageMeta: EleventyImage.MetadataEntry[] | undefined =
-            metaWidths.get(image.w)
-          if (imageMeta === undefined) {
-            imageMeta = metaWidthsEntries[0][1]
-            for (let i = 1, l = metaWidthsEntries.length; i < l; i++) {
-              const [mWidth, m] = metaWidthsEntries[i]
-              const [nextWidth, next] = metaWidthsEntries[i + 1] || []
-              if (mWidth >= image.w && (!next || nextWidth < image.w)) {
-                imageMeta = m
-                break
-              }
-            }
-            metaCache[image.w] = imageMeta
-          }
-          this.queries.push(
-            ...imageMeta.map<MediaQuery>(({ url, sourceType, format }) => ({
-              orientation,
-              maxWidth,
-              minWidth,
-              maxResolution: j > 0 && image.dppx,
-              minResolution: next && next.dppx,
-              url,
-              sourceType,
-              format,
-            }))
-          )
-        })
-      })
-    }
+  constructor(queries: MediaQuery[]) {
+    this.queries = queries
   }
 
   #imageSet?: ImageSetMap
