@@ -5,7 +5,7 @@ import type MediaQueries from './media-queries'
 
 import EleventyImage from '@11ty/eleventy-img'
 import cast from 'sass-cast'
-import { isOrientation } from './types'
+import { assertOrientation, assertValidImageFormat } from './types'
 import Config, { ConfigOptions } from './config'
 import Sizes from './sizes'
 import { filterSizes } from './utilities'
@@ -42,39 +42,6 @@ export interface MixedOptions extends HtmlOptions, FromSizesOptions {}
 
 export interface ImageMetadata extends HtmlOptions {
   metadata: EleventyImage.Metadata
-}
-
-export type ValidImageFormat =
-  | 'auto'
-  | EleventyImage.ImageFormatWithAliases
-  | null
-
-const validImageFormats: ValidImageFormat[] = [
-  'webp',
-  'jpeg',
-  'jpg',
-  'png',
-  'svg',
-  'svg+xml',
-  'avif',
-  'auto',
-  null,
-]
-
-const isValidImageFormat = (test: string | null): test is ValidImageFormat =>
-  validImageFormats.includes(test as ValidImageFormat)
-
-const assertOrientation = (test: string): Orientation => {
-  if (!isOrientation(test)) {
-    throw new Error(`Invalid orientation: ${test}`)
-  }
-  return test
-}
-
-const assertValidImageFormat = (test: string | null): ValidImageFormat => {
-  if (!isValidImageFormat(test))
-    throw new Error(`Invalid image format: ${test}`)
-  return test
 }
 
 export type { ConfigOptions }

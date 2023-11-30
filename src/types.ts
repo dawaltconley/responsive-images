@@ -1,15 +1,49 @@
-const Orientation = ['landscape', 'portrait'] as const
-type Orientation = (typeof Orientation)[number]
+export const Orientation = ['landscape', 'portrait'] as const
+export type Orientation = (typeof Orientation)[number]
 
-const isOrientation = (test: string): test is Orientation =>
+export const isOrientation = (test: string): test is Orientation =>
   Orientation.includes(test as Orientation)
 
-const Order = ['min', 'max'] as const
-type Order = (typeof Order)[number]
+export const assertOrientation = (test: string): Orientation => {
+  if (!isOrientation(test)) {
+    throw new Error(`Invalid orientation: ${test}`)
+  }
+  return test
+}
 
-const isOrder = (test: string): test is Order => Order.includes(test as Order)
+export const Order = ['min', 'max'] as const
+export type Order = (typeof Order)[number]
 
-export { Orientation, Order, isOrientation, isOrder }
+export const isOrder = (test: string): test is Order =>
+  Order.some(o => o === test)
+
+import type { ImageFormatWithAliases } from '@11ty/eleventy-img'
+
+export type ValidImageFormat = 'auto' | ImageFormatWithAliases | null
+
+const validImageFormats: ValidImageFormat[] = [
+  'webp',
+  'jpeg',
+  'jpg',
+  'png',
+  'svg',
+  'svg+xml',
+  'avif',
+  'auto',
+  null,
+]
+
+export const isValidImageFormat = (
+  test: string | null
+): test is ValidImageFormat => validImageFormats.some(f => f === test)
+
+export const assertValidImageFormat = (
+  test: string | null
+): ValidImageFormat => {
+  if (!isValidImageFormat(test))
+    throw new Error(`Invalid image format: ${test}`)
+  return test
+}
 
 export interface Dimension {
   /** width */
