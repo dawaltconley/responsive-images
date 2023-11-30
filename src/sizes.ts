@@ -5,17 +5,6 @@ import { ImageSize } from './unit-values'
 import QueryMap from './query-map'
 import { filterSizes } from './utilities'
 
-export const MediaFeature = [
-  'max-width',
-  'max-height',
-  'min-width',
-  'min-height',
-] as const
-export type MediaFeature = (typeof MediaFeature)[number]
-
-export const isMediaFeature = (s: string): s is MediaFeature =>
-  MediaFeature.some(f => f === s)
-
 /**
  * represents a valid rule for the img sizes attribute,
  * such as `(min-width: 600px) 400px` or `100vw`
