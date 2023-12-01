@@ -5,7 +5,8 @@ import type Sizes from './sizes'
 import type Image from './image'
 import Device from './device'
 import MediaQueries from './media-queries'
-import { filterSizes, groupBy } from './utilities'
+import { filterSizes } from './utilities'
+import groupBy from 'lodash/groupBy'
 
 export default class DeviceSizes {
   readonly sizes: Sizes
@@ -27,10 +28,12 @@ export default class DeviceSizes {
   }
 
   groupBySize(devices: number[]): number[][] {
-    return groupBy(devices, d => {
-      const { w, h } = this.devices[d]
-      return `${w},${h}`
-    })
+    return Object.values(
+      groupBy(devices, d => {
+        const { w, h } = this.devices[d]
+        return `${w},${h}`
+      })
+    )
   }
 
   async resize(

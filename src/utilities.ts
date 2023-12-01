@@ -51,37 +51,3 @@ export const permute = <T>(
   for (const item of row) permute(matrix, permutations, [...a, item]) // call function on each row
   return permutations
 }
-
-export function groupBy<T>(array: T[], cb: (item: T) => unknown): T[][] {
-  const grouped = array.reduce((shared, item) => {
-    const key = cb(item)
-    const s = shared.get(key) || []
-    s.push(item)
-    return shared.set(key, s)
-  }, new Map<unknown, T[]>())
-  return Array.from(grouped.values())
-}
-
-export function findFrom<T>(
-  array: T[],
-  start: number,
-  cb: (arg: T) => boolean
-): T | undefined {
-  for (let i = start; i < array.length; i++) {
-    if (cb(array[i])) {
-      return array[i]
-    }
-  }
-}
-
-export function findLastFrom<T>(
-  array: T[],
-  start: number,
-  cb: (arg: T) => boolean
-): T | undefined {
-  for (let i = start; i > -1; i--) {
-    if (cb(array[i])) {
-      return array[i]
-    }
-  }
-}
