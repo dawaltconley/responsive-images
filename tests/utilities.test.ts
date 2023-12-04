@@ -68,6 +68,15 @@ describe('filterSizes()', () => {
     expect(filterSizes(sampleWidths, 1)).toEqual(sortedWidths)
     expect(filterSizes(sampleDevices, 1, calcDevices)).toEqual(sortedDevices)
   })
+
+  test('filters arrays with falsy items', () => {
+    const withZero = [
+      200, 250, 380, 800, 801, 0, 1000, 1050, 1100, 1440, 1900, 2000,
+    ]
+    expect(filterSizes(withZero, 0.8)).toEqual([
+      2000, 1440, 1100, 801, 380, 250, 200, 0,
+    ])
+  })
 })
 
 describe('permute()', () => {

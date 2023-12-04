@@ -24,7 +24,7 @@ export function filterSizes<T>(
   for (let i = 0, j = 1; i < sorted.length; j++) {
     const a = sorted[i],
       b = sorted[j]
-    if (a && !b) {
+    if (a && b === undefined) {
       filtered.push(a)
       break
     }
