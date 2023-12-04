@@ -12,20 +12,21 @@ import groupBy from 'lodash/groupBy'
 export default class DeviceSizes {
   readonly sizes: Sizes
   readonly devices: Device[]
+  readonly targets: ImageTarget[]
   readonly landscape: number[]
   readonly portrait: number[]
-  readonly targets: ImageTarget[]
 
   constructor(sizes: Sizes, devices: Device[]) {
     this.sizes = sizes
     this.devices = [...devices].sort(Device.sort)
-    this.landscape = this.devices
-      .map((d, i) => (d.orientation === 'landscape' ? i : null))
-      .filter((n): n is number => n !== null)
-    this.portrait = this.devices
-      .map((d, i) => (d.orientation === 'portrait' ? i : null))
-      .filter((n): n is number => n !== null)
     this.targets = this.devices.map(d => d.getImage(sizes))
+
+    const { landscape, portrait } = groupBy(
+      this.devices.map((_d, i) => i),
+      i => this.devices[i].orientation
+    )
+    this.landscape = landscape
+    this.portrait = portrait
   }
 
   groupBySize(devices: number[]): number[][] {
@@ -74,12 +75,12 @@ export default class DeviceSizes {
     { orientations = ['landscape', 'portrait'] }: MediaQueriesOptions = {}
   ): MediaQueries {
     const queries: MediaQuery[] = []
-    const map = this.mapMetadata(metadata)
+    const metaMap = this.mapMetadata(metadata)
 
     for (const o of orientations) {
       const orientation = orientations.length > 1 && o
       this.groupBySize(this[o] ?? []).forEach((size, i, sizes) => {
-        const current = this.devices[size[0] ?? -1]
+        const current = this.devices[size[0]]
         const next = this.devices[sizes[i + 1]?.[0]]
         const maxWidth = i > 0 && current?.w
         const minWidth = next && next?.w
@@ -91,7 +92,7 @@ export default class DeviceSizes {
           const minResolution = next && next.dppx
 
           queries.push(
-            ...map[d].map<MediaQuery>(({ url, sourceType, format }) => ({
+            ...metaMap[d].map<MediaQuery>(({ url, sourceType, format }) => ({
               orientation,
               maxWidth,
               minWidth,
