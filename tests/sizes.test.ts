@@ -188,18 +188,17 @@ describe('Sizes.parse()', () => {
 })
 
 describe('Sizes.toWidths()', () => {
+  const toWidths = (sizes: string, d = devices): number[] =>
+    new Sizes(sizes).toWidths(d, { minScale: 0.8 })
+
   describe('calculates image widths using the default devices', () => {
     test('using media query and assigned width', () => {
-      expect(new Sizes('100vw').toWidths(devices)).toEqual([
+      expect(toWidths('100vw')).toEqual([
         3072, 2732, 2415, 2048, 1800, 1600, 1380, 1200, 1024, 824, 720, 640,
         540, 480, 412, 360, 320,
       ])
-      expect(new Sizes('400px').toWidths(devices)).toEqual([
-        1600, 1400, 1200, 1000, 800, 600, 400,
-      ])
-      expect(
-        new Sizes('(min-width: 680px) 400px, 50vw').toWidths(devices)
-      ).toEqual([
+      expect(toWidths('400px')).toEqual([1600, 1400, 1200, 1000, 800, 600, 400])
+      expect(toWidths('(min-width: 680px) 400px, 50vw')).toEqual([
         1600, 1400, 1200, 1000, 864, 721, 640, 540, 480, 412, 360, 320, 270,
         240, 206, 180, 160,
       ])
@@ -207,9 +206,9 @@ describe('Sizes.toWidths()', () => {
 
     test('using multiple media queries', () => {
       expect(
-        new Sizes(
+        toWidths(
           '(min-width: 1536px) 718.5px, (min-width: 1280px) 590px, (min-width: 1024px) 468px, (min-width: 768px) 704px, (min-width: 640px) 576px, 100vw'
-        ).toWidths(devices)
+        )
       ).toEqual([
         2816, 2304, 2016, 1800, 1442, 1280, 1080, 960, 824, 720, 640, 540, 480,
         412, 360, 320,
@@ -218,9 +217,7 @@ describe('Sizes.toWidths()', () => {
 
     test('using combined media queries with the "and" keyword', () => {
       expect(
-        new Sizes(
-          '(max-width: 780px) and (max-height: 720px) 600px, 400px'
-        ).toWidths(devices)
+        toWidths('(max-width: 780px) and (max-height: 720px) 600px, 400px')
       ).toEqual([2400, 2100, 1800, 1600, 1200, 1000, 800, 600, 400])
     })
   })
@@ -235,8 +232,12 @@ describe('Sizes.toWidths()', () => {
       },
     ])
 
-    expect(new Sizes('100vw').toWidths(devices)).toEqual([1600, 1200, 800, 600])
-    expect(new Sizes('400px').toWidths(devices)).toEqual([800, 400])
+    expect(new Sizes('100vw').toWidths(devices, { minScale: 0.8 })).toEqual([
+      1600, 1200, 800, 600,
+    ])
+    expect(new Sizes('400px').toWidths(devices, { minScale: 0.8 })).toEqual([
+      800, 400,
+    ])
 
     devices.push(
       ...Device.fromDefinitions([
@@ -249,10 +250,12 @@ describe('Sizes.toWidths()', () => {
       ])
     )
 
-    expect(new Sizes('100vw').toWidths(devices)).toEqual([
+    expect(new Sizes('100vw').toWidths(devices, { minScale: 0.8 })).toEqual([
       2100, 1600, 1400, 1200, 800, 600,
     ])
-    expect(new Sizes('400px').toWidths(devices)).toEqual([800, 600, 400])
+    expect(new Sizes('400px').toWidths(devices, { minScale: 0.8 })).toEqual([
+      800, 600, 400,
+    ])
   })
 
   test('calculates image widths using custom scaling factor', () => {

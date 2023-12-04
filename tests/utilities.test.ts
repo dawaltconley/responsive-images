@@ -6,7 +6,7 @@ describe('filterSizes()', () => {
     200, 250, 380, 800, 801, 1000, 1050, 1100, 1440, 1900, 2000,
   ]
   test('filters similar widths by a default scaling factor', () => {
-    expect(filterSizes(sampleWidths)).toEqual([
+    expect(filterSizes(sampleWidths, 0.8)).toEqual([
       2000, 1440, 1100, 801, 380, 250, 200,
     ])
   })
@@ -30,8 +30,9 @@ describe('filterSizes()', () => {
     { w: 1900, h: 1600 },
     { w: 2000, h: 1125 },
   ]
+  const calcDevices = ({ w, h }: Dimension) => w * h
   test('filters a list of dimensions by their total area', () => {
-    expect(filterSizes(sampleDevices)).toEqual([
+    expect(filterSizes(sampleDevices, 0.8, calcDevices)).toEqual([
       { w: 1900, h: 1600 },
       { w: 2000, h: 1125 },
       { w: 1440, h: 810 },
@@ -43,7 +44,7 @@ describe('filterSizes()', () => {
     ])
   })
   test('filters more devices with a stricter scaling factor', () => {
-    expect(filterSizes(sampleDevices, 0.7)).toEqual([
+    expect(filterSizes(sampleDevices, 0.7, calcDevices)).toEqual([
       { w: 1900, h: 1600 },
       { w: 1440, h: 810 },
       { w: 380, h: 2000 },
@@ -51,7 +52,7 @@ describe('filterSizes()', () => {
       { w: 250, h: 500 },
       { w: 200, h: 200 },
     ])
-    expect(filterSizes(sampleDevices, 0.35)).toEqual([
+    expect(filterSizes(sampleDevices, 0.35, calcDevices)).toEqual([
       { w: 1900, h: 1600 },
       { w: 380, h: 2000 },
       { w: 250, h: 500 },
@@ -65,7 +66,7 @@ describe('filterSizes()', () => {
       (a, b) => b.w * b.h - a.w * a.h
     )
     expect(filterSizes(sampleWidths, 1)).toEqual(sortedWidths)
-    expect(filterSizes(sampleDevices, 1)).toEqual(sortedDevices)
+    expect(filterSizes(sampleDevices, 1, calcDevices)).toEqual(sortedDevices)
   })
 })
 

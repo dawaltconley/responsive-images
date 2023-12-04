@@ -1,29 +1,26 @@
-import type { Dimension } from './types'
 import type { ImageOptions } from './image'
 import type Image from './image'
 import type DeviceSizes from './device-sizes'
 import type Metadata from './metadata'
-import { isDimension, isDimensionArray } from './types'
 
 /**
  * Filters a dimensions list, returning only dimensions that meet a threshold for downsizing.
  *
- * @param list - an array of dimension objects
- * @param factor - the maximum value for downscaling; i.e. 0.8 means any values that reduce an images pixels by less than 20% will be removed from the list
+ * @param list - An array of items.
+ * @param factor - The maximum value for downscaling; i.e. 0.8 means any values that reduce an images pixels by less than 20% will be removed from the list.
+ * @param calculate - The function to calculate the value of each item for comparison. By default it tries to square numbers and fails on non-numbers.
  * @return filtered array of dimensions
  */
-export function filterSizes(list: number[], factor?: number): number[]
-export function filterSizes(list: Dimension[], factor?: number): Dimension[]
-export function filterSizes(
-  list: number[] | Dimension[],
-  factor = 0.8
-): number[] | Dimension[] {
-  // sort list from large to small
-  const sorted = isDimensionArray(list)
-    ? [...list].sort((a, b) => b.w * b.h - a.w * a.h)
-    : [...list].sort((a, b) => b - a)
 
-  const filtered: (number | Dimension)[] = []
+export function filterSizes<T>(
+  list: T[],
+  factor?: number,
+  calculate: (item: T) => number = filterFallback
+): T[] {
+  // sort list from large to small
+  const sorted = [...list].sort((a, b) => calculate(b) - calculate(a))
+  if (!factor) return sorted
+  const filtered: T[] = []
   for (let i = 0, j = 1; i < sorted.length; j++) {
     const a = sorted[i],
       b = sorted[j]
@@ -31,15 +28,17 @@ export function filterSizes(
       filtered.push(a)
       break
     }
-    const scale1 = (isDimension(b) ? b.w : b) / (isDimension(a) ? a.w : a)
-    const scale2 = (isDimension(b) ? b.h : b) / (isDimension(a) ? a.h : a)
-    if (scale1 * scale2 < factor) {
+    const scale = calculate(b) / calculate(a)
+    if (Number.isNaN(scale) || scale < factor) {
       filtered.push(a)
       i = j
     }
   }
-  return filtered as number[] | Dimension[]
+  return filtered
 }
+
+const filterFallback = (n: unknown): number =>
+  typeof n === 'number' ? n * n : -Infinity
 
 export type ResizeFromSizesOptions = ImageOptions & { minScale?: number }
 
