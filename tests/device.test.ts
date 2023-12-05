@@ -108,6 +108,23 @@ describe('Device.fromDefinitions()', () => {
       new Device({ w: 1400, h: 1400, dppx: 1 }),
     ])
   })
+
+  test('passes through device objects', () => {
+    expect(Device.fromDefinitions(devices)).toEqual(devices)
+
+    expect(
+      Device.fromDefinitions([
+        { w: 800, h: 600, dppx: [1, 2], flip: true },
+        new Device({ w: 1400, h: 1400, dppx: 1.5 }),
+      ])
+    ).toEqual([
+      new Device({ w: 800, h: 600, dppx: 1 }),
+      new Device({ w: 800, h: 600, dppx: 2 }),
+      new Device({ w: 600, h: 800, dppx: 1 }),
+      new Device({ w: 600, h: 800, dppx: 2 }),
+      new Device({ w: 1400, h: 1400, dppx: 1.5 }),
+    ])
+  })
 })
 
 describe('Device.sort()', () => {
