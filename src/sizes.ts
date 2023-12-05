@@ -1,4 +1,5 @@
 import { toAST, type MediaQuery, type MediaCondition } from 'media-query-parser'
+import { SizeKeyword, isSizeKeyword, Dimension, isDimension } from './types'
 import { ImageSize } from './unit-values'
 
 /**
@@ -86,14 +87,6 @@ function parseConditions(queryString: string): MediaCondition | null {
   }
   return query.mediaCondition
 }
-
-type SizeKeyword = 'cover' | 'contain'
-const isSizeKeyword = (str: string): str is SizeKeyword =>
-  str === 'cover' || str === 'contain'
-
-type Dimension = 'width' | 'height'
-const isDimension = (str: string): str is SizeKeyword =>
-  str === 'width' || str === 'height'
 
 function parseImageSize(tokens: (string | ImageSize)[]): ImageSize {
   if (tokens.length === 1 && ImageSize.isUnitValue(tokens[0])) {

@@ -1,4 +1,4 @@
-import type { Dimension } from '../src/types'
+import type { Rect } from '../src/types'
 import { filterSizes, permute } from '../src/utilities'
 
 describe('filterSizes()', () => {
@@ -17,7 +17,7 @@ describe('filterSizes()', () => {
     expect(filterSizes(sampleWidths, 0.5)).toEqual([2000, 1100, 380, 250])
   })
 
-  const sampleDevices: Dimension[] = [
+  const sampleDevices: Rect[] = [
     { w: 200, h: 200 },
     { w: 250, h: 500 },
     { w: 380, h: 2000 },
@@ -30,7 +30,7 @@ describe('filterSizes()', () => {
     { w: 1900, h: 1600 },
     { w: 2000, h: 1125 },
   ]
-  const calcDevices = ({ w, h }: Dimension) => w * h
+  const calcDevices = ({ w, h }: Rect) => w * h
   test('filters a list of dimensions by their total area', () => {
     expect(filterSizes(sampleDevices, 0.8, calcDevices)).toEqual([
       { w: 1900, h: 1600 },

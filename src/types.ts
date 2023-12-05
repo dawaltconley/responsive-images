@@ -45,7 +45,7 @@ export const assertValidImageFormat = (
   return test
 }
 
-export interface Dimension {
+export interface Rect {
   /** width */
   w: number
 
@@ -53,15 +53,23 @@ export interface Dimension {
   h: number
 }
 
-export const isDimension = (object: unknown): object is Dimension =>
+export const isRect = (object: unknown): object is Rect =>
   !!object &&
   typeof object === 'object' &&
   'w' in object &&
   'h' in object &&
   !('dppx' in object)
 
-export const isDimensionArray = (objects: unknown[]): objects is Dimension[] =>
-  objects.every(isDimension)
+export const isRectArray = (objects: unknown[]): objects is Rect[] =>
+  objects.every(isRect)
+
+export type SizeKeyword = 'cover' | 'contain'
+export const isSizeKeyword = (str: string): str is SizeKeyword =>
+  str === 'cover' || str === 'contain'
+
+export type Dimension = 'width' | 'height'
+export const isDimension = (str: string): str is Dimension =>
+  str === 'width' || str === 'height'
 
 export interface Image {
   /** width of an actual image */

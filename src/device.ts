@@ -1,4 +1,4 @@
-import type { Dimension, Orientation, Image } from './types'
+import type { Rect, Orientation, Image } from './types'
 import type { MediaCondition, MediaFeature } from 'media-query-parser'
 import type Sizes from './sizes'
 import UnitValue, {
@@ -9,7 +9,7 @@ import UnitValue, {
 } from './unit-values'
 
 /** represents a supported device */
-export interface DeviceDefinition extends Dimension {
+export interface DeviceDefinition extends Rect {
   /** possible dppx for devices with these dimensions */
   dppx?: number[]
 
@@ -17,11 +17,11 @@ export interface DeviceDefinition extends Dimension {
   flip?: boolean
 }
 
-export interface DeviceOptions extends Dimension {
+export interface DeviceOptions extends Rect {
   dppx?: number
 }
 
-export default class Device implements Dimension {
+export default class Device implements Rect {
   w: number
   h: number
   dppx: number
