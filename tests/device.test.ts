@@ -1,8 +1,205 @@
 import type { Image } from '../src/types'
 
+import defaultDevices from '../src/data/devices'
 import Device, { DeviceDefinition } from '../src/device'
 import Sizes from '../src/sizes'
 import { cloneDeep } from 'lodash'
+
+const devices = Device.fromDefinitions(defaultDevices)
+
+describe('Device.fromDefinitions()', () => {
+  test('creates devices from default definitions', () => {
+    expect(devices).toEqual([
+      new Device({ w: 2560, h: 1600, dppx: 1 }),
+      new Device({ w: 1920, h: 1200, dppx: 1 }),
+      new Device({ w: 1680, h: 1050, dppx: 1 }),
+      new Device({ w: 1440, h: 900, dppx: 2 }),
+      new Device({ w: 1440, h: 900, dppx: 1 }),
+      new Device({ w: 1366, h: 1024, dppx: 2 }),
+      new Device({ w: 1366, h: 1024, dppx: 1 }),
+      new Device({ w: 1024, h: 1366, dppx: 2 }),
+      new Device({ w: 1024, h: 1366, dppx: 1 }),
+      new Device({ w: 1280, h: 800, dppx: 2 }),
+      new Device({ w: 1280, h: 800, dppx: 1.5 }),
+      new Device({ w: 1280, h: 800, dppx: 1 }),
+      new Device({ w: 800, h: 1280, dppx: 2 }),
+      new Device({ w: 800, h: 1280, dppx: 1.5 }),
+      new Device({ w: 800, h: 1280, dppx: 1 }),
+      new Device({ w: 1024, h: 768, dppx: 2 }),
+      new Device({ w: 1024, h: 768, dppx: 1 }),
+      new Device({ w: 768, h: 1024, dppx: 2 }),
+      new Device({ w: 768, h: 1024, dppx: 1 }),
+      new Device({ w: 960, h: 600, dppx: 3 }),
+      new Device({ w: 960, h: 600, dppx: 2 }),
+      new Device({ w: 960, h: 600, dppx: 1 }),
+      new Device({ w: 600, h: 960, dppx: 3 }),
+      new Device({ w: 600, h: 960, dppx: 2 }),
+      new Device({ w: 600, h: 960, dppx: 1 }),
+      new Device({ w: 768, h: 432, dppx: 4 }),
+      new Device({ w: 768, h: 432, dppx: 3 }),
+      new Device({ w: 768, h: 432, dppx: 2.5 }),
+      new Device({ w: 768, h: 432, dppx: 1 }),
+      new Device({ w: 432, h: 768, dppx: 4 }),
+      new Device({ w: 432, h: 768, dppx: 3 }),
+      new Device({ w: 432, h: 768, dppx: 2.5 }),
+      new Device({ w: 432, h: 768, dppx: 1 }),
+      new Device({ w: 690, h: 412, dppx: 3.5 }),
+      new Device({ w: 690, h: 412, dppx: 2 }),
+      new Device({ w: 690, h: 412, dppx: 1 }),
+      new Device({ w: 412, h: 690, dppx: 3.5 }),
+      new Device({ w: 412, h: 690, dppx: 2 }),
+      new Device({ w: 412, h: 690, dppx: 1 }),
+      new Device({ w: 640, h: 360, dppx: 4 }),
+      new Device({ w: 640, h: 360, dppx: 3 }),
+      new Device({ w: 640, h: 360, dppx: 2 }),
+      new Device({ w: 640, h: 360, dppx: 1.5 }),
+      new Device({ w: 640, h: 360, dppx: 1 }),
+      new Device({ w: 360, h: 640, dppx: 4 }),
+      new Device({ w: 360, h: 640, dppx: 3 }),
+      new Device({ w: 360, h: 640, dppx: 2 }),
+      new Device({ w: 360, h: 640, dppx: 1.5 }),
+      new Device({ w: 360, h: 640, dppx: 1 }),
+      new Device({ w: 480, h: 320, dppx: 4 }),
+      new Device({ w: 480, h: 320, dppx: 3 }),
+      new Device({ w: 480, h: 320, dppx: 2 }),
+      new Device({ w: 480, h: 320, dppx: 1.5 }),
+      new Device({ w: 480, h: 320, dppx: 1 }),
+      new Device({ w: 320, h: 480, dppx: 4 }),
+      new Device({ w: 320, h: 480, dppx: 3 }),
+      new Device({ w: 320, h: 480, dppx: 2 }),
+      new Device({ w: 320, h: 480, dppx: 1.5 }),
+      new Device({ w: 320, h: 480, dppx: 1 }),
+    ])
+  })
+
+  test('creates devices from custome definitions', () => {
+    const devices = Device.fromDefinitions([
+      {
+        w: 800,
+        h: 600,
+        dppx: [1, 2],
+        flip: true,
+      },
+    ])
+
+    expect(devices).toEqual([
+      new Device({ w: 800, h: 600, dppx: 1 }),
+      new Device({ w: 800, h: 600, dppx: 2 }),
+      new Device({ w: 600, h: 800, dppx: 1 }),
+      new Device({ w: 600, h: 800, dppx: 2 }),
+    ])
+
+    devices.push(
+      ...Device.fromDefinitions([
+        {
+          w: 1400,
+          h: 1400,
+          dppx: [1.5],
+        },
+      ])
+    )
+
+    expect(devices).toEqual([
+      new Device({ w: 800, h: 600, dppx: 1 }),
+      new Device({ w: 800, h: 600, dppx: 2 }),
+      new Device({ w: 600, h: 800, dppx: 1 }),
+      new Device({ w: 600, h: 800, dppx: 2 }),
+      new Device({ w: 1400, h: 1400, dppx: 1.5 }),
+      new Device({ w: 1400, h: 1400, dppx: 1 }),
+    ])
+  })
+})
+
+describe('Device.sort()', () => {
+  test('correctly sorts devices', () => {
+    let sorted = [...devices].sort(Device.sort)
+
+    expect(sorted).toEqual([
+      new Device({ w: 2560, h: 1600, dppx: 1 }),
+      new Device({ w: 1920, h: 1200, dppx: 1 }),
+      new Device({ w: 1680, h: 1050, dppx: 1 }),
+      new Device({ w: 1440, h: 900, dppx: 2 }),
+      new Device({ w: 1440, h: 900, dppx: 1 }),
+      new Device({ w: 1366, h: 1024, dppx: 2 }),
+      new Device({ w: 1366, h: 1024, dppx: 1 }),
+      new Device({ w: 1280, h: 800, dppx: 2 }),
+      new Device({ w: 1280, h: 800, dppx: 1.5 }),
+      new Device({ w: 1280, h: 800, dppx: 1 }),
+      new Device({ w: 1024, h: 1366, dppx: 2 }),
+      new Device({ w: 1024, h: 1366, dppx: 1 }),
+      new Device({ w: 1024, h: 768, dppx: 2 }),
+      new Device({ w: 1024, h: 768, dppx: 1 }),
+      new Device({ w: 960, h: 600, dppx: 3 }),
+      new Device({ w: 960, h: 600, dppx: 2 }),
+      new Device({ w: 960, h: 600, dppx: 1 }),
+      new Device({ w: 800, h: 1280, dppx: 2 }),
+      new Device({ w: 800, h: 1280, dppx: 1.5 }),
+      new Device({ w: 800, h: 1280, dppx: 1 }),
+      new Device({ w: 768, h: 1024, dppx: 2 }),
+      new Device({ w: 768, h: 1024, dppx: 1 }),
+      new Device({ w: 768, h: 432, dppx: 4 }),
+      new Device({ w: 768, h: 432, dppx: 3 }),
+      new Device({ w: 768, h: 432, dppx: 2.5 }),
+      new Device({ w: 768, h: 432, dppx: 1 }),
+      new Device({ w: 690, h: 412, dppx: 3.5 }),
+      new Device({ w: 690, h: 412, dppx: 2 }),
+      new Device({ w: 690, h: 412, dppx: 1 }),
+      new Device({ w: 640, h: 360, dppx: 4 }),
+      new Device({ w: 640, h: 360, dppx: 3 }),
+      new Device({ w: 640, h: 360, dppx: 2 }),
+      new Device({ w: 640, h: 360, dppx: 1.5 }),
+      new Device({ w: 640, h: 360, dppx: 1 }),
+      new Device({ w: 600, h: 960, dppx: 3 }),
+      new Device({ w: 600, h: 960, dppx: 2 }),
+      new Device({ w: 600, h: 960, dppx: 1 }),
+      new Device({ w: 480, h: 320, dppx: 4 }),
+      new Device({ w: 480, h: 320, dppx: 3 }),
+      new Device({ w: 480, h: 320, dppx: 2 }),
+      new Device({ w: 480, h: 320, dppx: 1.5 }),
+      new Device({ w: 480, h: 320, dppx: 1 }),
+      new Device({ w: 432, h: 768, dppx: 4 }),
+      new Device({ w: 432, h: 768, dppx: 3 }),
+      new Device({ w: 432, h: 768, dppx: 2.5 }),
+      new Device({ w: 432, h: 768, dppx: 1 }),
+      new Device({ w: 412, h: 690, dppx: 3.5 }),
+      new Device({ w: 412, h: 690, dppx: 2 }),
+      new Device({ w: 412, h: 690, dppx: 1 }),
+      new Device({ w: 360, h: 640, dppx: 4 }),
+      new Device({ w: 360, h: 640, dppx: 3 }),
+      new Device({ w: 360, h: 640, dppx: 2 }),
+      new Device({ w: 360, h: 640, dppx: 1.5 }),
+      new Device({ w: 360, h: 640, dppx: 1 }),
+      new Device({ w: 320, h: 480, dppx: 4 }),
+      new Device({ w: 320, h: 480, dppx: 3 }),
+      new Device({ w: 320, h: 480, dppx: 2 }),
+      new Device({ w: 320, h: 480, dppx: 1.5 }),
+      new Device({ w: 320, h: 480, dppx: 1 }),
+    ])
+
+    sorted = Device.fromDefinitions([
+      {
+        w: 800,
+        h: 600,
+        dppx: [1, 2],
+        flip: true,
+      },
+      {
+        w: 1400,
+        h: 1400,
+        dppx: [1.5],
+      },
+    ]).sort(Device.sort)
+
+    expect(sorted).toEqual([
+      new Device({ w: 1400, h: 1400, dppx: 1.5 }),
+      new Device({ w: 1400, h: 1400, dppx: 1 }),
+      new Device({ w: 800, h: 600, dppx: 2 }),
+      new Device({ w: 800, h: 600, dppx: 1 }),
+      new Device({ w: 600, h: 800, dppx: 2 }),
+      new Device({ w: 600, h: 800, dppx: 1 }),
+    ])
+  })
+})
 
 describe('Device.getImage()', () => {
   type Test = {
