@@ -10,7 +10,6 @@ import Config, { ConfigOptions } from './config'
 import Image, { ConfiguredImage } from './image'
 import Sizes from './sizes'
 import DeviceSizes from './device-sizes'
-import { filterSizes } from './utilities'
 import { toLegacyAsyncFunctions } from './legacy-sass'
 
 /**
@@ -65,7 +64,6 @@ export default class ResponsiveImages extends Config {
   }
 
   /**
-   * @deprecated
    * Generates multiple new sizes for an image. This is a wrapper method around
    * `@11ty/eleventy-img`, which just handles default options and allows disabling.
    * @param image - file or url of the source image
@@ -113,19 +111,6 @@ export default class ResponsiveImages extends Config {
       .then(meta => meta.toSources(properties))
   }
 
-  /**
-   * @deprecated
-   * Calculates image widths from a sizes query string.
-   * Uses configured defaults for the `devices` and `scalingFactor`.
-   */
-  widthsFromSizes(sizes: string): number[] {
-    const { targets } = new DeviceSizes(new Sizes(sizes), this.devices)
-    return filterSizes(
-      targets.map(img => img.w),
-      this.scalingFactor
-    )
-  }
-
   private _handleMixedOptions(
     options: MixedOptions
   ): [ResizeOptions, HtmlOptions] {
@@ -141,21 +126,6 @@ export default class ResponsiveImages extends Config {
   }
 
   /**
-   * Returns a copy of the config data with an undefined `widths` calculated from sizes.
-   * If sizes is not specified, it will be specified in the return config as `'100vw'`.
-   * @returns a new object with widths calculated from the sizes attribute
-   */
-  private _handleFromSizes<T extends FromSizesOptions>(kwargs: T): T {
-    const processed = { ...kwargs }
-    const { sizes = '100vw', widths } = processed
-    if (!widths) {
-      processed.widths = this.widthsFromSizes(sizes)
-    }
-    return { sizes, ...processed }
-  }
-
-  /**
-   * @deprecated
    * Uses a sizes attribute to parse images and returns a metadata object. Defaults to 100vw.
    */
   async metadataFromSizes(

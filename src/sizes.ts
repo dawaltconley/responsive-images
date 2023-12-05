@@ -1,9 +1,5 @@
-import type { Image } from './types'
-import type Device from './device'
 import { toAST, type MediaQuery, type MediaCondition } from 'media-query-parser'
 import { ImageSize } from './unit-values'
-import QueryMap from './query-map'
-import { filterSizes } from './utilities'
 
 /**
  * represents a valid rule for the img sizes attribute,
@@ -31,27 +27,6 @@ export default class Sizes {
 
   toString(): string {
     return this.string
-  }
-
-  getImages(devices: Device[]): Image[] {
-    return devices.map(d => d.getImage(this))
-  }
-
-  /**
-   * @deprecated
-   * @returns an array of dimensions, which represent image copies that should be produced to satisfy these sizes.
-   */
-  toWidths(
-    devices: Device[],
-    { minScale }: { minScale?: number } = {}
-  ): number[] {
-    const needWidths = new Set<number>(devices.map(d => d.getImage(this).w))
-    return filterSizes(Array.from(needWidths), minScale)
-  }
-
-  /** @deprecated */
-  toQueries(devices: Device[]): QueryMap {
-    return new QueryMap(devices, this)
   }
 
   /**
