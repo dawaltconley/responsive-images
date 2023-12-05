@@ -49,7 +49,11 @@ export default class DeviceSizes {
     return resizeFromSizes(image, this, options)
   }
 
-  /** @returns a MetadataEntry array where the index of each set corresponds to a device/target */
+  /**
+   * Assumes that all entries in the Metadata object have the same-ish aspect ratio.
+   * Won't work if any of the entries have been cropped.
+   * @returns a MetadataEntry array where the index of each set corresponds to a device/target
+   */
   mapMetadata({ metadata }: Metadata): MetadataEntry[][] {
     const byWidth = Object.values(
       groupBy(Object.values(metadata).flat(), ({ width }) => width)
