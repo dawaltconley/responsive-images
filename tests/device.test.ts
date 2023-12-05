@@ -426,10 +426,7 @@ describe('Device.getImage()', () => {
     const sizes = new Sizes(
       '(min-width: 1536px) 718.5px, (min-width: 1280px) 590px, (min-width: 1024px) 468px, (min-width: 768px) 704px, (min-width: 640px) 576px, 100vw'
     )
-    const device = new Device({
-      w: 1000,
-      h: 400,
-    })
+    const device = new Device({ w: 1000, h: 400 })
     device.w = 1920
     expect(device.getImage(sizes)).toEqual({ width: 719 })
     device.w = 1440
@@ -449,27 +446,18 @@ describe('Device.getImage()', () => {
       '(max-width: 780px) and (max-height: 720px) 600px, 400px'
     )
     const pass: Test = {
-      device: {
-        w: 600,
-        h: 480,
-      },
+      device: { w: 600, h: 480 },
       images: [{ width: 600 }],
     }
     // fail with height
     const fail1: Test = {
-      device: {
-        w: 800,
-        h: 600,
-      },
+      device: { w: 800, h: 600 },
       images: [{ width: 400 }],
     }
     // fail with width
     const fail2: Test = {
       ...fail1,
-      device: {
-        w: 772,
-        h: 728,
-      },
+      device: { w: 772, h: 728 },
     }
     run(pass, sizes)
     run(fail1, sizes)
@@ -482,26 +470,17 @@ describe('Device.getImage()', () => {
     )
     // pass with max width/height
     const pass1: Test = {
-      device: {
-        w: 600,
-        h: 480,
-      },
+      device: { w: 600, h: 480 },
       images: [{ width: 600 }],
     }
     // pass with min-width
     const pass2: Test = {
       ...pass1,
-      device: {
-        w: 920,
-        h: 600,
-      },
+      device: { w: 920, h: 600 },
     }
     // fail
     const fail: Test = {
-      device: {
-        w: 772,
-        h: 728,
-      },
+      device: { w: 772, h: 728 },
       images: [{ width: 400 }],
     }
     run(pass1, sizes)
@@ -514,27 +493,18 @@ describe('Device.getImage()', () => {
       '(not (max-width: 780px)) and (max-height: 720px) 600px, 400px'
     )
     const pass: Test = {
-      device: {
-        w: 800,
-        h: 600,
-      },
+      device: { w: 800, h: 600 },
       images: [{ width: 600 }],
     }
     // fail with not query
     const fail1: Test = {
-      device: {
-        w: 600,
-        h: 480,
-      },
+      device: { w: 600, h: 480 },
       images: [{ width: 400 }],
     }
     // fail with height
     const fail2: Test = {
       ...fail1,
-      device: {
-        w: 800,
-        h: 728,
-      },
+      device: { w: 800, h: 728 },
     }
     run(pass, sizes)
     run(fail1, sizes)
@@ -547,25 +517,16 @@ describe('Device.getImage()', () => {
     )
     // inverting or test
     const pass: Test = {
-      device: {
-        w: 772,
-        h: 728,
-      },
+      device: { w: 772, h: 728 },
       images: [{ width: 600 }],
     }
     const fail1: Test = {
-      device: {
-        w: 600,
-        h: 480,
-      },
+      device: { w: 600, h: 480 },
       images: [{ width: 400 }],
     }
     const fail2: Test = {
       ...fail1,
-      device: {
-        w: 920,
-        h: 600,
-      },
+      device: { w: 920, h: 600 },
     }
     run(pass, sizes)
     run(fail1, sizes)
