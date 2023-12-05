@@ -1,4 +1,4 @@
-import type { Rect, Orientation, Image } from './types'
+import type { Rect, Orientation, ResizeInstructions } from './types'
 import type { MediaCondition, MediaFeature } from 'media-query-parser'
 import type Sizes from './sizes'
 import UnitValue, {
@@ -20,6 +20,8 @@ export interface DeviceDefinition extends Rect {
 export interface DeviceOptions extends Rect {
   dppx?: number
 }
+
+export type ResolvedImage = ResizeInstructions<number>
 
 export default class Device implements Rect {
   w: number
@@ -95,28 +97,31 @@ export default class Device implements Rect {
   }
 
   /**
-   * @returns the image size recommended for this device by a sizes string
+   * @returns the {@link ResolvedImage}s needed to support a {@link Sizes} query on this device
    */
-  resolve(sizes: Sizes): ImageSize {
-    let imgWidth: ImageSize = new ImageSize(100, 'vw') // fallback to 100vw if no queries apply; this is the browser default
-
-    whichSize: for (const { conditions, width } of sizes.queries) {
-      if (conditions && !this.matches(conditions)) continue
-      imgWidth = width
-      break whichSize // break loop when device matches all conditions
+  getImage(sizes: Sizes): ResolvedImage {
+    for (const { conditions, size } of sizes.queries) {
+      if (!conditions || this.matches(conditions)) {
+        return this.resolve(size)
+      }
     }
-
-    return imgWidth
+    return { width: this.w } // fallback to 100vw if no queries apply; this is the browser default
   }
 
   /**
-   * @returns the {@link Image}s needed to support a {@link Sizes} query on this device
+   * @returns the resize instructions for a given image with all units resolved to device pixels
    */
-  getImage(sizes: Sizes): Image {
-    return {
-      w: toDevicePixels(this.resolve(sizes), this),
-      dppx: this.dppx,
-      orientation: this.orientation,
+  resolve(initial: ResizeInstructions<ImageSize>): ResolvedImage {
+    if ('fit' in initial) {
+      return {
+        width: toDevicePixels(initial.width, this),
+        height: toDevicePixels(initial.height, this),
+        fit: initial.fit,
+      }
+    } else if ('width' in initial) {
+      return { width: toDevicePixels(initial.width, this) }
+    } else {
+      return { width: toDevicePixels(initial.height, this) }
     }
   }
 

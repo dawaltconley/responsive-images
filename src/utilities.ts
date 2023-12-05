@@ -1,3 +1,4 @@
+import type { ResizeInstructions } from './types'
 import type { ImageOptions } from './image'
 import type Image from './image'
 import type DeviceSizes from './device-sizes'
@@ -47,15 +48,34 @@ export async function resizeFromSizes(
   devices: DeviceSizes,
   { minScale, ...options }: ResizeFromSizesOptions = {}
 ): Promise<Metadata> {
-  const { width: maxWidth } = await image.stat()
+  const { width, height } = await image.stat()
   const widths = filterSizes(
     devices.targets
-      .map(img => img.w)
-      .filter(w => w <= maxWidth)
-      .sort((a, b) => b - a),
+      .map(target => Math.ceil(instructionsToWidth(target, width / height)))
+      .filter(w => w <= width),
     minScale
   )
-  return image.resize({ widths: widths, ...options })
+  return image.resize({ widths, ...options })
+}
+
+export function instructionsToWidth(
+  resize: ResizeInstructions<number>,
+  aspect: number
+): number {
+  if ('fit' in resize) {
+    const resizeAspect = resize.width / resize.height
+    if (resize.fit === 'cover') {
+      // if instructions are wider than image, use instruction width; if instructions are taller than image, use instruction height
+      return resizeAspect > aspect ? resize.width : resize.height * aspect
+    } else {
+      // if instructions are wider than image, use instruction height; if instructions are taller than image, use instruction width
+      return resizeAspect < aspect ? resize.width : resize.height * aspect
+    }
+  } else if ('height' in resize) {
+    return resize.height * aspect
+  } else {
+    return resize.width
+  }
 }
 
 export const permute = <T>(

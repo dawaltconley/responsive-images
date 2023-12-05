@@ -17,6 +17,14 @@ export type Order = (typeof Order)[number]
 export const isOrder = (test: string): test is Order =>
   Order.some(o => o === test)
 
+export type SizeKeyword = 'cover' | 'contain'
+export const isSizeKeyword = (str: string): str is SizeKeyword =>
+  str === 'cover' || str === 'contain'
+
+export type Dimension = 'width' | 'height'
+export const isDimension = (str: string): str is Dimension =>
+  str === 'width' || str === 'height'
+
 import type { ImageFormatWithAliases } from '@11ty/eleventy-img'
 
 export type ValidImageFormat = 'auto' | ImageFormatWithAliases | null
@@ -45,6 +53,11 @@ export const assertValidImageFormat = (
   return test
 }
 
+export type ResizeInstructions<T> =
+  | { width: T }
+  | { height: T }
+  | { width: T; height: T; fit: SizeKeyword }
+
 export interface Rect {
   /** width */
   w: number
@@ -62,25 +75,3 @@ export const isRect = (object: unknown): object is Rect =>
 
 export const isRectArray = (objects: unknown[]): objects is Rect[] =>
   objects.every(isRect)
-
-export type SizeKeyword = 'cover' | 'contain'
-export const isSizeKeyword = (str: string): str is SizeKeyword =>
-  str === 'cover' || str === 'contain'
-
-export type Dimension = 'width' | 'height'
-export const isDimension = (str: string): str is Dimension =>
-  str === 'width' || str === 'height'
-
-export interface Image {
-  /** width of an actual image */
-  w: number
-
-  /** device dppx at which this image size will apply */
-  dppx: number
-
-  /** device orientation in which this image will be used */
-  orientation: Orientation
-
-  /** if present treats this image as an alias for another image */
-  use?: Omit<Image, 'use'>
-}

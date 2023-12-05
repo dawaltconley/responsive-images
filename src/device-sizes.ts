@@ -1,18 +1,22 @@
 import type { MetadataEntry } from '@11ty/eleventy-img'
-import type { Image as ImageTarget } from './types'
+import type { ResizeInstructions } from './types'
 import type { MediaQuery, MediaQueriesOptions } from './media-queries'
 import type Sizes from './sizes'
 import type Image from './image'
 import type Metadata from './metadata'
 import Device from './device'
 import MediaQueries from './media-queries'
-import { resizeFromSizes, ResizeFromSizesOptions } from './utilities'
+import {
+  instructionsToWidth,
+  resizeFromSizes,
+  ResizeFromSizesOptions,
+} from './utilities'
 import groupBy from 'lodash/groupBy'
 
 export default class DeviceSizes {
   readonly sizes: Sizes
   readonly devices: Device[]
-  readonly targets: ImageTarget[]
+  readonly targets: ResizeInstructions<number>[]
   readonly landscape: number[]
   readonly portrait: number[]
 
@@ -47,26 +51,22 @@ export default class DeviceSizes {
 
   /** @returns a MetadataEntry array where the index of each set corresponds to a device/target */
   mapMetadata({ metadata }: Metadata): MetadataEntry[][] {
-    const entries: MetadataEntry[] = Object.values(metadata)
-      .flat()
-      .sort((a, b) => b.width - a.width)
-    const metaWidths = entries.reduce((map, m) => {
-      const sameWidth = map.get(m.width) || []
-      return map.set(m.width, [...sameWidth, m])
-    }, new Map<number, MetadataEntry[]>())
-    const metaWidthsEntries = Array.from(metaWidths.entries())
+    const byWidth = Object.values(
+      groupBy(Object.values(metadata).flat(), ({ width }) => width)
+    ).sort((a, b) => b[0].width - a[0].width)
 
     return this.targets.map<MetadataEntry[]>(target => {
-      const exactMatch = metaWidths.get(target.w)
-      if (exactMatch) return exactMatch
-      for (let i = 1, l = metaWidthsEntries.length; i < l; i++) {
-        const [mWidth, m] = metaWidthsEntries[i]
-        const [nextWidth, next] = metaWidthsEntries[i + 1] || []
-        if (mWidth >= target.w && (!next || nextWidth < target.w)) {
-          return m
+      for (let i = 1, l = byWidth.length; i < l; i++) {
+        const { width, height } = byWidth[i][0]
+        const next = byWidth[i + 1]?.[0]
+        const targetWidth = Math.ceil(
+          instructionsToWidth(target, width / height)
+        )
+        if (width >= targetWidth && (!next || next.width < targetWidth)) {
+          return byWidth[i]
         }
       }
-      return metaWidthsEntries[0][1]
+      return byWidth[0]
     })
   }
 

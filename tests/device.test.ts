@@ -1,5 +1,3 @@
-import type { Image } from '../src/types'
-
 import defaultDevices from '../src/data/devices'
 import Device, { DeviceDefinition } from '../src/device'
 import Sizes from '../src/sizes'
@@ -218,12 +216,12 @@ describe('Device.sort()', () => {
   })
 })
 
-describe('Device.getImage()', () => {
-  type Test = {
-    device: DeviceDefinition
-    images: Image[]
-  }
+type Test = {
+  device: DeviceDefinition
+  images: { width: number }[]
+}
 
+describe('Device.getImage()', () => {
   const template: {
     sizes: Sizes
     pass: Test
@@ -231,30 +229,12 @@ describe('Device.getImage()', () => {
   } = {
     sizes: new Sizes('(min-width: 680px) 400px, 500px'),
     pass: {
-      device: {
-        w: 800,
-        h: 700,
-      },
-      images: [
-        {
-          w: 400,
-          dppx: 1,
-          orientation: 'landscape',
-        },
-      ],
+      device: { w: 800, h: 700 },
+      images: [{ width: 400 }],
     },
     fail: {
-      device: {
-        w: 500,
-        h: 600,
-      },
-      images: [
-        {
-          w: 500,
-          dppx: 1,
-          orientation: 'portrait',
-        },
-      ],
+      device: { w: 500, h: 600 },
+      images: [{ width: 500 }],
     },
   }
 
@@ -274,8 +254,8 @@ describe('Device.getImage()', () => {
     const { pass, fail } = cloneDeep(template)
     const sizes = new Sizes('(max-width: 680px) 400px, 500px')
     // invert pass and fail widths for max conditions
-    pass.images[0].w = 500
-    fail.images[0].w = 400
+    pass.images[0].width = 500
+    fail.images[0].width = 400
     run(pass, sizes)
     run(fail, sizes)
   })
@@ -298,8 +278,8 @@ describe('Device.getImage()', () => {
     let { sizes, pass, fail } = cloneDeep(template)
     sizes = new Sizes('(max-height: 680px) 400px, 500px')
     // invert pass and fail widths for max conditions
-    pass.images[0].w = 500
-    fail.images[0].w = 400
+    pass.images[0].width = 500
+    fail.images[0].width = 400
     run(pass, sizes)
     run(fail, sizes)
   })
@@ -336,8 +316,8 @@ describe('Device.getImage()', () => {
     const { pass, fail } = cloneDeep(template)
     const sizes = new Sizes('(max-aspect-ratio: 9/8) 400px, 500px')
     // invert pass and fail widths for max conditions
-    pass.images[0].w = 500
-    fail.images[0].w = 400
+    pass.images[0].width = 500
+    fail.images[0].width = 400
     run(pass, sizes)
     run(fail, sizes)
   })
@@ -346,8 +326,8 @@ describe('Device.getImage()', () => {
     const { pass, fail } = cloneDeep(template)
     const sizes = new Sizes('(max-aspect-ratio: 1.1) 400px, 500px')
     // invert pass and fail widths for max conditions
-    pass.images[0].w = 500
-    fail.images[0].w = 400
+    pass.images[0].width = 500
+    fail.images[0].width = 400
     run(pass, sizes)
     run(fail, sizes)
   })
@@ -372,9 +352,7 @@ describe('Device.getImage()', () => {
     const sizes = new Sizes('(min-resolution: 100dpi) 400px, 500px')
     // pass
     expect(new Device({ w: 100, h: 100, dppx: 1.5 }).getImage(sizes)).toEqual({
-      dppx: 1.5,
-      orientation: 'landscape',
-      w: 600,
+      width: 600,
     })
     run(fail, sizes)
   })
@@ -385,9 +363,7 @@ describe('Device.getImage()', () => {
     run(pass, sizes)
     // fail
     expect(new Device({ w: 100, h: 100, dppx: 3 }).getImage(sizes)).toEqual({
-      dppx: 3,
-      orientation: 'landscape',
-      w: 1500,
+      width: 1500,
     })
   })
 
@@ -396,9 +372,7 @@ describe('Device.getImage()', () => {
     const sizes = new Sizes('(resolution: 96dpcm) 400px, 500px')
     // pass
     expect(new Device({ w: 100, h: 100, dppx: 2.54 }).getImage(sizes)).toEqual({
-      dppx: 2.54,
-      orientation: 'landscape',
-      w: 1016,
+      width: 1016,
     })
     run(fail, sizes)
   })
@@ -407,7 +381,7 @@ describe('Device.getImage()', () => {
     const { sizes, pass, fail } = cloneDeep(template)
     sizes.queries.pop()
     fail.device.w = 555
-    fail.images[0].w = fail.device.w
+    fail.images[0].width = fail.device.w
     run(pass, sizes)
     run(fail, sizes)
   })
@@ -420,18 +394,7 @@ describe('Device.getImage()', () => {
         ...fail.device,
         dppx: [2, 1],
       },
-      images: [
-        {
-          w: 750,
-          dppx: 2,
-          orientation: 'portrait',
-        },
-        {
-          w: 375,
-          dppx: 1,
-          orientation: 'portrait',
-        },
-      ],
+      images: [{ width: 750 }, { width: 375 }],
     }
     run(pass, sizes)
     run(fail, sizes)
@@ -440,30 +403,13 @@ describe('Device.getImage()', () => {
   test('determines image width using vh and dppx', () => {
     let { pass, fail } = cloneDeep(template)
     const sizes = new Sizes('(min-width: 680px) 50vh, 75vh')
-    pass.images = [
-      {
-        w: 350,
-        dppx: 1,
-        orientation: 'landscape',
-      },
-    ]
+    pass.images = [{ width: 350 }]
     fail = {
       device: {
         ...fail.device,
         dppx: [2, 1],
       },
-      images: [
-        {
-          w: 900,
-          dppx: 2,
-          orientation: 'portrait',
-        },
-        {
-          w: 450,
-          dppx: 1,
-          orientation: 'portrait',
-        },
-      ],
+      images: [{ width: 900 }, { width: 450 }],
     }
     run(pass, sizes)
     run(fail, sizes)
@@ -484,23 +430,18 @@ describe('Device.getImage()', () => {
       w: 1000,
       h: 400,
     })
-    const image: Image = {
-      w: 1000,
-      dppx: 1,
-      orientation: 'landscape',
-    }
     device.w = 1920
-    expect(device.getImage(sizes)).toEqual({ ...image, w: 719 })
+    expect(device.getImage(sizes)).toEqual({ width: 719 })
     device.w = 1440
-    expect(device.getImage(sizes)).toEqual({ ...image, w: 590 })
+    expect(device.getImage(sizes)).toEqual({ width: 590 })
     device.w = 1200
-    expect(device.getImage(sizes)).toEqual({ ...image, w: 468 })
+    expect(device.getImage(sizes)).toEqual({ width: 468 })
     device.w = 820
-    expect(device.getImage(sizes)).toEqual({ ...image, w: 704 })
+    expect(device.getImage(sizes)).toEqual({ width: 704 })
     device.w = 680
-    expect(device.getImage(sizes)).toEqual({ ...image, w: 576 })
+    expect(device.getImage(sizes)).toEqual({ width: 576 })
     device.w = 600
-    expect(device.getImage(sizes)).toEqual({ ...image, w: 600 })
+    expect(device.getImage(sizes)).toEqual({ width: 600 })
   })
 
   test('handles multiple "and" media queries', () => {
@@ -512,13 +453,7 @@ describe('Device.getImage()', () => {
         w: 600,
         h: 480,
       },
-      images: [
-        {
-          w: 600,
-          dppx: 1,
-          orientation: 'landscape',
-        },
-      ],
+      images: [{ width: 600 }],
     }
     // fail with height
     const fail1: Test = {
@@ -526,13 +461,7 @@ describe('Device.getImage()', () => {
         w: 800,
         h: 600,
       },
-      images: [
-        {
-          w: 400,
-          dppx: 1,
-          orientation: 'landscape',
-        },
-      ],
+      images: [{ width: 400 }],
     }
     // fail with width
     const fail2: Test = {
@@ -557,13 +486,7 @@ describe('Device.getImage()', () => {
         w: 600,
         h: 480,
       },
-      images: [
-        {
-          w: 600,
-          dppx: 1,
-          orientation: 'landscape',
-        },
-      ],
+      images: [{ width: 600 }],
     }
     // pass with min-width
     const pass2: Test = {
@@ -579,13 +502,7 @@ describe('Device.getImage()', () => {
         w: 772,
         h: 728,
       },
-      images: [
-        {
-          w: 400,
-          dppx: 1,
-          orientation: 'landscape',
-        },
-      ],
+      images: [{ width: 400 }],
     }
     run(pass1, sizes)
     run(pass2, sizes)
@@ -601,13 +518,7 @@ describe('Device.getImage()', () => {
         w: 800,
         h: 600,
       },
-      images: [
-        {
-          w: 600,
-          dppx: 1,
-          orientation: 'landscape',
-        },
-      ],
+      images: [{ width: 600 }],
     }
     // fail with not query
     const fail1: Test = {
@@ -615,13 +526,7 @@ describe('Device.getImage()', () => {
         w: 600,
         h: 480,
       },
-      images: [
-        {
-          w: 400,
-          dppx: 1,
-          orientation: 'landscape',
-        },
-      ],
+      images: [{ width: 400 }],
     }
     // fail with height
     const fail2: Test = {
@@ -646,26 +551,14 @@ describe('Device.getImage()', () => {
         w: 772,
         h: 728,
       },
-      images: [
-        {
-          w: 600,
-          dppx: 1,
-          orientation: 'landscape',
-        },
-      ],
+      images: [{ width: 600 }],
     }
     const fail1: Test = {
       device: {
         w: 600,
         h: 480,
       },
-      images: [
-        {
-          w: 400,
-          dppx: 1,
-          orientation: 'landscape',
-        },
-      ],
+      images: [{ width: 400 }],
     }
     const fail2: Test = {
       ...fail1,
@@ -683,59 +576,19 @@ describe('Device.getImage()', () => {
     const { sizes, pass, fail } = cloneDeep(template)
     pass.device.dppx = [4, 3.2, 2.0, 1.5, 1]
     pass.images = [
-      {
-        w: 1600,
-        dppx: 4,
-        orientation: 'landscape',
-      },
-      {
-        w: 1280,
-        dppx: 3.2,
-        orientation: 'landscape',
-      },
-      {
-        w: 800,
-        dppx: 2,
-        orientation: 'landscape',
-      },
-      {
-        w: 600,
-        dppx: 1.5,
-        orientation: 'landscape',
-      },
-      {
-        w: 400,
-        dppx: 1,
-        orientation: 'landscape',
-      },
+      { width: 1600 },
+      { width: 1280 },
+      { width: 800 },
+      { width: 600 },
+      { width: 400 },
     ]
     fail.device.dppx = [4, 3.2, 2, 1.5, 1]
     fail.images = [
-      {
-        w: 2000,
-        dppx: 4,
-        orientation: 'portrait',
-      },
-      {
-        w: 1600,
-        dppx: 3.2,
-        orientation: 'portrait',
-      },
-      {
-        w: 1000,
-        dppx: 2,
-        orientation: 'portrait',
-      },
-      {
-        w: 750,
-        dppx: 1.5,
-        orientation: 'portrait',
-      },
-      {
-        w: 500,
-        dppx: 1,
-        orientation: 'portrait',
-      },
+      { width: 2000 },
+      { width: 1600 },
+      { width: 1000 },
+      { width: 750 },
+      { width: 500 },
     ]
 
     run(pass, sizes)
@@ -745,27 +598,13 @@ describe('Device.getImage()', () => {
   test('handles a flippable device', () => {
     const { sizes, pass, fail } = cloneDeep(template)
     pass.device.flip = true
-    pass.images = [
-      ...pass.images,
-      {
-        w: 400,
-        dppx: 1,
-        orientation: 'portrait',
-      },
-    ]
+    pass.images = [...pass.images, { width: 400 }]
     fail.device = {
       ...fail.device,
       h: 800,
       flip: true,
     }
-    fail.images = [
-      ...fail.images,
-      {
-        w: 400,
-        dppx: 1,
-        orientation: 'landscape',
-      },
-    ]
+    fail.images = [...fail.images, { width: 400 }]
     run(pass, sizes)
     run(fail, sizes)
   })

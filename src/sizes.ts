@@ -1,6 +1,12 @@
 import { toAST, type MediaQuery, type MediaCondition } from 'media-query-parser'
-import { SizeKeyword, isSizeKeyword, Dimension, isDimension } from './types'
-import { ImageSize } from './unit-values'
+import {
+  ResizeInstructions,
+  SizeKeyword,
+  isSizeKeyword,
+  Dimension,
+  isDimension,
+} from './types'
+import { ImageSize as ImageValue } from './unit-values'
 
 /**
  * represents a valid rule for the img sizes attribute,
@@ -14,8 +20,10 @@ export interface SizesQuery {
   conditions: MediaCondition | null
 
   /** the image width applied under these conditions */
-  width: ImageSize
+  size: ImageSize
 }
+
+export type ImageSize = ResizeInstructions<ImageValue>
 
 export default class Sizes {
   readonly string: string
@@ -40,7 +48,7 @@ export default class Sizes {
     return sizesQueryString
       .split(/\s*,\s*/)
       .map<SizesQuery | null>(sizeQuery => {
-        const imageSize: (SizeKeyword | Dimension | ImageSize)[] = []
+        const imageSize: (SizeKeyword | Dimension | ImageValue)[] = []
         const tokens = sizeQuery.split(/\s+/)
         while (tokens.length) {
           const t = tokens.pop()
@@ -50,7 +58,7 @@ export default class Sizes {
             continue
           }
           try {
-            const u = ImageSize.parse(t)
+            const u = ImageValue.parse(t)
             imageSize.unshift(u)
             continue
           } catch (e) {
@@ -60,7 +68,7 @@ export default class Sizes {
         }
         return {
           conditions: parseConditions(tokens.join(' ')),
-          width: parseImageSize(imageSize),
+          size: parseImageSize(imageSize),
         }
       })
       .filter((s): s is SizesQuery => s !== null)
@@ -88,14 +96,14 @@ function parseConditions(queryString: string): MediaCondition | null {
   return query.mediaCondition
 }
 
-function parseImageSize(tokens: (string | ImageSize)[]): ImageSize {
-  if (tokens.length === 1 && ImageSize.isUnitValue(tokens[0])) {
-    return tokens[0]
+function parseImageSize(tokens: (string | ImageValue)[]): ImageSize {
+  if (tokens.length === 1 && ImageValue.isUnitValue(tokens[0])) {
+    return { width: tokens[0] }
   }
   if (tokens.length === 2) {
     const [d, l] = tokens
-    if (d === 'width' && ImageSize.isUnitValue(l)) {
-      return l
+    if (d === 'width' && ImageValue.isUnitValue(l)) {
+      return { width: l }
     }
   }
   throw new Error(`Unable to parse image sizes: ${tokens.join(' ')}`)
