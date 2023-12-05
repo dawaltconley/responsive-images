@@ -28,6 +28,7 @@ describe('Sizes.parse()', () => {
           ],
         },
         size: { width: new U(400, 'px') },
+        isValid: true,
       },
     ])
     expect(Sizes.parse('(max-width: 680px) 100vw')).toEqual([
@@ -49,6 +50,7 @@ describe('Sizes.parse()', () => {
           ],
         },
         size: { width: new U(100, 'vw') },
+        isValid: true,
       },
     ])
   })
@@ -73,8 +75,13 @@ describe('Sizes.parse()', () => {
           ],
         },
         size: { width: new U(400, 'px') },
+        isValid: true,
       },
-      { conditions: null, size: { width: new U(100, 'vw') } },
+      {
+        conditions: null,
+        size: { width: new U(100, 'vw') },
+        isValid: true,
+      },
     ])
   })
 
@@ -104,24 +111,33 @@ describe('Sizes.parse()', () => {
       {
         conditions: set(cloneDeep(condition), 'children[0].value.value', 1536),
         size: { width: new U(718.5, 'px') },
+        isValid: true,
       },
       {
         conditions: set(cloneDeep(condition), 'children[0].value.value', 1280),
         size: { width: new U(590, 'px') },
+        isValid: true,
       },
       {
         conditions: set(cloneDeep(condition), 'children[0].value.value', 1024),
         size: { width: new U(468, 'px') },
+        isValid: true,
       },
       {
         conditions: set(cloneDeep(condition), 'children[0].value.value', 768),
         size: { width: new U(704, 'px') },
+        isValid: true,
       },
       {
         conditions: set(cloneDeep(condition), 'children[0].value.value', 640),
         size: { width: new U(576, 'px') },
+        isValid: true,
       },
-      { conditions: null, size: { width: new U(100, 'vw') } },
+      {
+        conditions: null,
+        size: { width: new U(100, 'vw') },
+        isValid: true,
+      },
     ])
   })
 
@@ -158,8 +174,13 @@ describe('Sizes.parse()', () => {
           ],
         },
         size: { width: new U(60, 'vh') },
+        isValid: true,
       },
-      { conditions: null, size: { width: new U(400, 'px') } },
+      {
+        conditions: null,
+        size: { width: new U(400, 'px') },
+        isValid: true,
+      },
     ])
   })
 
@@ -183,6 +204,7 @@ describe('Sizes.parse()', () => {
           ],
         },
         size: { width: new U(400, 'px') },
+        isValid: true,
       },
     ])
   })

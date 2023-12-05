@@ -21,6 +21,9 @@ export interface SizesQuery {
 
   /** the image width applied under these conditions */
   size: ImageSize
+
+  /** whether this SizesQuery is valid in the browser */
+  isValid: boolean
 }
 
 export type ImageSize = ResizeInstructions<ImageValue>
@@ -28,10 +31,12 @@ export type ImageSize = ResizeInstructions<ImageValue>
 export default class Sizes {
   readonly string: string
   readonly queries: SizesQuery[]
+  readonly isValid: boolean
 
   constructor(sizes: string) {
     this.string = sizes
     this.queries = Sizes.parse(sizes)
+    this.isValid = this.queries.every(q => q.isValid)
   }
 
   toString(): string {
@@ -69,6 +74,7 @@ export default class Sizes {
         return {
           conditions: parseConditions(tokens.join(' ')),
           size: parseImageSize(imageSize),
+          isValid: imageSize.length === 1,
         }
       })
       .filter((s): s is SizesQuery => s !== null)
