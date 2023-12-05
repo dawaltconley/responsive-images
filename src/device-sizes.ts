@@ -1,9 +1,9 @@
 import type { MetadataEntry } from '@11ty/eleventy-img'
 import type { ResizeInstructions } from './types'
 import type { MediaQuery, MediaQueriesOptions } from './media-queries'
-import type Sizes from './sizes'
 import type Image from './image'
 import type Metadata from './metadata'
+import Sizes from './sizes'
 import Device from './device'
 import MediaQueries from './media-queries'
 import {
@@ -20,10 +20,10 @@ export default class DeviceSizes {
   readonly landscape: number[]
   readonly portrait: number[]
 
-  constructor(sizes: Sizes, devices: Device[]) {
-    this.sizes = sizes
+  constructor(sizes: string | Sizes, devices: Device[]) {
+    this.sizes = typeof sizes === 'string' ? new Sizes(sizes) : sizes
     this.devices = [...devices].sort(Device.sort)
-    this.targets = this.devices.map(d => d.getImage(sizes))
+    this.targets = this.devices.map(d => d.getImage(this.sizes))
 
     const { landscape, portrait } = groupBy(
       this.devices.map((_d, i) => i),

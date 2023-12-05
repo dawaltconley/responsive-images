@@ -1,7 +1,6 @@
 import type Device from './device'
 import type { ImageSource, MetadataEntry } from '@11ty/eleventy-img'
 import EleventyImage from '@11ty/eleventy-img'
-import Sizes from './sizes'
 import DeviceSizes from './device-sizes'
 import Metadata, { SizesMetadata } from './metadata'
 import { resizeFromSizes } from './utilities'
@@ -73,7 +72,7 @@ export class ConfiguredImage extends Image {
     sizesQueryString: string,
     options: EleventyImage.ImageOptions = {}
   ): Promise<SizesMetadata> {
-    const sizes = new DeviceSizes(new Sizes(sizesQueryString), this.devices)
+    const sizes = new DeviceSizes(sizesQueryString, this.devices)
     const { metadata } = await resizeFromSizes(this, sizes, {
       minScale: this.scalingFactor,
       ...options,

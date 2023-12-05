@@ -212,7 +212,7 @@ describe('Sizes.parse()', () => {
 
 describe('new DeviceSizes()', () => {
   test('calculates queries using the default devices', () => {
-    let sizes = new DeviceSizes(new Sizes('400px'), devices)
+    let sizes = new DeviceSizes('400px', devices)
 
     expect(sizes.targets).toEqual([
       { width: 400 },
@@ -306,7 +306,7 @@ describe('new DeviceSizes()', () => {
       [54, 55, 56, 57, 58],
     ])
 
-    sizes = new DeviceSizes(new Sizes('80vw'), devices)
+    sizes = new DeviceSizes('80vw', devices)
     expect(sizes.targets).toEqual([
       { width: 2048 },
       { width: 1536 },
@@ -385,10 +385,7 @@ describe('new DeviceSizes()', () => {
       },
     ])
 
-    const sizes = new DeviceSizes(
-      new Sizes('(min-width: 680px) 400px, 100vw'),
-      devices
-    )
+    const sizes = new DeviceSizes('(min-width: 680px) 400px, 100vw', devices)
 
     expect(sizes.targets).toEqual([
       { width: 600 },
@@ -405,6 +402,36 @@ describe('new DeviceSizes()', () => {
       [0, 1],
       [2, 3],
       [4, 5],
+    ])
+  })
+
+  test('accepts a Sizes object as a first parameter', () => {
+    const devices = Device.fromDefinitions([
+      {
+        w: 800,
+        h: 600,
+        dppx: [1, 2],
+        flip: true,
+      },
+      {
+        w: 1400,
+        h: 1400,
+        dppx: [1.5],
+      },
+    ])
+
+    const sizes = new DeviceSizes(
+      new Sizes('(min-width: 680px) 400px, 100vw'),
+      devices
+    )
+
+    expect(sizes.targets).toEqual([
+      { width: 600 },
+      { width: 400 },
+      { width: 800 },
+      { width: 400 },
+      { width: 1200 },
+      { width: 600 },
     ])
   })
 })

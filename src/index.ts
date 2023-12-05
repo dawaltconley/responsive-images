@@ -8,7 +8,6 @@ import cast from 'sass-cast'
 import { assertOrientation, assertValidImageFormat } from './types'
 import Config, { ConfigOptions } from './config'
 import Image, { ConfiguredImage } from './image'
-import Sizes from './sizes'
 import DeviceSizes from './device-sizes'
 import { toLegacyAsyncFunctions } from './legacy-sass'
 
@@ -134,10 +133,10 @@ export default class ResponsiveImages extends Config {
   ): Promise<ImageMetadata> {
     const [options, properties] = this._handleMixedOptions(kwargs)
     const { sizes = '100vw' } = properties
-    const { metadata } = await new DeviceSizes(
-      new Sizes(sizes),
-      this.devices
-    ).resize(new Image(image), options)
+    const { metadata } = await new DeviceSizes(sizes, this.devices).resize(
+      new Image(image),
+      options
+    )
     return {
       ...properties,
       metadata,
@@ -178,7 +177,7 @@ export default class ResponsiveImages extends Config {
     } = kwargs
 
     const image = this.responsive(src)
-    const deviceImages = new DeviceSizes(new Sizes(sizes), this.devices)
+    const deviceImages = new DeviceSizes(sizes, this.devices)
     const metadata = widths
       ? await image.resize({ widths, formats })
       : await deviceImages.resize(image, {
