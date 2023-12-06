@@ -159,7 +159,7 @@ if you are using its methods elsewhere.
 
 Then, call the functions within your templates:
 
-```njk
+```liquid
 <div>
   {% picture "assets/example.jpg",
     alt="A responsive picture element",
