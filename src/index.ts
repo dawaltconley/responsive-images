@@ -74,3 +74,32 @@ export default class ResponsiveImages extends Config {
 }
 
 export { ResponsiveImages }
+export { default as DeviceSizes } from './lib/device-sizes'
+export { default as Sizes, SizesQuery, ImageSize } from './lib/sizes'
+export {
+  default as Device,
+  DeviceDefinition,
+  DeviceOptions,
+  ResolvedImage,
+} from './lib/device'
+export { default as Image } from './lib/image'
+export { default as Metadata, SizesMetadata, HtmlOptions } from './lib/metadata'
+export type { ConfiguredImage, ImageOptions } from './lib/image'
+export type {
+  default as MediaQueries,
+  MediaQuery,
+  MediaQueriesOptions,
+} from './lib/media-queries'
+export type { ResizeFromSizesOptions } from './lib/utilities'
+export {
+  Orientation,
+  isOrientation,
+  SizeKeyword,
+  isSizeKeyword,
+  Dimension,
+  isDimension,
+  ValidImageFormat,
+  isValidImageFormat,
+  Rect,
+  isRect,
+} from './lib/common'
