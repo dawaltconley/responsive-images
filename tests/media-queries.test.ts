@@ -26,7 +26,7 @@ describe('generateMediaQueries()', () => {
 
   test('generates media query data from sizes', async () => {
     const image = responsive('./tests/assets/xlg.jpg')
-    const metadata = await sizes.resize(image, { minScale: 0.5 })
+    const metadata = await sizes.resize(image)
     const { queries } = sizes.toMediaQueries(metadata)
     expect(queries).toEqual<MediaQuery[]>([
       {
@@ -594,7 +594,7 @@ describe('generateMediaQueries()', () => {
 
   test('generates queries from a small image', async () => {
     const image = responsive('./tests/assets/landscape.jpeg')
-    const metadata = await sizes.resize(image, { minScale: 0.5 })
+    const metadata = await sizes.resize(image)
     const { queries } = sizes.toMediaQueries(metadata)
     expect(queries).toEqual<MediaQuery[]>([
       {

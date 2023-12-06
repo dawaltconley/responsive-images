@@ -1,5 +1,5 @@
 import type { ResizeInstructions } from './types'
-import type { ImageOptions } from './image'
+import type { ConfiguredImage, ImageOptions } from './image'
 import type Image from './image'
 import type DeviceSizes from './device-sizes'
 import type Metadata from './metadata'
@@ -44,17 +44,21 @@ const filterFallback = (n: unknown): number =>
 export type ResizeFromSizesOptions = ImageOptions & { minScale?: number }
 
 export async function resizeFromSizes(
-  image: Image,
+  image: Image | ConfiguredImage,
   devices: DeviceSizes,
   { minScale, ...options }: ResizeFromSizesOptions = {}
 ): Promise<Metadata> {
   const { width, height } = await image.stat()
+  const scalingFactor =
+    minScale ?? ('scalingFactor' in image ? image.scalingFactor : undefined)
+
   const widths = filterSizes(
     devices.targets
       .map(target => Math.ceil(instructionsToWidth(target, width / height)))
       .filter(w => w <= width),
-    minScale
+    scalingFactor
   )
+
   return image.resize({ widths, ...options })
 }
 
