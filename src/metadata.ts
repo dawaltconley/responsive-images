@@ -19,11 +19,11 @@ export default class Metadata {
     this.metadata = metadata
   }
 
-  toPicture(attributes: HtmlOptions): string {
+  toPicture(attributes: Required<HtmlOptions>): string {
     return EleventyImage.generateHTML(this.metadata, attributes)
   }
 
-  toSources(attributes: HtmlOptions): string {
+  toSources(attributes: Required<HtmlOptions>): string {
     return this.toPicture(attributes).replace(/(^<picture>|<\/picture>$)/g, '')
   }
 }
