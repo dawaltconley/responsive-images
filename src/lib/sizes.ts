@@ -5,7 +5,7 @@ import {
   isSizeKeyword,
   Dimension,
   isDimension,
-} from './types'
+} from './common'
 import { ImageSize as ImageValue } from './unit-values'
 
 /**

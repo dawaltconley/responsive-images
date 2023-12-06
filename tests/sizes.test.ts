@@ -1,8 +1,8 @@
 import defaultDevices from '../src/data/devices'
-import Device from '../src/device'
-import Sizes from '../src/sizes'
-import DeviceSizes from '../src/device-sizes'
-import U from '../src/unit-values'
+import Device from '../src/lib/device'
+import Sizes from '../src/lib/sizes'
+import DeviceSizes from '../src/lib/device-sizes'
+import U from '../src/lib/unit-values'
 import { set, cloneDeep } from 'lodash'
 
 const devices = Device.fromDefinitions(defaultDevices)

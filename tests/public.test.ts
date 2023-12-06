@@ -1,5 +1,5 @@
 import ResponsiveImages, { type ConfigOptions } from '../src/index'
-import Metadata, { SizesMetadata } from '../src/metadata'
+import Metadata, { SizesMetadata } from '../src/lib/metadata'
 
 const devices = [
   {

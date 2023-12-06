@@ -1,4 +1,4 @@
-import { type Orientation } from './types'
+import { type Orientation } from './common'
 import { permute } from './utilities'
 import { css } from './syntax'
 

@@ -1,4 +1,4 @@
-import type { Rect, Orientation, ResizeInstructions } from './types'
+import type { Rect, Orientation, ResizeInstructions } from './common'
 import type { MediaCondition, MediaFeature } from 'media-query-parser'
 import type Sizes from './sizes'
 import UnitValue, {

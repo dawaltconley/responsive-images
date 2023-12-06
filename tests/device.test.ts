@@ -1,6 +1,6 @@
 import defaultDevices from '../src/data/devices'
-import Device, { DeviceDefinition } from '../src/device'
-import Sizes from '../src/sizes'
+import Device, { DeviceDefinition } from '../src/lib/device'
+import Sizes from '../src/lib/sizes'
 import { cloneDeep } from 'lodash'
 
 const devices = Device.fromDefinitions(defaultDevices)

@@ -1,5 +1,5 @@
 import type { MetadataEntry } from '@11ty/eleventy-img'
-import type { ResizeInstructions } from './types'
+import type { ResizeInstructions } from './common'
 import type { MediaQuery, MediaQueriesOptions } from './media-queries'
 import type Image from './image'
 import type Metadata from './metadata'

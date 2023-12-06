@@ -1,4 +1,4 @@
-import defaultDevices from './data/devices'
+import defaultDevices from '../data/devices'
 import Device, { type DeviceDefinition } from './device'
 import type { ImageOptions } from '@11ty/eleventy-img'
 

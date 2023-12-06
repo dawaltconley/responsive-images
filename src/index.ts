@@ -3,11 +3,11 @@ import type { HtmlOptions } from './lib/metadata'
 
 import EleventyImage from '@11ty/eleventy-img'
 import cast from 'sass-cast'
-import { assertOrientation, assertValidImageFormat } from './types'
-import Config, { ConfigOptions } from './config'
-import { ConfiguredImage } from './image'
-import DeviceSizes from './device-sizes'
-import { toLegacyAsyncFunctions } from './legacy-sass'
+import { assertOrientation, assertValidImageFormat } from './lib/common'
+import Config, { ConfigOptions } from './lib/config'
+import { ConfiguredImage } from './lib/image'
+import DeviceSizes from './lib/device-sizes'
+import { toLegacyAsyncFunctions } from './sass/legacy'
 
 /**
  * Options passed to the EleventyImage resize function.

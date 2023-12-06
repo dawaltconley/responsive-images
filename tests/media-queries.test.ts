@@ -1,7 +1,7 @@
-import type { MediaQuery } from '../src/media-queries'
+import type { MediaQuery } from '../src/lib/media-queries'
 import devices from '../src/data/devices'
-import Device from '../src/device'
-import DeviceSizes from '../src/device-sizes'
+import Device from '../src/lib/device'
+import DeviceSizes from '../src/lib/device-sizes'
 import ResponsiveImages, { ConfigOptions } from '../src/index'
 import { merge } from 'lodash'
 

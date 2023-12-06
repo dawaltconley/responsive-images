@@ -1,4 +1,4 @@
-import type { DeviceDefinition } from '../device'
+import type { DeviceDefinition } from '../lib/device'
 
 const devices: DeviceDefinition[] = [
   {

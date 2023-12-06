@@ -1,4 +1,4 @@
-import type { ResizeInstructions } from './types'
+import type { ResizeInstructions } from './common'
 import type { ConfiguredImage, ImageOptions } from './image'
 import type Image from './image'
 import type DeviceSizes from './device-sizes'

@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "exports": {
     ".": "./dist/index.js",
-    "./types": "./dist/types.js",
-    "./eleventy": "./dist/eleventy-plugin.js",
+    "./types": "./dist/lib/common.js",
+    "./eleventy": "./dist/plugins/eleventy.js",
     "./devices": "./dist/data/devices.js"
   },
   "files": [

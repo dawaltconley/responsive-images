@@ -3,7 +3,7 @@
 import type { TagImplOptions } from 'liquidjs/dist/src/template'
 import type { Liquid } from 'liquidjs'
 
-import { ResponsiveImages, ConfigOptions } from './index'
+import { ResponsiveImages, ConfigOptions } from '../index'
 import liquidArgs from 'liquid-args'
 
 type AnyFunction = (...args: any[]) => any

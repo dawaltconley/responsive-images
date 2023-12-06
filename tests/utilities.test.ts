@@ -1,5 +1,5 @@
-import type { Rect } from '../src/types'
-import { filterSizes, permute } from '../src/utilities'
+import type { Rect } from '../src/lib/common'
+import { filterSizes, permute } from '../src/lib/utilities'
 
 describe('filterSizes()', () => {
   const sampleWidths: number[] = [

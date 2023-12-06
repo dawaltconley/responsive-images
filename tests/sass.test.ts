@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import sass from 'sass'
 import ResponsiveImages, { ConfigOptions } from '../src/index'
-import { scss } from '../src/syntax'
+import { scss } from '../src/lib/syntax'
 
 const defaultConfig: ConfigOptions = {
   scalingFactor: 0.5,
