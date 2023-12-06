@@ -1,7 +1,16 @@
-import type { HtmlOptions } from './index'
 import type { MediaQueriesOptions } from './media-queries'
 import type DeviceSizes from './device-sizes'
 import EleventyImage from '@11ty/eleventy-img'
+
+/**
+ * Defines properties for image markup. `alt` is required.
+ * Passed to the `EleventyImage.generateHTML` function.
+ */
+export interface HtmlOptions {
+  alt: string
+  sizes?: string
+  [attribute: string]: unknown
+}
 
 export default class Metadata {
   metadata: EleventyImage.Metadata

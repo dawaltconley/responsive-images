@@ -235,17 +235,16 @@ describe('bg mixin', () => {
   })
 })
 
-describe('backgroundFromSizes()', () => {
-  const images = new ResponsiveImages({
+describe('responsive.fromSizes().toCss()', () => {
+  const { responsive } = new ResponsiveImages({
     ...defaultConfig,
     scalingFactor: 0.5,
   })
 
   test('generates responsive background css from default values', async () => {
-    const css = await images.backgroundFromSizes(
-      '.bg-image',
-      './tests/assets/xlg.jpg'
-    )
+    const css = await responsive('./tests/assets/xlg.jpg')
+      .fromSizes('100vw', { formats: [null] })
+      .then(r => r.toCss('.bg-image'))
     const [output, expected] = await Promise.all([
       compile(css),
       compile(defaultExpected),
@@ -254,13 +253,9 @@ describe('backgroundFromSizes()', () => {
   })
 
   test('generates responsive background css with multiple formats', async () => {
-    const css = await images.backgroundFromSizes(
-      '.bg-image',
-      './tests/assets/xlg.jpg',
-      {
-        formats: ['webp', null],
-      }
-    )
+    const css = await responsive('./tests/assets/xlg.jpg')
+      .fromSizes('100vw')
+      .then(r => r.toCss('.bg-image'))
     const [output, expected] = await Promise.all([
       compile(css),
       compile(defaultExpectedFormats),
