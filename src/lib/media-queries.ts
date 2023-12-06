@@ -101,6 +101,7 @@ export default class MediaQueries {
             }
           `
 
+        // TODO don't use image-set when there's only one type
         const imageSet = `image-set(${images
           .map(({ image, type }) => `url('${image}') type('${type}')`)
           .join(', ')})`
