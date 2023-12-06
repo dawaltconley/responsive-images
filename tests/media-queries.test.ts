@@ -1,5 +1,9 @@
 import type { MediaQuery } from '../src/media-queries'
+import devices from '../src/data/devices'
+import Device from '../src/device'
+import DeviceSizes from '../src/device-sizes'
 import ResponsiveImages, { ConfigOptions } from '../src/index'
+import { merge } from 'lodash'
 
 const defaultConfig: ConfigOptions = {
   defaults: {
@@ -8,14 +12,22 @@ const defaultConfig: ConfigOptions = {
   },
 }
 
+const sizes = new DeviceSizes('100vw', Device.fromDefinitions(devices))
+
 describe('generateMediaQueries()', () => {
-  const images = new ResponsiveImages({
-    ...defaultConfig,
-    scalingFactor: 0.5,
-  })
+  const { responsive } = new ResponsiveImages(
+    merge(defaultConfig, {
+      scalingFactor: 0.5,
+      defaults: {
+        formats: [null],
+      },
+    })
+  )
 
   test('generates media query data from sizes', async () => {
-    const queries = await images.generateMediaQueries('./tests/assets/xlg.jpg')
+    const image = responsive('./tests/assets/xlg.jpg')
+    const metadata = await sizes.resize(image, { minScale: 0.5 })
+    const { queries } = sizes.toMediaQueries(metadata)
     expect(queries).toEqual<MediaQuery[]>([
       {
         orientation: 'landscape',
@@ -581,9 +593,9 @@ describe('generateMediaQueries()', () => {
   })
 
   test('generates queries from a small image', async () => {
-    const queries = await images.generateMediaQueries(
-      './tests/assets/landscape.jpeg'
-    )
+    const image = responsive('./tests/assets/landscape.jpeg')
+    const metadata = await sizes.resize(image, { minScale: 0.5 })
+    const { queries } = sizes.toMediaQueries(metadata)
     expect(queries).toEqual<MediaQuery[]>([
       {
         orientation: 'landscape',
