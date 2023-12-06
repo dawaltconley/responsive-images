@@ -2,6 +2,7 @@ import _ from 'lodash'
 import sass from 'sass'
 import ResponsiveImages, { ConfigOptions } from '../src/index'
 import { scss } from '../src/lib/syntax'
+import { getSassFunctions, getLegacySassFunctions } from '../src/sass'
 
 const defaultConfig: ConfigOptions = {
   scalingFactor: 0.5,
@@ -35,12 +36,11 @@ const compile = async (
   sassString: string,
   config: ConfigOptions = {}
 ): Promise<string> => {
-  const { sassFunctions } = new ResponsiveImages(_.merge(defaultConfig, config))
-
+  const merged = new ResponsiveImages(_.merge(defaultConfig, config))
   return sass
     .compileStringAsync(sassString, {
       loadPaths: ['node_modules'],
-      functions: sassFunctions,
+      functions: getSassFunctions(merged),
     })
     .then(result => result.css)
 }
@@ -49,16 +49,13 @@ const compileLegacy = async (
   sassString: string,
   config: ConfigOptions = {}
 ): Promise<string> => {
-  const { sassLegacyFunctions } = new ResponsiveImages(
-    _.merge(defaultConfig, config)
-  )
-
+  const merged = new ResponsiveImages(_.merge(defaultConfig, config))
   return new Promise((resolve, reject) =>
     sass.render(
       {
         data: sassString,
         includePaths: ['node_modules'],
-        functions: sassLegacyFunctions,
+        functions: getLegacySassFunctions(merged),
       },
       (e, result) => {
         if (e) reject(e)
