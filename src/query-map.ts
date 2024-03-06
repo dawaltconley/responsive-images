@@ -2,6 +2,7 @@ import type EleventyImage from '@11ty/eleventy-img'
 import type { Orientation, Dimension, Image } from './types'
 import type Device from './device'
 import type Sizes from './sizes'
+import Metadata from './metadata'
 import MediaQueries, { type MediaQueriesOptions } from './media-queries'
 import DeviceSizes from './device-sizes'
 
@@ -71,7 +72,7 @@ export default class QueryMap implements Record<Orientation, QueryObject[]> {
     options: MediaQueriesOptions
   ): MediaQueries {
     return new DeviceSizes(this.#sizes, this.#devices).toMediaQueries(
-      { jpeg: metadata } as EleventyImage.Metadata,
+      new Metadata({ jpeg: metadata } as EleventyImage.Metadata),
       options
     )
   }

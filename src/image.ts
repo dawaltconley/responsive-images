@@ -1,8 +1,10 @@
 import type Device from './device'
-import type { ImageSource, Metadata, MetadataEntry } from '@11ty/eleventy-img'
+import type { ImageSource, MetadataEntry } from '@11ty/eleventy-img'
 import EleventyImage from '@11ty/eleventy-img'
 import Sizes from './sizes'
-import { filterSizes } from './utilities'
+import DeviceSizes from './device-sizes'
+import Metadata, { SizesMetadata } from './metadata'
+import { resizeFromSizes } from './utilities'
 
 export interface ImageOptions extends EleventyImage.BaseImageOptions {
   disableResize?: boolean
@@ -40,7 +42,7 @@ export default class Image {
         widths: [null],
         formats: [null],
       }
-    return EleventyImage(this.src, imgOpts)
+    return new Metadata(await EleventyImage(this.src, imgOpts))
   }
 
   async stat(): Promise<MetadataEntry> {
@@ -48,27 +50,8 @@ export default class Image {
       statsOnly: true,
       widths: [null],
       formats: [null],
-    }).then(metadata => Object.values(metadata)[0][0])
+    }).then(({ metadata }) => Object.values(metadata)[0][0])
   }
-}
-
-// could be a method on QueryMap, or some similar class
-// that combines Sizes and Device[]
-export async function resizeFromSizes(
-  image: Image,
-  sizes: Sizes, // could attach devices to sizes, potentially easier than attaching to image
-  devices: Device[],
-  { minScale, ...options }: ImageOptions & { minScale?: number } = {}
-): Promise<Metadata> {
-  const { width: maxWidth } = await image.stat()
-  const widths = filterSizes(
-    sizes
-      .toWidths(devices)
-      .filter(w => w <= maxWidth)
-      .sort((a, b) => b - a),
-    minScale
-  )
-  return image.resize({ widths: widths, ...options })
 }
 
 import type Config from './config'
@@ -89,15 +72,12 @@ export class ConfiguredImage extends Image {
   async fromSizes(
     sizesQueryString: string,
     options: EleventyImage.ImageOptions = {}
-  ): Promise<Metadata> {
-    const { width: maxWidth } = await this.stat()
-    const widths = filterSizes(
-      new Sizes(sizesQueryString)
-        .toWidths(this.devices)
-        .filter(w => w <= maxWidth)
-        .sort((a, b) => b - a),
-      this.scalingFactor
-    )
-    return this.resize({ widths, ...options })
+  ): Promise<SizesMetadata> {
+    const sizes = new DeviceSizes(new Sizes(sizesQueryString), this.devices)
+    const { metadata } = await resizeFromSizes(this, sizes, {
+      minScale: this.scalingFactor,
+      ...options,
+    })
+    return new SizesMetadata(metadata, sizes)
   }
 }

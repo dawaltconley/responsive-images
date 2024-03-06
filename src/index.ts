@@ -10,6 +10,7 @@ import Config, { ConfigOptions } from './config'
 import Image, { ConfiguredImage } from './image'
 import Sizes from './sizes'
 import DeviceSizes from './device-sizes'
+import { filterSizes } from './utilities'
 import { toLegacyAsyncFunctions } from './legacy-sass'
 
 /**
@@ -53,6 +54,7 @@ export default class ResponsiveImages extends Config {
     super(options)
 
     this.resize = this.resize.bind(this)
+    this.responsive = this.responsive.bind(this)
     this.generatePicture = this.generatePicture.bind(this)
     this.generateSources = this.generateSources.bind(this)
     this.metadataFromSizes = this.metadataFromSizes.bind(this)
@@ -63,6 +65,7 @@ export default class ResponsiveImages extends Config {
   }
 
   /**
+   * @deprecated
    * Generates multiple new sizes for an image. This is a wrapper method around
    * `@11ty/eleventy-img`, which just handles default options and allows disabling.
    * @param image - file or url of the source image
@@ -95,26 +98,32 @@ export default class ResponsiveImages extends Config {
     kwargs: MixedOptions
   ): Promise<string> {
     const [options, properties] = this._handleMixedOptions(kwargs)
-    const metadata = await this.resize(image, options)
-    return EleventyImage.generateHTML(metadata, properties)
+    return this.responsive(image)
+      .resize(options)
+      .then(meta => meta.toPicture(properties))
   }
 
   async generateSources(
     image: EleventyImage.ImageSource,
     kwargs: MixedOptions
   ): Promise<string> {
-    const html = await this.generatePicture(image, kwargs)
-    return html.replace(/(^<picture>|<\/picture>$)/g, '')
+    const [options, properties] = this._handleMixedOptions(kwargs)
+    return this.responsive(image)
+      .resize(options)
+      .then(meta => meta.toSources(properties))
   }
 
   /**
+   * @deprecated
    * Calculates image widths from a sizes query string.
    * Uses configured defaults for the `devices` and `scalingFactor`.
    */
   widthsFromSizes(sizes: string): number[] {
-    return new Sizes(sizes).toWidths(this.devices, {
-      minScale: this.scalingFactor,
-    })
+    const { targets } = new DeviceSizes(new Sizes(sizes), this.devices)
+    return filterSizes(
+      targets.map(img => img.w),
+      this.scalingFactor
+    )
   }
 
   private _handleMixedOptions(
@@ -145,14 +154,17 @@ export default class ResponsiveImages extends Config {
     return { sizes, ...processed }
   }
 
-  /** Uses a sizes attribute to parse images and returns a metadata object. Defaults to 100vw. */
+  /**
+   * @deprecated
+   * Uses a sizes attribute to parse images and returns a metadata object. Defaults to 100vw.
+   */
   async metadataFromSizes(
     image: EleventyImage.ImageSource,
     kwargs: MixedOptions
   ): Promise<ImageMetadata> {
-    const [options, { sizes = '100vw', ...properties }] =
-      this._handleMixedOptions(kwargs)
-    const metadata = await new DeviceSizes(
+    const [options, properties] = this._handleMixedOptions(kwargs)
+    const { sizes = '100vw' } = properties
+    const { metadata } = await new DeviceSizes(
       new Sizes(sizes),
       this.devices
     ).resize(new Image(image), options)
@@ -166,14 +178,22 @@ export default class ResponsiveImages extends Config {
     image: EleventyImage.ImageSource,
     kwargs: MixedOptions
   ): Promise<string> {
-    return this.generatePicture(image, this._handleFromSizes(kwargs))
+    const [options, properties] = this._handleMixedOptions(kwargs)
+    const { sizes = '100vw' } = properties
+    return this.responsive(image)
+      .fromSizes(sizes, options)
+      .then(meta => meta.toPicture(properties))
   }
 
   async sourceFromSizes(
     image: EleventyImage.ImageSource,
     kwargs: MixedOptions
   ): Promise<string> {
-    return this.generateSources(image, this._handleFromSizes(kwargs))
+    const [options, properties] = this._handleMixedOptions(kwargs)
+    const { sizes = '100vw' } = properties
+    return this.responsive(image)
+      .fromSizes(sizes, options)
+      .then(meta => meta.toSources(properties))
   }
 
   async #generateMediaQueries(
@@ -187,16 +207,15 @@ export default class ResponsiveImages extends Config {
       sizes = '100vw',
     } = kwargs
 
-
     const image = this.responsive(src)
     const deviceImages = new DeviceSizes(new Sizes(sizes), this.devices)
-    const images = widths
+    const metadata = widths
       ? await image.resize({ widths, formats })
       : await deviceImages.resize(image, {
           formats,
           minScale: this.scalingFactor,
         })
-    return deviceImages.toMediaQueries(images, { orientations })
+    return deviceImages.toMediaQueries(metadata, { orientations })
   }
 
   async generateMediaQueries(
@@ -238,7 +257,10 @@ export default class ResponsiveImages extends Config {
             assertValidImageFormat(s.realNull && s.assertString('formats').text)
           )
 
-        const metadata = await this.resize(src, { widths, formats })
+        const { metadata } = await this.responsive(src).resize({
+          widths,
+          formats,
+        })
         return cast.toSass(metadata)
       },
       [queriesFunction]: async (args: SassValue[]): Promise<SassValue> => {

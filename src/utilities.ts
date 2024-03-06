@@ -1,4 +1,8 @@
 import type { Dimension } from './types'
+import type { ImageOptions } from './image'
+import type Image from './image'
+import type DeviceSizes from './device-sizes'
+import type Metadata from './metadata'
 import { isDimension, isDimensionArray } from './types'
 
 /**
@@ -35,6 +39,24 @@ export function filterSizes(
     }
   }
   return filtered as number[] | Dimension[]
+}
+
+export type ResizeFromSizesOptions = ImageOptions & { minScale?: number }
+
+export async function resizeFromSizes(
+  image: Image,
+  devices: DeviceSizes,
+  { minScale, ...options }: ResizeFromSizesOptions = {}
+): Promise<Metadata> {
+  const { width: maxWidth } = await image.stat()
+  const widths = filterSizes(
+    devices.targets
+      .map(img => img.w)
+      .filter(w => w <= maxWidth)
+      .sort((a, b) => b - a),
+    minScale
+  )
+  return image.resize({ widths: widths, ...options })
 }
 
 export const permute = <T>(

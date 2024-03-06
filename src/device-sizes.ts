@@ -1,11 +1,12 @@
-import type { ImageOptions, Metadata, MetadataEntry } from '@11ty/eleventy-img'
+import type { MetadataEntry } from '@11ty/eleventy-img'
 import type { Image as ImageTarget } from './types'
 import type { MediaQuery, MediaQueriesOptions } from './media-queries'
 import type Sizes from './sizes'
 import type Image from './image'
+import type Metadata from './metadata'
 import Device from './device'
 import MediaQueries from './media-queries'
-import { filterSizes } from './utilities'
+import { resizeFromSizes, ResizeFromSizesOptions } from './utilities'
 import groupBy from 'lodash/groupBy'
 
 export default class DeviceSizes {
@@ -38,21 +39,13 @@ export default class DeviceSizes {
 
   async resize(
     image: Image,
-    { minScale, ...options }: ImageOptions & { minScale?: number } = {}
+    options: ResizeFromSizesOptions = {}
   ): Promise<Metadata> {
-    const { width: maxWidth } = await image.stat()
-    const widths = filterSizes(
-      this.targets
-        .map(img => img.w)
-        .filter(w => w <= maxWidth)
-        .sort((a, b) => b - a),
-      minScale
-    )
-    return image.resize({ widths, ...options })
+    return resizeFromSizes(image, this, options)
   }
 
   /** @returns a MetadataEntry array where the index of each set corresponds to a device/target */
-  mapMetadata(metadata: Metadata): MetadataEntry[][] {
+  mapMetadata({ metadata }: Metadata): MetadataEntry[][] {
     const entries: MetadataEntry[] = Object.values(metadata)
       .flat()
       .sort((a, b) => b.width - a.width)
@@ -78,7 +71,7 @@ export default class DeviceSizes {
 
   toMediaQueries(
     metadata: Metadata,
-    { orientations = ['landscape', 'portrait'] }: MediaQueriesOptions
+    { orientations = ['landscape', 'portrait'] }: MediaQueriesOptions = {}
   ): MediaQueries {
     const queries: MediaQuery[] = []
     const map = this.mapMetadata(metadata)
