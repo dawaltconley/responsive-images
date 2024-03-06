@@ -61,3 +61,27 @@ export function groupBy<T>(array: T[], cb: (item: T) => unknown): T[][] {
   }, new Map<unknown, T[]>())
   return Array.from(grouped.values())
 }
+
+export function findFrom<T>(
+  array: T[],
+  start: number,
+  cb: (arg: T) => boolean
+): T | undefined {
+  for (let i = start; i < array.length; i++) {
+    if (cb(array[i])) {
+      return array[i]
+    }
+  }
+}
+
+export function findLastFrom<T>(
+  array: T[],
+  start: number,
+  cb: (arg: T) => boolean
+): T | undefined {
+  for (let i = start; i > -1; i--) {
+    if (cb(array[i])) {
+      return array[i]
+    }
+  }
+}
