@@ -82,34 +82,64 @@ export default class DeviceSizes {
 
     for (const o of orientations) {
       const orientation = orientations.length > 1 && o
-      this.groupBySize(this[o] ?? []).forEach((size, i, sizes) => {
-        const current = this.devices[size[0] ?? -1]
-        const next = this.devices[sizes[i + 1]?.[0]]
-        const maxWidth = i > 0 && current?.w
-        const minWidth = next && next?.w
+      this[o]?.forEach((d, i, devices) => {
+        const device = this.devices[d]
+        const prev = this.devices[devices[i - 1]]
+        const next = this.devices[devices[i + 1]]
+        const prevSize =
+          this.devices[
+            findLastFrom(devices, i - 1, d => this.devices[d]?.w > device.w) ??
+              -1
+          ]
+        const nextSize =
+          this.devices[
+            findFrom(devices, i + 1, d => this.devices[d]?.w < device.w) ?? -1
+          ]
 
-        size.forEach((d, j, devices) => {
-          const current = this.devices[d]
-          const next = this.devices[devices[j + 1]]
-          const maxResolution = j > 0 && current.dppx
-          const minResolution = next && next.dppx
+        const maxWidth = prevSize && device.w
+        const minWidth = nextSize?.w
+        const maxResolution = prev?.dppx > device.dppx && device.dppx
+        const minResolution = next?.dppx < device.dppx ? next.dppx : undefined
 
-          queries.push(
-            ...map[d].map<MediaQuery>(({ url, sourceType, format }) => ({
-              orientation,
-              maxWidth,
-              minWidth,
-              maxResolution,
-              minResolution,
-              url,
-              sourceType,
-              format,
-            }))
-          )
-        })
+        queries.push(
+          ...map[d].map<MediaQuery>(({ url, sourceType, format }) => ({
+            orientation,
+            maxWidth: maxWidth ?? false,
+            ...(minWidth !== undefined ? { minWidth } : {}),
+            maxResolution: maxResolution ?? false,
+            ...(minResolution !== undefined ? { minResolution } : {}),
+            url,
+            sourceType,
+            format,
+          }))
+        )
       })
     }
 
     return new MediaQueries(queries)
+  }
+}
+
+function findFrom<T>(
+  array: T[],
+  start: number,
+  cb: (arg: T) => boolean
+): T | undefined {
+  for (let i = start; i < array.length; i++) {
+    if (cb(array[i])) {
+      return array[i]
+    }
+  }
+}
+
+function findLastFrom<T>(
+  array: T[],
+  start: number,
+  cb: (arg: T) => boolean
+): T | undefined {
+  for (let i = start; i > -1; i--) {
+    if (cb(array[i])) {
+      return array[i]
+    }
   }
 }
