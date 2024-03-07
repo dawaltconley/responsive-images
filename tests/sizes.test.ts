@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest'
 import defaultDevices from '../src/data/devices'
 import Device from '../src/lib/device'
 import Sizes from '../src/lib/sizes'
