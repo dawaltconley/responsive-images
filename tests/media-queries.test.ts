@@ -1,4 +1,5 @@
 import type { MediaQuery } from '../src/lib/media-queries'
+import { describe, test, expect } from 'vitest'
 import devices from '../src/data/devices'
 import Device from '../src/lib/device'
 import DeviceSizes from '../src/lib/device-sizes'

@@ -1,4 +1,5 @@
 import type { Rect } from '../src/lib/common'
+import { describe, test, expect } from 'vitest'
 import { filterSizes, permute } from '../src/lib/utilities'
 
 describe('filterSizes()', () => {

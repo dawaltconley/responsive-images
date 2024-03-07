@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest'
 import _ from 'lodash'
 import sass from 'sass'
 import ResponsiveImages, { ConfigOptions } from '../src/index'

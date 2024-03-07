@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest'
 import ResponsiveImages, { type ConfigOptions } from '../src/index'
 import Metadata, { SizesMetadata } from '../src/lib/metadata'
 
