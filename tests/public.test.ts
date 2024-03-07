@@ -1,6 +1,7 @@
 import { describe, test, expect } from 'vitest'
 import ResponsiveImages, { type ConfigOptions } from '../src/index'
 import Metadata, { SizesMetadata } from '../src/lib/metadata'
+import { parse as parseHtml } from 'node-html-parser'
 
 const devices = [
   {
@@ -94,7 +95,18 @@ describe('responsive.resize()', () => {
       widths: [1024, 432],
       formats: ['webp', null],
     })
-    const output = metadata.toPicture({
+    const output = parseHtml(
+      metadata.toPicture({
+        class: 'foo foo--bar',
+        loading: 'lazy',
+        decoding: 'async',
+        foo: 'bar',
+        sizes: '100vw',
+        alt: '',
+      })
+    ).querySelector('img')?.attributes
+
+    expect(output).toMatchObject({
       class: 'foo foo--bar',
       loading: 'lazy',
       decoding: 'async',
@@ -102,11 +114,6 @@ describe('responsive.resize()', () => {
       sizes: '100vw',
       alt: '',
     })
-    expect(output).toMatch(/<img.* class="foo foo--bar" .*>/)
-    expect(output).toMatch(/<img.* loading="lazy" .*>/)
-    expect(output).toMatch(/<img.* decoding="async" .*>/)
-    expect(output).toMatch(/<img.* foo="bar" .*>/)
-    expect(output).toMatch(/<img.* alt="" .*>/)
   })
 })
 
@@ -177,7 +184,18 @@ describe('responsive.fromSizes()', () => {
   })
 
   test('produces valid html with optional attributes', async () => {
-    const output = (await resizing).toPicture({
+    const output = parseHtml(
+      (await resizing).toPicture({
+        class: 'foo foo--bar',
+        loading: 'lazy',
+        decoding: 'async',
+        foo: 'bar',
+        sizes: '100vw',
+        alt: '',
+      })
+    ).querySelector('img')?.attributes
+
+    expect(output).toMatchObject({
       class: 'foo foo--bar',
       loading: 'lazy',
       decoding: 'async',
@@ -185,11 +203,6 @@ describe('responsive.fromSizes()', () => {
       sizes: '100vw',
       alt: '',
     })
-    expect(output).toMatch(/<img.* class="foo foo--bar" .*>/)
-    expect(output).toMatch(/<img.* loading="lazy" .*>/)
-    expect(output).toMatch(/<img.* decoding="async" .*>/)
-    expect(output).toMatch(/<img.* foo="bar" .*>/)
-    expect(output).toMatch(/<img.* alt="" .*>/)
   })
 
   test('produces valid css for background images', async () => {
