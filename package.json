@@ -34,6 +34,7 @@
   "dependencies": {
     "@11ty/eleventy-img": "^4.0.2",
     "@types/11ty__eleventy-img": "^2.0.5",
+    "@types/hast": "^3.0.4",
     "@types/lodash": "^4.14.202",
     "liquid-args": "^1.1.0",
     "lodash": "^4.17.21",
@@ -49,6 +50,7 @@
     "@typescript-eslint/parser": "^5.27.0",
     "eslint": "^8.17.0",
     "eslint-config-prettier": "^8.5.0",
+    "hast-util-to-html": "^9.0.0",
     "liquidjs": "^10.7.0",
     "node-html-parser": "^6.1.12",
     "node-typescript-compiler": "^3.0.0",

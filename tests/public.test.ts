@@ -2,6 +2,7 @@ import { describe, test, expect } from 'vitest'
 import ResponsiveImages, { type ConfigOptions } from '../src/index'
 import Metadata, { SizesMetadata } from '../src/lib/metadata'
 import { parse as parseHtml } from 'node-html-parser'
+import { toHtml } from 'hast-util-to-html'
 
 const devices = [
   {
@@ -75,6 +76,7 @@ describe('responsive.resize()', () => {
       '<img alt="test image" src="/img/output-666.png" width="5312" height="2988" srcset="/img/output-666.png 666w, /img/output-1129.png 1129w, /img/output-5312.png 5312w" sizes="100vw">'
     expect(metadata.toPicture(props)).toStrictEqual(result)
     expect(metadata.toSources(props)).toStrictEqual(result)
+    expect(toHtml(metadata.toHast(props))).toStrictEqual(result)
   })
 
   test('produces valid html with multiple formats', async () => {
@@ -82,12 +84,15 @@ describe('responsive.resize()', () => {
       widths: [1024, 432],
       formats: ['webp', null],
     })
-    expect(metadata.toPicture({ sizes: '100vw', alt: '' })).toStrictEqual(
-      '<picture><source type="image/webp" srcset="/img/output-432.webp 432w, /img/output-1024.webp 1024w" sizes="100vw"><img alt="" src="/img/output-432.jpeg" width="1024" height="576" srcset="/img/output-432.jpeg 432w, /img/output-1024.jpeg 1024w" sizes="100vw"></picture>'
-    )
-    expect(metadata.toSources({ sizes: '100vw', alt: '' })).toStrictEqual(
+    const props = { sizes: '100vw', alt: '' }
+    const result =
       '<source type="image/webp" srcset="/img/output-432.webp 432w, /img/output-1024.webp 1024w" sizes="100vw"><img alt="" src="/img/output-432.jpeg" width="1024" height="576" srcset="/img/output-432.jpeg 432w, /img/output-1024.jpeg 1024w" sizes="100vw">'
+
+    expect(metadata.toPicture(props)).toStrictEqual(
+      `<picture>${result}</picture>`
     )
+    expect(metadata.toSources(props)).toStrictEqual(result)
+    expect(toHtml(metadata.toHast(props))).toStrictEqual(result)
   })
 
   test('produces valid html with optional attributes', async () => {
@@ -95,25 +100,21 @@ describe('responsive.resize()', () => {
       widths: [1024, 432],
       formats: ['webp', null],
     })
-    const output = parseHtml(
-      metadata.toPicture({
-        class: 'foo foo--bar',
-        loading: 'lazy',
-        decoding: 'async',
-        foo: 'bar',
-        sizes: '100vw',
-        alt: '',
-      })
-    ).querySelector('img')?.attributes
-
-    expect(output).toMatchObject({
+    const attributes = {
       class: 'foo foo--bar',
       loading: 'lazy',
       decoding: 'async',
       foo: 'bar',
       sizes: '100vw',
       alt: '',
-    })
+    }
+    expect(
+      parseHtml(metadata.toPicture(attributes)).querySelector('img')?.attributes
+    ).toMatchObject(attributes)
+    expect(
+      parseHtml(toHtml(metadata.toHast(attributes))).querySelector('img')
+        ?.attributes
+    ).toMatchObject(attributes)
   })
 })
 
@@ -175,12 +176,13 @@ describe('responsive.fromSizes()', () => {
 
   test('produces valid html with multiple formats', async () => {
     const metadata = await resizing
-    expect(metadata.toPicture({ alt: '' })).toStrictEqual(
-      '<picture><source type="image/webp" srcset="/img/output-360.webp 360w, /img/output-624.webp 624w, /img/output-900.webp 900w, /img/output-1639.webp 1639w" sizes="(min-width: 1600px) 52vh, (max-width: 800px) 360px, 80vw"><img alt="" src="/img/output-360.jpeg" width="1639" height="921" srcset="/img/output-360.jpeg 360w, /img/output-624.jpeg 624w, /img/output-900.jpeg 900w, /img/output-1639.jpeg 1639w" sizes="(min-width: 1600px) 52vh, (max-width: 800px) 360px, 80vw"></picture>'
-    )
-    expect(metadata.toSources({ alt: '' })).toStrictEqual(
+    const expected =
       '<source type="image/webp" srcset="/img/output-360.webp 360w, /img/output-624.webp 624w, /img/output-900.webp 900w, /img/output-1639.webp 1639w" sizes="(min-width: 1600px) 52vh, (max-width: 800px) 360px, 80vw"><img alt="" src="/img/output-360.jpeg" width="1639" height="921" srcset="/img/output-360.jpeg 360w, /img/output-624.jpeg 624w, /img/output-900.jpeg 900w, /img/output-1639.jpeg 1639w" sizes="(min-width: 1600px) 52vh, (max-width: 800px) 360px, 80vw">'
+    expect(metadata.toPicture({ alt: '' })).toStrictEqual(
+      `<picture>${expected}</picture>`
     )
+    expect(metadata.toSources({ alt: '' })).toStrictEqual(expected)
+    expect(toHtml(metadata.toHast({ alt: '' }))).toStrictEqual(expected)
   })
 
   test('produces valid html with optional attributes', async () => {
