@@ -2,8 +2,9 @@ import type Device from './device'
 import type { ImageSource, MetadataEntry } from '@11ty/eleventy-img'
 import EleventyImage from '@11ty/eleventy-img'
 import DeviceSizes from './device-sizes'
-import Metadata, { SizesMetadata, AsyncMetadata } from './metadata'
+import Metadata, { SizesMetadata } from './metadata'
 import { resizeFromSizes } from './utilities'
+import { chain, type ChainedPromise } from './chained-promise'
 
 export interface ImageOptions extends EleventyImage.BaseImageOptions {
   disableResize?: boolean
@@ -71,15 +72,15 @@ export class ConfiguredImage extends Image {
   fromSizes(
     sizesQueryString: string,
     options: EleventyImage.ImageOptions = {}
-  ): AsyncMetadata {
-    return new AsyncMetadata((resolve, reject) => {
+  ): ChainedPromise<SizesMetadata> {
+    const getMetadata = async () => {
       const sizes = new DeviceSizes(sizesQueryString, this.devices)
-      resizeFromSizes(this, sizes, {
+      const { metadata } = await resizeFromSizes(this, sizes, {
         minScale: this.scalingFactor,
         ...options,
       })
-        .then(({ metadata }) => resolve(new SizesMetadata(metadata, sizes)))
-        .catch(reject)
-    })
+      return new SizesMetadata(metadata, sizes)
+    }
+    return chain(getMetadata())
   }
 }
