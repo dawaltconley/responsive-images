@@ -225,4 +225,21 @@ describe('responsive.fromSizes()', () => {
       ].join('\n')
     )
   })
+
+  test('allows chaining further methods without awaiting', async () => {
+    expect(await resizing.devices).toBe((await resizing).devices)
+    expect(await resizing.devices.sizes).toBe((await resizing).devices.sizes)
+    expect(await resizing.devices.sizes.string).toBe(
+      (await resizing).devices.sizes.string
+    )
+    expect(await resizing.toSources({ alt: '' })).toEqual(
+      (await resizing).toSources({ alt: '' })
+    )
+    expect(await resizing.toHast({ alt: '' })).toEqual(
+      (await resizing).toHast({ alt: '' })
+    )
+    expect(await resizing.toCss('.foo')).toEqual((await resizing).toCss('.foo'))
+    const toCss = resizing.toCss
+    expect(await toCss('.foo')).toEqual((await resizing).toCss('.foo'))
+  })
 })

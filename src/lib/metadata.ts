@@ -123,24 +123,3 @@ export class SizesMetadata extends Metadata {
     return this.devices.toMediaQueries(this, options).toCss(selector)
   }
 }
-
-export class AsyncMetadata extends Promise<SizesMetadata> {
-  async toPicture(attributes: HtmlOptions): Promise<string> {
-    return (await this).toPicture(attributes)
-  }
-
-  async toSources(attributes: HtmlOptions): Promise<string> {
-    return (await this).toSources(attributes)
-  }
-
-  async toHast(attributes: HtmlOptions): Promise<HastOutput> {
-    return (await this).toHast(attributes)
-  }
-
-  async toCss(
-    selector: string,
-    options: MediaQueriesOptions = {}
-  ): Promise<string> {
-    return (await this).toCss(selector, options)
-  }
-}
