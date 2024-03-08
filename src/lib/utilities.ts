@@ -96,3 +96,12 @@ export const permute = <T>(
   for (const item of row) permute(matrix, permutations, [...a, item]) // call function on each row
   return permutations
 }
+
+export function isUrl(url: string): boolean {
+  try {
+    const { protocol } = new URL(url)
+    return protocol.startsWith('http')
+  } catch (e) {
+    return false
+  }
+}

@@ -140,6 +140,29 @@ describe('responsive.resize()', () => {
   })
 })
 
+describe('responsive.stat()', () => {
+  test('returns correct metadata for a local image', async () => {
+    const metadata = await responsive('./tests/assets/landscape.jpeg').stat()
+    expect(metadata).toMatchObject({
+      format: 'jpeg',
+      width: 1920,
+      height: 1280,
+      sourceType: 'image/jpeg',
+    })
+  })
+  test('returns correct metadata for a remote image', async () => {
+    const metadata = await responsive(
+      'https://svp.icu/placeholder/42x13.png'
+    ).stat()
+    expect(metadata).toMatchObject({
+      format: 'png',
+      width: 42,
+      height: 13,
+      sourceType: 'image/png',
+    })
+  })
+})
+
 describe('responsive.fromSizes()', () => {
   const resizing = responsive('./tests/assets/xlg.jpg').fromSizes(
     '(min-width: 1600px) 52vh, (max-width: 800px) 360px, 80vw'
@@ -179,6 +202,22 @@ describe('responsive.fromSizes()', () => {
         { width: 624, height: 351 },
         { width: 900, height: 506 },
         { width: 1639, height: 921 },
+      ],
+    })
+  })
+
+  test('resizes remote images', async () => {
+    const { metadata } = await responsive(
+      'https://svp.icu/placeholder/857x1233.png'
+    ).fromSizes('(min-width: 1380px) 30vh, (max-width: 700px) 360px, 60vw')
+    expect(JSON.parse(JSON.stringify(metadata))).toMatchObject({
+      webp: [
+        { width: 360, height: 517 },
+        { width: 615, height: 884 },
+      ],
+      jpeg: [
+        { width: 360, height: 517 },
+        { width: 615, height: 884 },
       ],
     })
   })

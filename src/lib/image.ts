@@ -1,9 +1,10 @@
 import type Device from './device'
 import type { ImageSource, MetadataEntry } from '@11ty/eleventy-img'
 import EleventyImage from '@11ty/eleventy-img'
+import { RemoteAssetCache } from '@11ty/eleventy-fetch'
 import DeviceSizes from './device-sizes'
 import Metadata, { SizesMetadata } from './metadata'
-import { resizeFromSizes } from './utilities'
+import { isUrl, resizeFromSizes } from './utilities'
 import { chain, type ChainedPromise } from './chained-promise'
 
 export interface ImageOptions extends EleventyImage.BaseImageOptions {
@@ -45,7 +46,28 @@ export default class Image {
     return chain(EleventyImage(this.src, imgOpts).then(m => new Metadata(m)))
   }
 
+  /** if the Image src is a url to a remote image, this method downloads and caches the entire image */
   async stat(): Promise<MetadataEntry> {
+    const src = this.src.toString()
+    const { cacheOptions } = this.defaults
+
+    // handle remote assets
+    if (isUrl(src)) {
+      const cache = new RemoteAssetCache(
+        src,
+        cacheOptions?.directory,
+        cacheOptions
+      )
+      await cache.fetch()
+      const metadata = await EleventyImage(cache.getCachedContentsPath(), {
+        statsOnly: true,
+        widths: [null],
+        formats: [null],
+        cacheOptions,
+      })
+      return Object.values(metadata)[0][0]
+    }
+
     return this.resize({
       statsOnly: true,
       widths: [null],
