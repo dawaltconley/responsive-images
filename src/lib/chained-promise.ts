@@ -9,15 +9,15 @@ export type ChainedPromise<T> = {
     ? Async<T[K]>
     : T[K] extends object
     ? ChainedPromise<T[K]>
-    : Promise<T[K]>
-} & Promise<T>
+    : PromiseLike<T[K]>
+} & PromiseLike<T>
 
 export function chain<T>(
-  item: Promise<T>,
-  parent?: Promise<unknown>
+  item: T | PromiseLike<T>,
+  parent?: PromiseLike<unknown>
 ): ChainedPromise<T> {
   // wrap proxied promise in a function, which makes it callable in case it resolves to a function
-  return new Proxy(() => item, {
+  return new Proxy(() => Promise.resolve(item), {
     get(getTarget, accessed) {
       const target = getTarget()
       const property = Reflect.get(target, accessed)
