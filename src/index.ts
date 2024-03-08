@@ -83,7 +83,12 @@ export {
   ResolvedImage,
 } from './lib/device'
 export { default as Image } from './lib/image'
-export { default as Metadata, SizesMetadata, HtmlOptions } from './lib/metadata'
+export {
+  default as Metadata,
+  SizesMetadata,
+  HtmlOptions,
+  HastOutput,
+} from './lib/metadata'
 export type { ConfiguredImage, ImageOptions } from './lib/image'
 export type {
   default as MediaQueries,
