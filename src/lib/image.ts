@@ -31,7 +31,7 @@ export default class Image {
    * @param options - options passed to `@11ty/eleventy-img`
    * @returns a promise resolving to a metadata object for the generated images
    */
-  async resize(options: ImageOptions = {}): Promise<Metadata> {
+  resize(options: ImageOptions = {}): ChainedPromise<Metadata> {
     let imgOpts = {
       ...this.defaults,
       ...options,
@@ -42,7 +42,7 @@ export default class Image {
         widths: [null],
         formats: [null],
       }
-    return new Metadata(await EleventyImage(this.src, imgOpts))
+    return chain(EleventyImage(this.src, imgOpts).then(m => new Metadata(m)))
   }
 
   async stat(): Promise<MetadataEntry> {
