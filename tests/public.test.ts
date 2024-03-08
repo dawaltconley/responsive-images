@@ -208,7 +208,7 @@ describe('responsive.fromSizes()', () => {
   })
 
   test('produces valid css for background images', async () => {
-    const css = await resizing.then(r => r.toCss('.bg-test'))
+    const css = await resizing.toCss('.bg-test')
     expect(css).toStrictEqual(
       [
         "@media (orientation: landscape) and (min-width: 1025px) { .bg-test { background-image: image-set(url('/img/output-624.webp') type('image/webp'), url('/img/output-624.jpeg') type('image/jpeg')); } @supports not (background-image: image-set(url('/img/output-624.webp') type('image/webp'), url('/img/output-624.jpeg') type('image/jpeg'))) { .bg-test { background-image: url('/img/output-624.jpeg'); } } }",

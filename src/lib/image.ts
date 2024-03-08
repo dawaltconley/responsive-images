@@ -2,7 +2,7 @@ import type Device from './device'
 import type { ImageSource, MetadataEntry } from '@11ty/eleventy-img'
 import EleventyImage from '@11ty/eleventy-img'
 import DeviceSizes from './device-sizes'
-import Metadata, { SizesMetadata } from './metadata'
+import Metadata, { SizesMetadata, AsyncMetadata } from './metadata'
 import { resizeFromSizes } from './utilities'
 
 export interface ImageOptions extends EleventyImage.BaseImageOptions {
@@ -68,15 +68,19 @@ export class ConfiguredImage extends Image {
     this.scalingFactor = scalingFactor
   }
 
-  async fromSizes(
+  // should export EleventyImage.ImageOptions somehow...
+  fromSizes(
     sizesQueryString: string,
     options: EleventyImage.ImageOptions = {}
-  ): Promise<SizesMetadata> {
-    const sizes = new DeviceSizes(sizesQueryString, this.devices)
-    const { metadata } = await resizeFromSizes(this, sizes, {
-      minScale: this.scalingFactor,
-      ...options,
+  ): AsyncMetadata {
+    return new AsyncMetadata((resolve, reject) => {
+      const sizes = new DeviceSizes(sizesQueryString, this.devices)
+      resizeFromSizes(this, sizes, {
+        minScale: this.scalingFactor,
+        ...options,
+      })
+        .then(({ metadata }) => resolve(new SizesMetadata(metadata, sizes)))
+        .catch(reject)
     })
-    return new SizesMetadata(metadata, sizes)
   }
 }
