@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import type { TagImplOptions } from 'liquidjs/dist/src/template'
+import type { TagImplOptions } from 'liquidjs/dist/template'
 import type { Liquid } from 'liquidjs'
 
 import { ResponsiveImages, ConfigOptions } from '../index'

@@ -42,30 +42,30 @@
     "liquid-args": "^1.1.0",
     "lodash": "^4.17.21",
     "media-query-parser": "^2.0.2",
-    "sass-cast": "^0.4.1"
+    "sass-cast": "^0.4.3"
   },
   "optionalDependencies": {
     "sass": "^1.45.0"
   },
   "devDependencies": {
-    "@11ty/eleventy": "^1.0.1",
-    "@typescript-eslint/eslint-plugin": "^5.27.0",
-    "@typescript-eslint/parser": "^5.27.0",
-    "eslint": "^8.17.0",
-    "eslint-config-prettier": "^8.5.0",
+    "@11ty/eleventy": "^1.0.2",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^8.10.0",
     "hast-util-to-html": "^9.0.0",
-    "liquidjs": "^10.7.0",
+    "liquidjs": "^10.10.1",
     "node-html-parser": "^6.1.12",
     "node-typescript-compiler": "^3.0.0",
-    "prettier": "^2.6.2",
-    "sass": "^1.62.1",
-    "stylelint": "^14.8.5",
-    "stylelint-config-prettier": "^9.0.3",
+    "prettier": "^2.8.8",
+    "sass": "^1.71.1",
+    "stylelint": "^14.16.1",
+    "stylelint-config-prettier": "^9.0.5",
     "stylelint-config-recommended": "^7.0.0",
     "stylelint-config-recommended-scss": "^6.0.0",
-    "stylelint-scss": "^4.2.0",
+    "stylelint-scss": "^4.7.0",
     "typedoc": "^0.23.28",
-    "typescript": "^4.7.3",
+    "typescript": "^4.9.5",
     "vitest": "^1.3.1"
   }
 }
