@@ -116,6 +116,28 @@ describe('responsive.resize()', () => {
         ?.attributes
     ).toMatchObject(attributes)
   })
+
+  test('allows chaining further methods without awaiting', async () => {
+    const result =
+      '<source type="image/webp" srcset="/img/output-432.webp 432w, /img/output-1024.webp 1024w" sizes="100vw"><img alt="" src="/img/output-432.jpeg" width="1024" height="576" srcset="/img/output-432.jpeg 432w, /img/output-1024.jpeg 1024w" sizes="100vw">'
+    expect(
+      await responsive('./tests/assets/xlg.jpg')
+        .resize({
+          widths: [1024, 432],
+          formats: ['webp', null],
+        })
+        .toSources({ sizes: '100vw', alt: '' })
+    ).toEqual(result)
+    expect(
+      await responsive('./tests/assets/xlg.jpg')
+        .resize({
+          widths: [1024, 432],
+          formats: ['webp', null],
+        })
+        .toHast({ sizes: '100vw', alt: '' })
+        .then(toHtml)
+    ).toEqual(result)
+  })
 })
 
 describe('responsive.fromSizes()', () => {
