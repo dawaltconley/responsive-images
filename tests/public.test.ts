@@ -152,13 +152,13 @@ describe('responsive.stat()', () => {
   })
   test('returns correct metadata for a remote image', async () => {
     const metadata = await responsive(
-      'https://svp.icu/placeholder/42x13.png'
+      'https://raw.githubusercontent.com/dawaltconley/responsive-images/main/tests/assets/landscape.jpeg'
     ).stat()
     expect(metadata).toMatchObject({
-      format: 'png',
-      width: 42,
-      height: 13,
-      sourceType: 'image/png',
+      format: 'jpeg',
+      width: 1920,
+      height: 1280,
+      sourceType: 'image/jpeg',
     })
   })
 })
@@ -208,16 +208,18 @@ describe('responsive.fromSizes()', () => {
 
   test('resizes remote images', async () => {
     const { metadata } = await responsive(
-      'https://svp.icu/placeholder/857x1233.png'
+      'https://raw.githubusercontent.com/dawaltconley/responsive-images/main/tests/assets/portrait.jpeg'
     ).fromSizes('(min-width: 1380px) 30vh, (max-width: 700px) 360px, 60vw')
     expect(JSON.parse(JSON.stringify(metadata))).toMatchObject({
       webp: [
-        { width: 360, height: 517 },
-        { width: 615, height: 884 },
+        { height: 479, width: 360 },
+        { height: 819, width: 615 },
+        { height: 1281, width: 961 },
       ],
       jpeg: [
-        { width: 360, height: 517 },
-        { width: 615, height: 884 },
+        { height: 479, width: 360 },
+        { height: 819, width: 615 },
+        { height: 1281, width: 961 },
       ],
     })
   })
