@@ -79,6 +79,19 @@ describe('responsive.resize()', () => {
     expect(toHtml(metadata.toHast(props))).toStrictEqual(result)
   })
 
+  test('determines whether sources need to be wrapped in a picture element', async () => {
+    const singleFormat = await responsive('./tests/assets/xlg.jpg').resize({
+      widths: [null, 1129, 666],
+      formats: ['png'],
+    })
+    const multiFormat = await responsive('./tests/assets/xlg.jpg').resize({
+      widths: [1024, 432],
+      formats: ['webp', null],
+    })
+    expect(singleFormat.needsPicture).toBe(false)
+    expect(multiFormat.needsPicture).toBe(true)
+  })
+
   test('produces valid html with multiple formats', async () => {
     const metadata = await responsive('./tests/assets/xlg.jpg').resize({
       widths: [1024, 432],

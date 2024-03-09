@@ -46,9 +46,11 @@ export interface HastOutput extends Root {
 
 export default class Metadata {
   metadata: EleventyImage.Metadata
+  needsPicture: boolean
 
   constructor(metadata: EleventyImage.Metadata) {
     this.metadata = metadata
+    this.needsPicture = Object.keys(metadata).length > 1
   }
 
   toPicture(attributes: Required<HtmlOptions>): string {
