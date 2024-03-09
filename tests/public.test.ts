@@ -224,6 +224,26 @@ describe('responsive.fromSizes()', () => {
     })
   })
 
+  test('works with images too small to resize', async () => {
+    const m = await responsive('./tests/assets/tiny.png').fromSizes(
+      '(min-width: 1536px) 476px, (min-width: 1280px) 396px, (min-width: 1024px) 438px, (min-width: 768px) 320px, (min-width: 640px) 576px, 100vw'
+    )
+    expect(m).toBeInstanceOf(Metadata)
+    expect(m.metadata).toHaveProperty('jpeg')
+    expect(m.metadata.jpeg).toBeTruthy()
+    expect(m.metadata.jpeg?.length).greaterThan(0)
+    expect(m.metadata.jpeg && m.metadata.jpeg[0]).toMatchObject({
+      format: 'jpeg',
+      width: expect.any(Number),
+      height: expect.any(Number),
+      url: expect.stringMatching(/output-\d+\.jpeg/),
+      sourceType: 'image/jpeg',
+      srcset: expect.stringMatching(/output-\d+\.jpeg \d+w/),
+      outputPath: expect.stringMatching(/output-\d+\.jpeg/),
+      size: expect.any(Number),
+    })
+  })
+
   test('produces valid html with a single format', async () => {
     const metadata = await responsive('./tests/assets/xlg.jpg').fromSizes(
       '(min-width: 1600px) 52vh, (max-width: 800px) 360px, 80vw',

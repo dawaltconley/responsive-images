@@ -52,10 +52,13 @@ export async function resizeFromSizes(
   const scalingFactor =
     minScale ?? ('scalingFactor' in image ? image.scalingFactor : undefined)
 
+  const targets = devices.targets.map(target =>
+    Math.ceil(instructionsToWidth(target, width / height))
+  )
+  const maxWidth = Math.min(width, Math.max(...targets))
+  targets.push(width) // add original width, incase smaller than the largest desired
   const widths = filterSizes(
-    devices.targets
-      .map(target => Math.ceil(instructionsToWidth(target, width / height)))
-      .filter(w => w <= width),
+    targets.filter(w => w <= maxWidth),
     scalingFactor
   )
 
