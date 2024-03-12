@@ -21,7 +21,7 @@ declare module 'sass-cast' {
 }
 
 declare module 'sass-cast/legacy' {
-  import type { LegacyValue, LegacyFunction } from 'sass/types' // eslint-disable-line @typescript-eslint/no-duplicate-imports
+  import type { LegacyValue, LegacyFunction } from 'sass/types'
 
   export function toSass(
     value: unknown,

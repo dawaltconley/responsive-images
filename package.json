@@ -49,8 +49,8 @@
   },
   "devDependencies": {
     "@11ty/eleventy": "^1.0.2",
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
-    "@typescript-eslint/parser": "^5.62.0",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^8.10.0",
     "hast-util-to-html": "^9.0.0",
@@ -64,8 +64,8 @@
     "stylelint-config-recommended": "^7.0.0",
     "stylelint-config-recommended-scss": "^6.0.0",
     "stylelint-scss": "^4.7.0",
-    "typedoc": "^0.23.28",
-    "typescript": "^4.9.5",
+    "typedoc": "^0.25.12",
+    "typescript": "^5.4.2",
     "vitest": "^1.3.1"
   }
 }
