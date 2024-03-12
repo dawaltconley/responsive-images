@@ -40,7 +40,7 @@ const compile = async (
   const merged = new ResponsiveImages(_.merge(defaultConfig, config))
   return sass
     .compileStringAsync(sassString, {
-      loadPaths: ['node_modules'],
+      loadPaths: [import.meta.dirname],
       functions: getSassFunctions(merged),
     })
     .then(result => result.css)
@@ -55,7 +55,7 @@ const compileLegacy = async (
     sass.render(
       {
         data: sassString,
-        includePaths: ['node_modules'],
+        includePaths: [import.meta.dirname],
         functions: getLegacySassFunctions(merged),
       },
       (e, result) => {
