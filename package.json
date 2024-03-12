@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "compile": "npx tsc",
-    "build": "node build.mjs",
+    "build": "./build.sh",
     "lint": "npx eslint . && npx prettier -c .",
     "test": "npx vitest run && npm run lint",
     "test:watch": "npx vitest",
@@ -56,7 +56,6 @@
     "hast-util-to-html": "^9.0.0",
     "liquidjs": "^10.10.1",
     "node-html-parser": "^6.1.12",
-    "node-typescript-compiler": "^3.0.0",
     "prettier": "^2.8.8",
     "sass": "^1.71.1",
     "stylelint": "^14.16.1",
