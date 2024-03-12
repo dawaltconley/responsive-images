@@ -51,18 +51,42 @@ export async function resizeFromSizes(
   const { width, height } = await image.stat()
   const scalingFactor =
     minScale ?? ('scalingFactor' in image ? image.scalingFactor : undefined)
-
-  const targets = devices.targets.map(target =>
-    Math.ceil(instructionsToWidth(target, width / height))
+  const widths = getWidthsFromInstructions(
+    devices.targets,
+    scalingFactor,
+    width,
+    height
   )
-  const maxWidth = Math.min(width, Math.max(...targets))
-  targets.push(width) // add original width, incase smaller than the largest desired
-  const widths = filterSizes(
-    targets.filter(w => w <= maxWidth),
-    scalingFactor
-  )
-
   return image.resize({ widths, ...options })
+}
+
+/**
+ * @param width - ensures that no images larger than the source image are created
+ * @param height - together with the width, allows you to use non-standard sizes query strings
+ * @returns an array of image widths
+ */
+export function getWidthsFromInstructions(
+  instructions: ResizeInstructions<number>[],
+  scalingFactor?: number,
+  width?: number,
+  height?: number
+): number[] {
+  const aspectRatio = width && height ? width / height : null
+  let targets = instructions.map(target => {
+    if (aspectRatio) {
+      return instructionsToWidth(target, aspectRatio)
+    } else if ('height' in target) {
+      throw new Error(
+        'You must specify an aspectRatio when getting widths from a non-standard sizes string.'
+      )
+    }
+    return target.width
+  })
+  if (width) {
+    const maxWidth = Math.min(width, Math.max(...targets))
+    targets = [...targets, width].filter(w => w <= maxWidth) // add original width, incase smaller than the largest desired
+  }
+  return filterSizes(targets, scalingFactor)
 }
 
 export function instructionsToWidth(

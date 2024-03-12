@@ -74,6 +74,10 @@ export default class ResponsiveImages extends Config {
 }
 
 export { ResponsiveImages }
+export {
+  getWidthsFromSizes,
+  WidthsFromSizesOptions,
+} from './lib/widthsFromSizes'
 export { default as DeviceSizes } from './lib/device-sizes'
 export { default as Sizes, SizesQuery, ImageSize } from './lib/sizes'
 export {
