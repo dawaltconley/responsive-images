@@ -1,3 +1,15 @@
+/**
+ * The device definitions used by default.
+ *
+ * ```
+ * import devices from '@dawaltconley/responsive-images/devices'
+ * ```
+ *
+ * @see {@link https://github.com/dawaltconley/responsive-images/blob/main/src/data/devices.ts}
+ *
+ * @module devices
+ */
+
 import type { DeviceDefinition } from '../lib/device'
 
 const devices: DeviceDefinition[] = [

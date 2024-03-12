@@ -19,7 +19,7 @@
     "lint": "npx eslint . && npx prettier -c .",
     "test": "npx vitest run && npm run lint",
     "test:watch": "npx vitest",
-    "document": "npx typedoc src/index.ts src/types.ts src/eleventy-plugin.ts src/data/devices.ts",
+    "document": "npx typedoc src/index.ts src/sass/index.ts src/plugins/*.ts src/data/devices.ts",
     "prepublishOnly": "npm test && npm run build && npm run document",
     "prepack": "npm test && npm run build"
   },

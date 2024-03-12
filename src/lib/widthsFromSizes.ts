@@ -22,6 +22,7 @@ export interface WidthsFromSizesOptions
  * Useful if you want to integrate the sizes parser with another image transformation and markup generation pipeline.
  * @param sizes - a sizes query string
  * @returns an array of widths for images needed to match this sizes string
+ * @group public
  */
 export function getWidthsFromSizes(
   sizes: string,

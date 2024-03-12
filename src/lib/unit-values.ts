@@ -9,10 +9,16 @@ export const units = new Set([
   'dppx',
   'x',
 ] as const)
+
+/** @see one of {@link units} */
 export type Unit = Parameters<typeof units.has>[number]
 
 export const isUnit = (s: string): s is Unit => units.has(s as Unit)
 
+/**
+ * Represents a value with a unit, such as 600px, 40vw, etc.
+ * Used internally for parsing the sizes query string.
+ */
 export default class UnitValue<U extends Unit = Unit> {
   value: number
   unit: U

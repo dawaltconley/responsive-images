@@ -1,3 +1,16 @@
+/**
+ * The main imports.
+ *
+ * ```
+ * import ResponsiveImages from '@dawaltconley/responsive-images'
+ * ```
+ *
+ * @see {@link ResponsiveImages}
+ * @see {@link getWidthsFromSizes}
+ *
+ * @module
+ */
+
 import type { HtmlOptions } from './lib/metadata'
 import type {
   ImageSource,
@@ -24,6 +37,10 @@ export interface ResizeOptions {
 
 export interface MixedOptions extends HtmlOptions, ResizeOptions {}
 
+/**
+ * This class can be used set global configuration options which are inherited but its subsequent methods.
+ * @group public
+ */
 export default class ResponsiveImages extends Config {
   constructor(options?: ConfigOptions) {
     super(options)
@@ -32,6 +49,11 @@ export default class ResponsiveImages extends Config {
     this.sourceFromSizes = this.sourceFromSizes.bind(this)
   }
 
+  /**
+   * This is the main entrypoint for the responsive image API.
+   * @param image - The path to an image that you want to make responsive; either a local image file or a url.
+   * @returns An object with a few methods for resizing the image.
+   */
   responsive(image: ImageSource): ConfiguredImage {
     return new ConfiguredImage(image, this)
   }
@@ -95,12 +117,11 @@ export { ResponsiveImages, getWidthsFromSizes }
 export type { Config, ConfigOptions, WidthsFromSizesOptions }
 
 export { default as DeviceSizes } from './lib/device-sizes'
-export { default as Sizes, SizesQuery, ImageSize } from './lib/sizes'
-export {
+export { default as Sizes, SizesQuery } from './lib/sizes'
+export type {
   default as Device,
   DeviceDefinition,
   DeviceOptions,
-  ResolvedImage,
 } from './lib/device'
 export { default as Image } from './lib/image'
 export {
@@ -111,22 +132,21 @@ export {
   HastSource,
   HastImage,
 } from './lib/metadata'
+export {
+  default as UnitValue,
+  Unit,
+  units,
+  ImageSize,
+  ImageUnit,
+} from './lib/unit-values'
 export type { ConfiguredImage, ImageOptions } from './lib/image'
 export type {
   default as MediaQueries,
   MediaQuery,
   MediaQueriesOptions,
+  ImageSet,
+  ImageSetMap,
 } from './lib/media-queries'
 export type { ResizeFromSizesOptions } from './lib/utilities'
-export {
-  Orientation,
-  isOrientation,
-  SizeKeyword,
-  isSizeKeyword,
-  Dimension,
-  isDimension,
-  ValidImageFormat,
-  isValidImageFormat,
-  Rect,
-  isRect,
-} from './lib/common'
+export type { ChainedPromise, Async } from './lib/chained-promise'
+export { SizeKeyword, Rect, ResizeInstructions } from './lib/common'

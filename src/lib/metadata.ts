@@ -13,30 +13,26 @@ export interface HtmlOptions {
   [attribute: string]: unknown
 }
 
-type Source = {
-  type: string
-  srcSet: string
-  sizes: string
-}
-
-type Img = {
-  alt: string
-  src: string
-  width: string
-  height: string
-  sizes: string
-  srcSet?: string
-}
-
 export interface HastSource extends Element {
   tagName: 'source'
-  properties: Source
+  properties: {
+    type: string
+    srcSet: string
+    sizes: string
+  }
   children: []
 }
 
 export interface HastImage extends Element {
   tagName: 'img'
-  properties: Img & Element['properties']
+  properties: {
+    alt: string
+    src: string
+    width: string
+    height: string
+    sizes: string
+    srcSet?: string
+  } & Element['properties']
   children: []
 }
 
@@ -44,8 +40,13 @@ export interface HastOutput extends Root {
   children: [...HastSource[], HastImage]
 }
 
+/**
+ * An object representing generated responsive images, and providing methods to represent that in markup.
+ */
 export default class Metadata {
+  /** An object representing the generated images. This is the same object returned by the [EleventyImage](https://www.11ty.dev/docs/plugins/image/) function. */
   metadata: EleventyImage.Metadata
+  /** Whether or not the output of {@link toSources} needs to be wrapped in a `<picture>` element. */
   needsPicture: boolean
 
   constructor(metadata: EleventyImage.Metadata) {
@@ -53,20 +54,26 @@ export default class Metadata {
     this.needsPicture = Object.keys(metadata).length > 1
   }
 
+  /** @see {@link SizesMetadata.toPicture} */
   toPicture(attributes: Required<HtmlOptions>): string {
     return EleventyImage.generateHTML(this.metadata, attributes)
   }
 
+  /** @see {@link SizesMetadata.toSources} */
   toSources(attributes: Required<HtmlOptions>): string {
     return this.toPicture(attributes).replace(/(^<picture>|<\/picture>$)/g, '')
   }
 
+  /**
+   * @param attributes
+   * @see {@link SizesMetadata.toHast}
+   */
   toHast({ sizes, alt, ...attributes }: Required<HtmlOptions>): HastOutput {
     const metaValues = Object.values(this.metadata)
     const smallest = metaValues[metaValues.length - 1][0]
     const biggest = metaValues[metaValues.length - 1][metaValues[0].length - 1]
 
-    const sources = metaValues.map<Source>(v => ({
+    const sources = metaValues.map(v => ({
       type: v[0].sourceType,
       srcSet: v.map(img => img.srcset).join(', '),
       sizes,
@@ -101,6 +108,11 @@ export default class Metadata {
   }
 }
 
+/**
+ * A {@link Metadata} object produced from a sizes string. If the `sizes`
+ * attribute is ommited from its methods, then it defaults to the original
+ * sizes string.
+ */
 export class SizesMetadata extends Metadata {
   devices: DeviceSizes
 
@@ -109,18 +121,51 @@ export class SizesMetadata extends Metadata {
     this.devices = devices
   }
 
+  /**
+   * Returns responsive image markup. This is a thin wrapper around {@link
+   * SizesMetadata.toSources}: it only adds a picture element with no
+   * attributes.
+   *
+   * @param attributes - passed to the generated `<img>` element.
+   * @return an HTML string
+   */
   toPicture(attributes: HtmlOptions): string {
     return super.toPicture({ sizes: this.devices.sizes.string, ...attributes })
   }
 
+  /**
+   * Returns responsive image markup, consisting of an `<img>` tag and any
+   * number of `<source>` tags. The output must be wrapped in a `<picture>`
+   * element, unless {@link needsPicture} is false.
+   *
+   * @param attributes - passed to the generated `<img>` element.
+   * @return an HTML string
+   */
   toSources(attributes: HtmlOptions): string {
     return super.toSources({ sizes: this.devices.sizes.string, ...attributes })
   }
 
+  /**
+   * Returns the responsive image markup as an AST. This is useful if you want
+   * to pass it to something like JSX.
+   *
+   * @return AST representing the responsive image markup
+   * @see {@link https://github.com/syntax-tree/hast}
+   */
   toHast(attributes: HtmlOptions): HastOutput {
     return super.toHast({ sizes: this.devices.sizes.string, ...attributes })
   }
 
+  /**
+   * Returns CSS to display the image as a `background-image`. This uses a number of non-overlapping media queries and the [image-set](https://developer.mozilla.org/en-US/docs/Web/CSS/image/image-set) function, with a fallback for unsupported browsers.
+   *
+   * This also depends on the `resolution` media queries, which are supported in most modern browsers.
+   *
+   * @return a CSS string
+   *
+   * @see {@link https://caniuse.com/css-image-set}
+   * @see {@link https://caniuse.com/css-media-resolution}
+   */
   toCss(selector: string, options: MediaQueriesOptions = {}): string {
     return this.devices.toMediaQueries(this, options).toCss(selector)
   }

@@ -53,7 +53,9 @@ export const assertValidImageFormat = (
   return test
 }
 
-export type ResizeInstructions<T> =
+import type UnitValue from './unit-values'
+
+export type ResizeInstructions<T extends number | UnitValue> =
   | { width: T }
   | { height: T }
   | { width: T; height: T; fit: SizeKeyword }

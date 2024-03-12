@@ -6,7 +6,7 @@ import {
   Dimension,
   isDimension,
 } from './common'
-import { ImageSize as ImageValue } from './unit-values'
+import { ImageSize } from './unit-values'
 
 /**
  * represents a valid rule for the img sizes attribute,
@@ -20,13 +20,11 @@ export interface SizesQuery {
   conditions: MediaCondition | null
 
   /** the image width applied under these conditions */
-  size: ImageSize
+  size: ResizeInstructions<ImageSize>
 
   /** whether this SizesQuery is valid in the browser */
   isValid: boolean
 }
-
-export type ImageSize = ResizeInstructions<ImageValue>
 
 export default class Sizes {
   readonly string: string
@@ -53,7 +51,7 @@ export default class Sizes {
     return sizesQueryString
       .split(/\s*,\s*/)
       .map<SizesQuery | null>(sizeQuery => {
-        const imageSize: (SizeKeyword | Dimension | ImageValue)[] = []
+        const imageSize: (SizeKeyword | Dimension | ImageSize)[] = []
         const tokens = sizeQuery.split(/\s+/)
         while (tokens.length) {
           const t = tokens.pop()
@@ -63,7 +61,7 @@ export default class Sizes {
             continue
           }
           try {
-            const u = ImageValue.parse(t)
+            const u = ImageSize.parse(t)
             imageSize.unshift(u)
             continue
           } catch (e) {
@@ -102,13 +100,15 @@ function parseConditions(queryString: string): MediaCondition | null {
   return query.mediaCondition
 }
 
-function parseImageSize(tokens: (string | ImageValue)[]): ImageSize {
-  if (tokens.length === 1 && ImageValue.isUnitValue(tokens[0])) {
+function parseImageSize(
+  tokens: (string | ImageSize)[]
+): ResizeInstructions<ImageSize> {
+  if (tokens.length === 1 && ImageSize.isUnitValue(tokens[0])) {
     return { width: tokens[0] }
   }
   if (tokens.length === 2) {
     const [d, l] = tokens
-    if (d === 'width' && ImageValue.isUnitValue(l)) {
+    if (d === 'width' && ImageSize.isUnitValue(l)) {
       return { width: l }
     }
   }

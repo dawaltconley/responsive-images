@@ -12,14 +12,48 @@ and comparing it with a range of target devices. This means that, as long as you
 write a good sizes query, you don't need to specify the widths for each image
 you want to generate.
 
-For all methods and options please reference the
+For all methods and options please refer to the
 [full documentation](https://dawaltconley.github.io/responsive-images/).
 
-## Install
+## Basic Usage
 
 ```
 npm install @dawaltconley/responsive-images
 ```
+
+The basic API is flexible, but designed around the idea of chaining methods,
+which generate the necessary images and return appropriate markup.
+
+```js
+import ResponsiveImages from '@dawaltconley/responsive-images'
+
+// set global config options
+const { responsive } = new ResponsiveImages({ scalingFactor: 0.5 })
+
+// resize an image based on a sizes query string
+// this generates the required images and returns an object representing them
+const metadata = await responsive('./path/to/image.png').fromSizes(
+  '(max-width: 1280px) 800px, 100vw'
+)
+
+// call one of the available methods to get the required markup
+const html = `<picture>${metadata.toSources({
+  class: 'responsive-image',
+  alt: 'image properties go here',
+})}</picture>`
+```
+
+This library uses a proxied `Promise` object, so you can continue to chain
+through the asynchronous methods without awaiting each one.
+
+```js
+const hast = await responsive('./path/to/image.png')
+  .fromSizes('(max-width: 1280px) 800px, 100vw')
+  .toHast({ alt: 'image properties go here' })
+```
+
+If you want to generate the images and markup separately, you can use the
+`getWidthsFromSizes` function instead.
 
 ## Configure
 
@@ -29,7 +63,7 @@ can be exported as a singleton for use in multiple files.
 ```js
 import ResponsiveImages from '@dawaltconley/responsive-images'
 
-export default new ResponsiveImages({
+const config = new ResponsiveImages({
   scalingFactor: 0.6,
   disable: false,
   defaults: {
@@ -38,9 +72,12 @@ export default new ResponsiveImages({
     outputDir: './dist/assets/generated/',
   },
 })
+
+export default config
+export const { responsive } = config
 ```
 
-## Options
+## Configuration Options
 
 All config options are optional.
 
@@ -215,8 +252,9 @@ images using media queries and the CSS `background-image` property.
 }
 ```
 
-These mixins rely on custom functions, which should be passed to Sass via the
-`ResponsiveImages.sassFunctions` property.
+These mixins rely on custom functions, which can be imported from
+`@dawaltconley/responsive-images/sass` and passed to Sass's `compileAsync`
+method.
 
 In addition to the above keyword arguments, you can pass additional
 `background-image` backgrounds (such as linear-gradient functions) using the

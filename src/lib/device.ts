@@ -21,12 +21,11 @@ export interface DeviceOptions extends Rect {
   dppx?: number
 }
 
-export type ResolvedImage = ResizeInstructions<number>
-
+/** @internal */
 export default class Device implements Rect {
-  w: number
-  h: number
-  dppx: number
+  readonly w: number
+  readonly h: number
+  readonly dppx: number
 
   constructor({ w, h, dppx = 1 }: DeviceOptions) {
     this.w = w
@@ -97,9 +96,9 @@ export default class Device implements Rect {
   }
 
   /**
-   * @returns the {@link ResolvedImage}s needed to support a {@link Sizes} query on this device
+   * @returns the {@link ResizeInstructions} needed to support a {@link Sizes} query on this device
    */
-  getImage(sizes: Sizes): ResolvedImage {
+  getImage(sizes: Sizes): ResizeInstructions<number> {
     for (const { conditions, size } of sizes.queries) {
       if (!conditions || this.matches(conditions)) {
         return this.resolve(size)
@@ -111,7 +110,7 @@ export default class Device implements Rect {
   /**
    * @returns the resize instructions for a given image with all units resolved to device pixels
    */
-  resolve(initial: ResizeInstructions<ImageSize>): ResolvedImage {
+  resolve(initial: ResizeInstructions<ImageSize>): ResizeInstructions<number> {
     if ('fit' in initial) {
       return {
         width: toDevicePixels(initial.width, this),
@@ -148,6 +147,7 @@ export default class Device implements Rect {
     return devices
   }
 
+  /** can be passed directly to the `sort` Array method */
   static sort(a: Device, b: Device): number {
     return b.w - a.w || b.h - a.h || b.dppx - a.dppx
   }

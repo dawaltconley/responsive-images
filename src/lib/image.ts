@@ -28,7 +28,6 @@ export default class Image {
   /**
    * Generates multiple new sizes for an image. This is a wrapper method around
    * `@11ty/eleventy-img`, which just handles default options and allows disabling.
-   * @param image - file or url of the source image
    * @param options - options passed to `@11ty/eleventy-img`
    * @returns a promise resolving to a metadata object for the generated images
    */
@@ -91,10 +90,16 @@ export class ConfiguredImage extends Image {
     this.scalingFactor = scalingFactor
   }
 
-  // should export EleventyImage.ImageOptions somehow...
+  /**
+   * Generates different variants of the image based on a sizes query
+   * string. Resolves when all variants have been created.
+   *
+   * @returns A {@link SizesMetadata} object representing the generated
+   * images.
+   */
   fromSizes(
     sizesQueryString: string,
-    options: EleventyImage.ImageOptions = {}
+    options: ImageOptions = {}
   ): ChainedPromise<SizesMetadata> {
     const getMetadata = async () => {
       const sizes = new DeviceSizes(sizesQueryString, this.devices)

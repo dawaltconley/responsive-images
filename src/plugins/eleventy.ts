@@ -1,3 +1,19 @@
+/**
+ * Plugin for use with Eleventy sites.
+ *
+ * ```ts
+ * import plugin from '@dawaltconley/responsive-images/eleventy'
+ * ```
+ *
+ * Or if you're using CommonJS:
+ *
+ * ```js
+ * const { default: plugin } = require('@dawaltconley/responsive-images/eleventy')
+ * ```
+ *
+ * @module eleventy
+ */
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import type { TagImplOptions } from 'liquidjs/dist/template'
@@ -45,7 +61,37 @@ const liquidKwargsTag = (cb: (...args: any[]) => string | Promise<string>) =>
     }
   }
 
-export = function (
+/**
+ * This plugin provides Nunjucks and Liquid filters and shortcodes for adding
+ * responsive images to your Eleventy site. Pass this function as the first
+ * argument to eleventyConfig.addPlugin()
+ *
+ * @see https://www.11ty.dev/docs/plugins/
+ *
+ * @example
+ * ```liquid
+ * <div>
+ *   {% picture "assets/example.jpg",
+ *     alt="A responsive picture element",
+ *     sizes="(min-width: 800px) 400px, 100vw", %}
+ *
+ *   {% set picHtml = "assets/example.jpg" | picture({ alt: 'used as a filter', sizes: '100vw' }) #}
+ *   {{ picHtml | safe }}
+ *
+ *   <picture class="picture-class">
+ *     {% img "assets/example.jpg",
+ *       alt="Use the img shortcode to include image sources without a picture element",
+ *       class="passed-to-image-element",
+ *       sizes="(min-width: 1000px) 50vw, 100vw" %}
+ *   </picture>
+ *
+ *   {# The resize filter just calls EleventyImage and returns a metadata object #}
+ *   {% set metadata = "assets/example.jpg" | resize({ widths: [1200, null] }) %}
+ * </div>
+ * ```
+ */
+
+export default function (
   eleventyConfig: any,
   options: ConfigOptions | ResponsiveImages = {}
 ): void {

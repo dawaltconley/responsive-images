@@ -37,6 +37,7 @@ export interface ConfigOptions {
   disable?: boolean
 }
 
+/** Controls how {@link ConfigOptions} are processed. */
 export default class Config implements Required<ConfigOptions> {
   /** @see ConfigOptions {@link ConfigOptions.defaults} */
   defaults: Partial<ImageOptions>
