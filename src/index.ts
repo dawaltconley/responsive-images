@@ -7,6 +7,10 @@ import type {
 } from '@11ty/eleventy-img'
 import Config, { ConfigOptions } from './lib/config'
 import { ConfiguredImage } from './lib/image'
+import {
+  getWidthsFromSizes,
+  type WidthsFromSizesOptions,
+} from './lib/widthsFromSizes'
 
 /**
  * Options passed to the EleventyImage resize function.
@@ -19,8 +23,6 @@ export interface ResizeOptions {
 }
 
 export interface MixedOptions extends HtmlOptions, ResizeOptions {}
-
-export type { ConfigOptions }
 
 export default class ResponsiveImages extends Config {
   constructor(options?: ConfigOptions) {
@@ -71,13 +73,27 @@ export default class ResponsiveImages extends Config {
       .fromSizes(sizes, options)
       .then(meta => meta.toSources(properties))
   }
+
+  /**
+   * Same as {@link getWidthsFromSizes} but inheriting the default `devices`
+   * and `scalingFactor` of this ResponsiveImages instance.
+   */
+  getWidthsFromSizes(
+    sizes: string,
+    { width, height }: Pick<WidthsFromSizesOptions, 'width' | 'height'> = {}
+  ): number[] {
+    return getWidthsFromSizes(sizes, {
+      devices: this.devices,
+      scalingFactor: this.scalingFactor,
+      width,
+      height,
+    })
+  }
 }
 
-export { ResponsiveImages }
-export {
-  getWidthsFromSizes,
-  WidthsFromSizesOptions,
-} from './lib/widthsFromSizes'
+export { ResponsiveImages, getWidthsFromSizes }
+export type { Config, ConfigOptions, WidthsFromSizesOptions }
+
 export { default as DeviceSizes } from './lib/device-sizes'
 export { default as Sizes, SizesQuery, ImageSize } from './lib/sizes'
 export {
