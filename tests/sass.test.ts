@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest'
 import _ from 'lodash'
-import sass from 'sass'
+import * as sass from 'sass'
 import ResponsiveImages, { ConfigOptions } from '../src/index'
 import { scss } from '../src/lib/syntax'
 import { getSassFunctions, getLegacySassFunctions } from '../src/sass'
