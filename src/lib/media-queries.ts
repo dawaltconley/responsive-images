@@ -19,8 +19,8 @@ export interface MediaQuery {
 // }
 
 export interface ImageSource {
-  /** pixel density only, string list of srcs and dppx */
-  srcSet?: string
+  // /** pixel density only, string list of srcs and dppx */
+  srcSet: string
   type?: string
   media: string
 }
@@ -37,9 +37,7 @@ export interface ImageSet {
 //    same logic but just delete minWidth and minResolution before
 //    passing to the function.
 
-// type ImageMap = Map<string, Image>
-//
-// function getImageMap(queries: MediaQuery[]): Map<string, Image[]> {
+// function makeQueryMap(queries: MediaQuery[]): Map<string, ImageSet[]> {
 //   return queries.reduce((map, q) => {
 //     const andQueries: string[] = []
 //     const orQueries: string[][] = []
@@ -71,13 +69,13 @@ export interface ImageSet {
 //
 //     const images = map.get(selectors) || []
 //     images.push({
-//       source: q.url,
+//       image: q.url,
 //       type: q.sourceType,
 //       // dppx: q.maxResolution || undefined,
 //     })
 //
 //     return map.set(selectors, images)
-//   }, new Map<string, Image[]>())
+//   }, new Map<string, ImageSet[]>())
 // }
 
 export type ImageSetMap = Map<string, ImageSet[]>
@@ -184,7 +182,7 @@ export default class MediaQueries {
       .join('\n')
   }
 
-  toHast(): ImageSource[] {
+  toSources(): ImageSource[] {
     // this could be compressed by removing the min queries, only using max
     // since you don't have to worry about overlapping queries with <picture> element
     return Array.from(this.imageSet.entries()).reduce<ImageSource[]>(

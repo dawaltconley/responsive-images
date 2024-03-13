@@ -16,11 +16,23 @@ export interface HtmlOptions {
 
 export interface HastSource extends Element {
   tagName: 'source'
-  properties: {
-    type: string
-    srcSet: string
-    sizes: string
-  }
+  // properties: {
+  //   srcSet: string
+  //   type?: string
+  //   sizes?: string
+  //   media?: string
+  // }
+  properties:
+    | {
+        srcSet: string
+        type: string // should this be optional? if there's only one media type...
+        sizes: string
+      }
+    | {
+        srcSet: string
+        type?: string
+        media: string
+      }
   children: []
 }
 
@@ -31,7 +43,7 @@ export interface HastImage extends Element {
     src: string
     width: string
     height: string
-    sizes: string
+    sizes?: string // optional because pictures using the `media` attribute won't use sizes
     srcSet?: string
   } & Element['properties']
   children: []
@@ -41,18 +53,39 @@ export interface HastOutput extends Root {
   children: [...HastSource[], HastImage]
 }
 
+function hastToHtml(hast: HastOutput): string {
+  return hast.children.reduce((markup, e) => {
+    const properties = Object.entries(e.properties)
+      .reduce<string[]>((props, [key, value]) => {
+        if (value === null || value === undefined || value === false)
+          return props
+        if (typeof value === 'object') {
+          value = value.join(' ')
+        }
+        return props.concat(value === true ? key : `${key}="${value}"`)
+      }, [])
+      .join(' ')
+    return markup + `<${e.tagName} ${properties}>`
+  }, '')
+}
+
 /**
  * An object representing generated responsive images, and providing methods to represent that in markup.
  */
 export default class Metadata {
   /** An object representing the generated images. This is the same object returned by the [EleventyImage](https://www.11ty.dev/docs/plugins/image/) function. */
-  metadata: EleventyImage.Metadata
+  metadata: EleventyImage.Metadata // this could potentially be stored as MetadataEntry[][] or [string, MetadataEntry[]][]. i think it's always transformed into that when used
   /** Whether or not the output of {@link toSources} needs to be wrapped in a `<picture>` element. */
   needsPicture: boolean
+  smallest: EleventyImage.MetadataEntry
+  biggest: EleventyImage.MetadataEntry
 
   constructor(metadata: EleventyImage.Metadata) {
     this.metadata = metadata
-    this.needsPicture = Object.keys(metadata).length > 1
+    const metaValues = Object.values(metadata)
+    this.needsPicture = metaValues.length > 1
+    this.smallest = metaValues[metaValues.length - 1][0]
+    this.biggest = metaValues[metaValues.length - 1][metaValues[0].length - 1]
   }
 
   /** @see {@link SizesMetadata.toPicture} */
@@ -70,11 +103,7 @@ export default class Metadata {
    * @see {@link SizesMetadata.toHast}
    */
   toHast({ sizes, alt, ...attributes }: Required<HtmlOptions>): HastOutput {
-    const metaValues = Object.values(this.metadata)
-    const smallest = metaValues[metaValues.length - 1][0]
-    const biggest = metaValues[metaValues.length - 1][metaValues[0].length - 1]
-
-    const sources = metaValues.map(v => ({
+    const sources = Object.values(this.metadata).map(v => ({
       type: v[0].sourceType,
       srcSet: v.map(img => img.srcset).join(', '),
       sizes,
@@ -95,9 +124,9 @@ export default class Metadata {
           tagName: 'img',
           properties: {
             alt,
-            src: smallest.url,
-            width: biggest.width.toString(),
-            height: biggest.height.toString(),
+            src: this.smallest.url,
+            width: this.biggest.width.toString(),
+            height: this.biggest.height.toString(),
             srcSet,
             sizes,
             ...attributes,
@@ -132,10 +161,11 @@ export class SizesMetadata extends Metadata {
    * @param attributes - passed to the generated `<img>` element.
    * @return an HTML string
    */
-  toPicture(attributes: HtmlOptions): string {
+  toPicture({ sizes = this.sizes.string, ...attributes }: HtmlOptions): string {
     if (this.sizes.isValid) {
-      return super.toPicture({ sizes: this.sizes.string, ...attributes })
+      return super.toPicture({ sizes, ...attributes })
     }
+    return `<picture>${this.toSources({ sizes, ...attributes })}</picture>`
   }
 
   /**
@@ -146,10 +176,11 @@ export class SizesMetadata extends Metadata {
    * @param attributes - passed to the generated `<img>` element.
    * @return an HTML string
    */
-  toSources(attributes: HtmlOptions): string {
+  toSources({ sizes = this.sizes.string, ...attributes }: HtmlOptions): string {
     if (this.sizes.isValid) {
-      return super.toSources({ sizes: this.sizes.string, ...attributes })
+      return super.toSources({ sizes, ...attributes })
     }
+    return hastToHtml(this.toHast({ sizes, ...attributes }))
   }
 
   /**
@@ -159,9 +190,39 @@ export class SizesMetadata extends Metadata {
    * @return AST representing the responsive image markup
    * @see {@link https://github.com/syntax-tree/hast}
    */
-  toHast(attributes: HtmlOptions): HastOutput {
+  toHast(
+    { sizes = this.sizes.string, ...attributes }: HtmlOptions,
+    options: MediaQueriesOptions = {},
+  ): HastOutput {
     if (this.sizes.isValid) {
-      return super.toHast({ sizes: this.sizes.string, ...attributes })
+      return super.toHast({ sizes, ...attributes })
+    }
+    // const options = {} // how to pass this in?
+    const sources = this.devices.toMediaQueries(this, options).toSources()
+    const { srcSet } = sources.pop() ?? {}
+
+    return {
+      type: 'root',
+      children: [
+        ...sources.map<HastSource>(properties => ({
+          type: 'element',
+          tagName: 'source',
+          properties,
+          children: [],
+        })),
+        {
+          type: 'element',
+          tagName: 'img',
+          properties: {
+            src: this.smallest.url,
+            width: this.biggest.width.toString(),
+            height: this.biggest.height.toString(),
+            srcSet,
+            ...attributes,
+          },
+          children: [],
+        },
+      ],
     }
   }
 
@@ -176,9 +237,7 @@ export class SizesMetadata extends Metadata {
    * @see {@link https://caniuse.com/css-media-resolution}
    */
   toCss(selector: string, options: MediaQueriesOptions = {}): string {
-    if (this.sizes.isValid) {
-      return this.devices.toMediaQueries(this, options).toCss(selector)
-    }
+    return this.devices.toMediaQueries(this, options).toCss(selector)
   }
 }
 
