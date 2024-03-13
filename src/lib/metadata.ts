@@ -1,4 +1,5 @@
 import type { MediaQueriesOptions } from './media-queries'
+import type Sizes from './sizes'
 import type DeviceSizes from './device-sizes'
 import type { Element, Root } from 'hast'
 import EleventyImage from '@11ty/eleventy-img'
@@ -115,10 +116,12 @@ export default class Metadata {
  */
 export class SizesMetadata extends Metadata {
   devices: DeviceSizes
+  sizes: Sizes
 
   constructor(metadata: EleventyImage.Metadata, devices: DeviceSizes) {
     super(metadata)
     this.devices = devices
+    this.sizes = devices.sizes
   }
 
   /**
@@ -130,7 +133,9 @@ export class SizesMetadata extends Metadata {
    * @return an HTML string
    */
   toPicture(attributes: HtmlOptions): string {
-    return super.toPicture({ sizes: this.devices.sizes.string, ...attributes })
+    if (this.sizes.isValid) {
+      return super.toPicture({ sizes: this.sizes.string, ...attributes })
+    }
   }
 
   /**
@@ -142,7 +147,9 @@ export class SizesMetadata extends Metadata {
    * @return an HTML string
    */
   toSources(attributes: HtmlOptions): string {
-    return super.toSources({ sizes: this.devices.sizes.string, ...attributes })
+    if (this.sizes.isValid) {
+      return super.toSources({ sizes: this.sizes.string, ...attributes })
+    }
   }
 
   /**
@@ -153,7 +160,9 @@ export class SizesMetadata extends Metadata {
    * @see {@link https://github.com/syntax-tree/hast}
    */
   toHast(attributes: HtmlOptions): HastOutput {
-    return super.toHast({ sizes: this.devices.sizes.string, ...attributes })
+    if (this.sizes.isValid) {
+      return super.toHast({ sizes: this.sizes.string, ...attributes })
+    }
   }
 
   /**
@@ -167,7 +176,9 @@ export class SizesMetadata extends Metadata {
    * @see {@link https://caniuse.com/css-media-resolution}
    */
   toCss(selector: string, options: MediaQueriesOptions = {}): string {
-    return this.devices.toMediaQueries(this, options).toCss(selector)
+    if (this.sizes.isValid) {
+      return this.devices.toMediaQueries(this, options).toCss(selector)
+    }
   }
 }
 
