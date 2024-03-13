@@ -13,10 +13,15 @@ export interface MediaQuery {
   format: string
 }
 
+// interface Image {
+//   source: string
+//   type: string
+// }
+
 export interface ImageSource {
   /** pixel density only, string list of srcs and dppx */
-  srcset?: string
-  type: string
+  srcSet?: string
+  type?: string
   media: string
 }
 
@@ -25,6 +30,55 @@ export interface ImageSet {
   dppx?: number
   type?: string
 }
+
+// benefit of separating out a function:
+// 1. keep private, minimize api exposure
+// 2. abstracting allows me to optimize queries for sources easily.
+//    same logic but just delete minWidth and minResolution before
+//    passing to the function.
+
+// type ImageMap = Map<string, Image>
+//
+// function getImageMap(queries: MediaQuery[]): Map<string, Image[]> {
+//   return queries.reduce((map, q) => {
+//     const andQueries: string[] = []
+//     const orQueries: string[][] = []
+//
+//     if (q.orientation) {
+//       andQueries.push(css`(orientation: ${q.orientation})`)
+//     }
+//     if (q.maxWidth) {
+//       andQueries.push(css`(max-width: ${q.maxWidth}px)`)
+//     }
+//     if (q.minWidth) {
+//       orQueries.push([css`(min-width: ${q.minWidth + 1}px)`])
+//     }
+//
+//     if (q.maxResolution || q.minResolution) {
+//       const resolutions: string[] = []
+//       if (q.maxResolution) {
+//         resolutions.push(css`(max-resolution: ${q.maxResolution * 96}dpi)`)
+//       }
+//       if (q.minResolution) {
+//         resolutions.push(css`(min-resolution: ${q.minResolution * 96 + 1}dpi)`)
+//       }
+//       orQueries.push([resolutions.join(' and ')])
+//     }
+//
+//     const selectors = permute(orQueries)
+//       .map(set => [...andQueries, ...set].join(' and '))
+//       .join(', ')
+//
+//     const images = map.get(selectors) || []
+//     images.push({
+//       source: q.url,
+//       type: q.sourceType,
+//       // dppx: q.maxResolution || undefined,
+//     })
+//
+//     return map.set(selectors, images)
+//   }, new Map<string, Image[]>())
+// }
 
 export type ImageSetMap = Map<string, ImageSet[]>
 
@@ -128,5 +182,21 @@ export default class MediaQueries {
           .trim()
       })
       .join('\n')
+  }
+
+  toHast(): ImageSource[] {
+    // this could be compressed by removing the min queries, only using max
+    // since you don't have to worry about overlapping queries with <picture> element
+    return Array.from(this.imageSet.entries()).reduce<ImageSource[]>(
+      (sources, [selectors, images]) =>
+        sources.concat(
+          images.map<ImageSource>(image => ({
+            srcSet: image.image,
+            type: image.type,
+            media: selectors,
+          }))
+        ),
+      []
+    )
   }
 }
