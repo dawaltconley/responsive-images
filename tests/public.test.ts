@@ -268,7 +268,6 @@ describe('responsive.fromSizes()', () => {
         formats: ['avif'],
       },
     )
-    // this is an invalid sizes attribute
     const result =
       '<img alt="" src="/img/output-360.avif" width="1639" height="921" srcset="/img/output-360.avif 360w, /img/output-624.avif 624w, /img/output-900.avif 900w, /img/output-1639.avif 1639w" sizes="(min-width: 1600px) 52vh, (max-width: 800px) 360px, 80vw">'
     expect(metadata.toPicture({ alt: '' })).toStrictEqual(result)
@@ -277,7 +276,6 @@ describe('responsive.fromSizes()', () => {
 
   test('produces valid html with multiple formats', async () => {
     const metadata = await resizing
-    // this is an invalid sizes attribute
     const expected =
       '<source type="image/webp" srcset="/img/output-360.webp 360w, /img/output-624.webp 624w, /img/output-900.webp 900w, /img/output-1639.webp 1639w" sizes="(min-width: 1600px) 52vh, (max-width: 800px) 360px, 80vw"><img alt="" src="/img/output-360.jpeg" width="1639" height="921" srcset="/img/output-360.jpeg 360w, /img/output-624.jpeg 624w, /img/output-900.jpeg 900w, /img/output-1639.jpeg 1639w" sizes="(min-width: 1600px) 52vh, (max-width: 800px) 360px, 80vw">'
     expect(metadata.toPicture({ alt: '' })).toStrictEqual(
