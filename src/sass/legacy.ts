@@ -4,7 +4,7 @@ import type {
   LegacyValue,
   LegacyAsyncFunction,
   LegacyAsyncFunctionDone,
-} from 'sass/types'
+} from 'sass'
 import { toSass } from 'sass-cast'
 import { fromSass as fromLegacySass } from 'sass-cast/legacy'
 

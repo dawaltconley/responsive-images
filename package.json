@@ -31,6 +31,9 @@
   ],
   "author": "Dylan Awalt-Conley",
   "license": "ISC",
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "@11ty/eleventy-fetch": "^4.0.1",
     "@11ty/eleventy-img": "^4.0.2",
@@ -48,6 +51,7 @@
     "sass": "^1.45.0"
   },
   "devDependencies": {
+    "@tsconfig/node18": "^18.2.2",
     "@types/lodash": "^4.17.0",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",

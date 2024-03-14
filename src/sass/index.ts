@@ -8,7 +8,7 @@
  * @module sass
  */
 
-import type { Value as SassValue, CustomFunction } from 'sass/types'
+import type { Value as SassValue, CustomFunction } from 'sass'
 import type ResponsiveImages from '../index'
 import cast from 'sass-cast'
 import DeviceSizes from '../lib/device-sizes'
