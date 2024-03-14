@@ -2,3 +2,9 @@ dist/
 img/
 .cache/
 package-lock.json
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+eleventy/_site

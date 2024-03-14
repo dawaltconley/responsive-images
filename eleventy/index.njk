@@ -1,0 +1,20 @@
+<html>
+  <head>
+    <title>Responsive Images Test Page</title>
+  </head>
+  <style>
+    body, main, picture, img {
+      max-width: 100%;
+    }
+    img {
+      height: auto;
+    }
+  </style>
+  <body>
+    <main>
+      {% picture "./tests/assets/landscape.jpeg",
+        alt="image with a basic min-width query",
+        sizes="(min-width: 1280px) 800px, 100vw" %}
+    </main>
+  </body>
+</html>
