@@ -1,5 +1,8 @@
 import { describe, test, expect } from 'vitest'
-import ResponsiveImages, { type ConfigOptions } from '../src/index'
+import ResponsiveImages, {
+  getWidthsFromSizes,
+  type ConfigOptions,
+} from '../src/index'
 import Metadata, { SizesMetadata } from '../src/lib/metadata'
 import { parse as parseHtml } from 'node-html-parser'
 import { toHtml } from 'hast-util-to-html'
@@ -337,5 +340,24 @@ describe('responsive.fromSizes()', () => {
     expect(await resizing.toCss('.foo')).toEqual((await resizing).toCss('.foo'))
     const toCss = resizing.toCss
     expect(await toCss('.foo')).toEqual((await resizing).toCss('.foo'))
+  })
+})
+
+describe('getWidthsFromSizes()', () => {
+  test('generates correct widths from a sizes string', () => {
+    expect(
+      getWidthsFromSizes(
+        '(min-width: 1600px) 52vh, (max-width: 800px) 360px, 80vw',
+        { devices, scalingFactor: 0.5 }
+      )
+    ).toEqual([1639, 900, 624, 360])
+  })
+  test('generates widths constrained by the image width', () => {
+    expect(
+      getWidthsFromSizes(
+        '(min-width: 1380px) 30vh, (max-width: 700px) 360px, 60vw',
+        { devices, scalingFactor: 0.5, width: 961 }
+      )
+    ).toEqual([961, 615, 360])
   })
 })
