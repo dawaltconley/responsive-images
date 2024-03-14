@@ -45,6 +45,7 @@ export default class ResponsiveImages extends Config {
   constructor(options?: ConfigOptions) {
     super(options)
     this.responsive = this.responsive.bind(this)
+    this.resize = this.resize.bind(this)
     this.pictureFromSizes = this.pictureFromSizes.bind(this)
     this.sourceFromSizes = this.sourceFromSizes.bind(this)
   }
