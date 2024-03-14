@@ -11,7 +11,7 @@ import {
   resizeFromSizes,
   ResizeFromSizesOptions,
 } from './utilities'
-import groupBy from 'lodash/groupBy'
+import groupBy from 'lodash.groupby'
 
 export default class DeviceSizes {
   readonly sizes: Sizes
