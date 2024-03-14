@@ -101,7 +101,7 @@ function parseConditions(queryString: string): MediaCondition | null {
 }
 
 function parseImageSize(
-  tokens: (string | ImageSize)[]
+  tokens: (string | ImageSize)[],
 ): ResizeInstructions<ImageSize> {
   if (tokens.length === 1 && ImageSize.isUnitValue(tokens[0])) {
     return { width: tokens[0] }

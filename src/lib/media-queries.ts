@@ -66,7 +66,7 @@ export default class MediaQueries {
         }
         if (q.minResolution) {
           resolutions.push(
-            css`(min-resolution: ${q.minResolution * 96 + 1}dpi)`
+            css`(min-resolution: ${q.minResolution * 96 + 1}dpi)`,
           )
         }
         orQueries.push([resolutions.join(' and ')])
@@ -109,7 +109,7 @@ export default class MediaQueries {
             img.dppx && fallback.dppx && img.dppx < fallback.dppx
               ? img
               : fallback,
-          images[images.length - 1]
+          images[images.length - 1],
         )
         return css`
           @media ${selectors} {

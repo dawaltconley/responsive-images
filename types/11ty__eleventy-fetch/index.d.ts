@@ -34,24 +34,24 @@ declare module '@11ty/eleventy-fetch' {
 
   export default function EleventyFetch<AssetType>(
     source: string,
-    options?: JsonOptions
+    options?: JsonOptions,
   ): Promise<AssetType>
   export default function EleventyFetch(
     source: string,
-    options?: TextOptions
+    options?: TextOptions,
   ): Promise<string>
   export default function EleventyFetch(
     source: string,
-    options?: BufferOptions
+    options?: BufferOptions,
   ): Promise<Buffer>
   export default function EleventyFetch(
     source: string,
-    options?: Options
+    options?: Options,
   ): Promise<unknown>
 
   export function queue<T>(
     source: string,
-    queueCallback: (...args: any[]) => T
+    queueCallback: (...args: any[]) => T,
   ): Promise<T>
 
   export interface Util {
@@ -98,7 +98,7 @@ declare module '@11ty/eleventy-fetch' {
     getResponseValue(response: Response, type: 'buffer'): Promise<Buffer>
     getResponseValue(
       response: Response,
-      type: CacheType
+      type: CacheType,
     ): Promise<AssetType | string | Buffer>
     fetch(optionsOverride?: JsonOptions): Promise<AssetType>
     fetch(optionsOverride?: TextOptions): Promise<string>

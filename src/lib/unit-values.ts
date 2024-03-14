@@ -52,8 +52,8 @@ export default class UnitValue<U extends Unit = Unit> {
     if (!isUnit(unit))
       throw new Error(
         `Invalid unit: ${unit}\nOnly the following are supported: ${Array.from(
-          units
-        ).join(' ')}`
+          units,
+        ).join(' ')}`,
       )
     return new UnitValue(value, unit)
   }
@@ -73,7 +73,7 @@ export class ImageSize<U extends ImageUnit = ImageUnit> extends UnitValue<U> {
     const parsed = super.parse(v)
     if (!parsed.uses('px', 'vw', 'vh')) {
       throw new Error(
-        `Invalid unit: ${parsed}\n ImageSize can only use: px vw vh`
+        `Invalid unit: ${parsed}\n ImageSize can only use: px vw vh`,
       )
     }
     return parsed
@@ -82,7 +82,7 @@ export class ImageSize<U extends ImageUnit = ImageUnit> extends UnitValue<U> {
 
 export type ResolutionUnit = 'dpi' | 'dpcm' | 'dppx' | 'x'
 export class Resolution<
-  U extends ResolutionUnit = ResolutionUnit
+  U extends ResolutionUnit = ResolutionUnit,
 > extends UnitValue<U> {
   constructor(value: number, unit: U) {
     super(value, unit)
@@ -92,7 +92,7 @@ export class Resolution<
     const parsed = super.parse(v)
     if (!parsed.uses('dpi', 'dpcm', 'dppx', 'x')) {
       throw new Error(
-        `Invalid unit: ${parsed}\n ResolutionValue can only use: dpi dpcm dppx x`
+        `Invalid unit: ${parsed}\n ResolutionValue can only use: dpi dpcm dppx x`,
       )
     }
     return parsed
@@ -101,7 +101,7 @@ export class Resolution<
 
 export function toDevicePixels(
   { value, unit }: ImageSize,
-  device: Device
+  device: Device,
 ): number {
   let pixels = value
   if (unit === 'vw') {

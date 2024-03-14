@@ -139,8 +139,8 @@ export default class Device implements Rect {
                 w: def.h,
                 h: def.w,
                 dppx,
-              })
-          )
+              }),
+          ),
         )
       }
     })
@@ -163,7 +163,7 @@ export default class Device implements Rect {
 function compare(
   device: number,
   feature: number,
-  prefix: 'max' | 'min' | null = null
+  prefix: 'max' | 'min' | null = null,
 ): boolean {
   return (
     (prefix === 'min' && device >= feature) ||

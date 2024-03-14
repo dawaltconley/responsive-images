@@ -105,7 +105,7 @@ describe('responsive.resize()', () => {
       '<source type="image/webp" srcset="/img/output-432.webp 432w, /img/output-1024.webp 1024w" sizes="100vw"><img alt="" src="/img/output-432.jpeg" width="1024" height="576" srcset="/img/output-432.jpeg 432w, /img/output-1024.jpeg 1024w" sizes="100vw">'
 
     expect(metadata.toPicture(props)).toStrictEqual(
-      `<picture>${result}</picture>`
+      `<picture>${result}</picture>`,
     )
     expect(metadata.toSources(props)).toStrictEqual(result)
     expect(toHtml(metadata.toHast(props))).toStrictEqual(result)
@@ -125,11 +125,12 @@ describe('responsive.resize()', () => {
       alt: '',
     }
     expect(
-      parseHtml(metadata.toPicture(attributes)).querySelector('img')?.attributes
+      parseHtml(metadata.toPicture(attributes)).querySelector('img')
+        ?.attributes,
     ).toMatchObject(attributes)
     expect(
       parseHtml(toHtml(metadata.toHast(attributes))).querySelector('img')
-        ?.attributes
+        ?.attributes,
     ).toMatchObject(attributes)
   })
 
@@ -142,7 +143,7 @@ describe('responsive.resize()', () => {
           widths: [1024, 432],
           formats: ['webp', null],
         })
-        .toSources({ sizes: '100vw', alt: '' })
+        .toSources({ sizes: '100vw', alt: '' }),
     ).toEqual(result)
     expect(
       await responsive('./tests/assets/xlg.jpg')
@@ -151,7 +152,7 @@ describe('responsive.resize()', () => {
           formats: ['webp', null],
         })
         .toHast({ sizes: '100vw', alt: '' })
-        .then(toHtml)
+        .then(toHtml),
     ).toEqual(result)
   })
 })
@@ -168,7 +169,7 @@ describe('responsive.stat()', () => {
   })
   test('returns correct metadata for a remote image', async () => {
     const metadata = await responsive(
-      'https://raw.githubusercontent.com/dawaltconley/responsive-images/main/tests/assets/landscape.jpeg'
+      'https://raw.githubusercontent.com/dawaltconley/responsive-images/main/tests/assets/landscape.jpeg',
     ).stat()
     expect(metadata).toMatchObject({
       format: 'jpeg',
@@ -181,7 +182,7 @@ describe('responsive.stat()', () => {
 
 describe('responsive.fromSizes()', () => {
   const resizing = responsive('./tests/assets/xlg.jpg').fromSizes(
-    '(min-width: 1600px) 52vh, (max-width: 800px) 360px, 80vw'
+    '(min-width: 1600px) 52vh, (max-width: 800px) 360px, 80vw',
   )
 
   test('returns metadata with expected structure', async () => {
@@ -224,7 +225,7 @@ describe('responsive.fromSizes()', () => {
 
   test('resizes remote images', async () => {
     const { metadata } = await responsive(
-      'https://raw.githubusercontent.com/dawaltconley/responsive-images/main/tests/assets/portrait.jpeg'
+      'https://raw.githubusercontent.com/dawaltconley/responsive-images/main/tests/assets/portrait.jpeg',
     ).fromSizes('(min-width: 1380px) 30vh, (max-width: 700px) 360px, 60vw')
     expect(JSON.parse(JSON.stringify(metadata))).toMatchObject({
       webp: [
@@ -242,7 +243,7 @@ describe('responsive.fromSizes()', () => {
 
   test('works with images too small to resize', async () => {
     const m = await responsive('./tests/assets/tiny.png').fromSizes(
-      '(min-width: 1536px) 476px, (min-width: 1280px) 396px, (min-width: 1024px) 438px, (min-width: 768px) 320px, (min-width: 640px) 576px, 100vw'
+      '(min-width: 1536px) 476px, (min-width: 1280px) 396px, (min-width: 1024px) 438px, (min-width: 768px) 320px, (min-width: 640px) 576px, 100vw',
     )
     expect(m).toBeInstanceOf(Metadata)
     expect(m.metadata).toHaveProperty('jpeg')
@@ -265,7 +266,7 @@ describe('responsive.fromSizes()', () => {
       '(min-width: 1600px) 52vh, (max-width: 800px) 360px, 80vw',
       {
         formats: ['avif'],
-      }
+      },
     )
     const result =
       '<img alt="" src="/img/output-360.avif" width="1639" height="921" srcset="/img/output-360.avif 360w, /img/output-624.avif 624w, /img/output-900.avif 900w, /img/output-1639.avif 1639w" sizes="(min-width: 1600px) 52vh, (max-width: 800px) 360px, 80vw">'
@@ -278,7 +279,7 @@ describe('responsive.fromSizes()', () => {
     const expected =
       '<source type="image/webp" srcset="/img/output-360.webp 360w, /img/output-624.webp 624w, /img/output-900.webp 900w, /img/output-1639.webp 1639w" sizes="(min-width: 1600px) 52vh, (max-width: 800px) 360px, 80vw"><img alt="" src="/img/output-360.jpeg" width="1639" height="921" srcset="/img/output-360.jpeg 360w, /img/output-624.jpeg 624w, /img/output-900.jpeg 900w, /img/output-1639.jpeg 1639w" sizes="(min-width: 1600px) 52vh, (max-width: 800px) 360px, 80vw">'
     expect(metadata.toPicture({ alt: '' })).toStrictEqual(
-      `<picture>${expected}</picture>`
+      `<picture>${expected}</picture>`,
     )
     expect(metadata.toSources({ alt: '' })).toStrictEqual(expected)
     expect(toHtml(metadata.toHast({ alt: '' }))).toStrictEqual(expected)
@@ -293,7 +294,7 @@ describe('responsive.fromSizes()', () => {
         foo: 'bar',
         sizes: '100vw',
         alt: '',
-      })
+      }),
     ).querySelector('img')?.attributes
 
     expect(output).toMatchObject({
@@ -321,7 +322,7 @@ describe('responsive.fromSizes()', () => {
         "@media (orientation: portrait) and (max-width: 432px) and (min-resolution: 241dpi) { .bg-test { background-image: image-set(url('/img/output-1639.webp') type('image/webp'), url('/img/output-1639.jpeg') type('image/jpeg')); } @supports not (background-image: image-set(url('/img/output-1639.webp') type('image/webp'), url('/img/output-1639.jpeg') type('image/jpeg'))) { .bg-test { background-image: url('/img/output-1639.jpeg'); } } }",
         "@media (orientation: portrait) and (max-width: 432px) and (max-resolution: 240dpi) and (min-resolution: 97dpi) { .bg-test { background-image: image-set(url('/img/output-900.webp') type('image/webp'), url('/img/output-900.jpeg') type('image/jpeg')); } @supports not (background-image: image-set(url('/img/output-900.webp') type('image/webp'), url('/img/output-900.jpeg') type('image/jpeg'))) { .bg-test { background-image: url('/img/output-900.jpeg'); } } }",
         "@media (orientation: portrait) and (max-width: 432px) and (max-resolution: 96dpi) { .bg-test { background-image: image-set(url('/img/output-360.webp') type('image/webp'), url('/img/output-360.jpeg') type('image/jpeg')); } @supports not (background-image: image-set(url('/img/output-360.webp') type('image/webp'), url('/img/output-360.jpeg') type('image/jpeg'))) { .bg-test { background-image: url('/img/output-360.jpeg'); } } }",
-      ].join('\n')
+      ].join('\n'),
     )
   })
 
@@ -329,13 +330,13 @@ describe('responsive.fromSizes()', () => {
     expect(await resizing.devices).toBe((await resizing).devices)
     expect(await resizing.devices.sizes).toBe((await resizing).devices.sizes)
     expect(await resizing.devices.sizes.string).toBe(
-      (await resizing).devices.sizes.string
+      (await resizing).devices.sizes.string,
     )
     expect(await resizing.toSources({ alt: '' })).toEqual(
-      (await resizing).toSources({ alt: '' })
+      (await resizing).toSources({ alt: '' }),
     )
     expect(await resizing.toHast({ alt: '' })).toEqual(
-      (await resizing).toHast({ alt: '' })
+      (await resizing).toHast({ alt: '' }),
     )
     expect(await resizing.toCss('.foo')).toEqual((await resizing).toCss('.foo'))
     const toCss = resizing.toCss
@@ -348,16 +349,16 @@ describe('getWidthsFromSizes()', () => {
     expect(
       getWidthsFromSizes(
         '(min-width: 1600px) 52vh, (max-width: 800px) 360px, 80vw',
-        { devices, scalingFactor: 0.5 }
-      )
+        { devices, scalingFactor: 0.5 },
+      ),
     ).toEqual([1639, 900, 624, 360])
   })
   test('generates widths constrained by the image width', () => {
     expect(
       getWidthsFromSizes(
         '(min-width: 1380px) 30vh, (max-width: 700px) 360px, 60vw',
-        { devices, scalingFactor: 0.5, width: 961 }
-      )
+        { devices, scalingFactor: 0.5, width: 961 },
+      ),
     ).toEqual([961, 615, 360])
   })
 })

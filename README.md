@@ -33,7 +33,7 @@ const { responsive } = new ResponsiveImages({ scalingFactor: 0.5 })
 // resize an image based on a sizes query string
 // this generates the required images and returns an object representing them
 const metadata = await responsive('./path/to/image.png').fromSizes(
-  '(max-width: 1280px) 800px, 100vw'
+  '(max-width: 1280px) 800px, 100vw',
 )
 
 // call one of the available methods to get the required markup

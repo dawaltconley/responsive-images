@@ -32,13 +32,13 @@ export type ChainedPromise<T> = {
   [K in keyof T]: T[K] extends (...args: any[]) => any // eslint-disable-line @typescript-eslint/no-explicit-any
     ? Async<T[K]>
     : T[K] extends object
-    ? ChainedPromise<T[K]>
-    : PromiseLike<T[K]>
+      ? ChainedPromise<T[K]>
+      : PromiseLike<T[K]>
 } & PromiseLike<T>
 
 export function chain<T>(
   item: T | PromiseLike<T>,
-  parent?: PromiseLike<unknown>
+  parent?: PromiseLike<unknown>,
 ): ChainedPromise<T> {
   // wrap proxied promise in a function, which makes it callable in case it resolves to a function
   return new Proxy(() => Promise.resolve(item), {
@@ -56,10 +56,10 @@ export function chain<T>(
             return Reflect.get(o, accessed)
           }
           throw new Error(
-            `Tried to access the property of a primitive (${typeof o}) in an ChainedPromise chain. Primitives must be awaited before being used.`
+            `Tried to access the property of a primitive (${typeof o}) in an ChainedPromise chain. Primitives must be awaited before being used.`,
           )
         }),
-        target
+        target,
       )
     },
     // treat function calls as calls to the resolved method
@@ -67,7 +67,7 @@ export function chain<T>(
       const [object, method] = await Promise.all([parent, getMethod()])
       if (typeof method !== 'function') {
         throw new TypeError(
-          `${method?.constructor.name || 'method'} is not callable`
+          `${method?.constructor.name || 'method'} is not callable`,
         )
       }
       return method.apply(object, argList)

@@ -42,11 +42,11 @@ const validImageFormats: ValidImageFormat[] = [
 ]
 
 export const isValidImageFormat = (
-  test: string | null
+  test: string | null,
 ): test is ValidImageFormat => validImageFormats.some(f => f === test)
 
 export const assertValidImageFormat = (
-  test: string | null
+  test: string | null,
 ): ValidImageFormat => {
   if (!isValidImageFormat(test))
     throw new Error(`Invalid image format: ${test}`)

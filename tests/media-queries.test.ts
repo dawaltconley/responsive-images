@@ -22,7 +22,7 @@ describe('generateMediaQueries()', () => {
       defaults: {
         formats: [null],
       },
-    })
+    }),
   )
 
   test('generates media query data from sizes', async () => {

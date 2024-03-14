@@ -76,7 +76,7 @@ export function getSassFunctions({
       const formats = args[2].asList
         .toArray()
         .map(s =>
-          assertValidImageFormat(s.realNull && s.assertString('formats').text)
+          assertValidImageFormat(s.realNull && s.assertString('formats').text),
         )
 
       const { metadata } = await responsive(src).resize({

@@ -106,8 +106,8 @@ describe('Sizes.parse()', () => {
 
     expect(
       Sizes.parse(
-        '(min-width: 1536px) 718.5px, (min-width: 1280px) 590px, (min-width: 1024px) 468px, (min-width: 768px) 704px, (min-width: 640px) 576px, 100vw'
-      )
+        '(min-width: 1536px) 718.5px, (min-width: 1280px) 590px, (min-width: 1024px) 468px, (min-width: 768px) 704px, (min-width: 640px) 576px, 100vw',
+      ),
     ).toEqual([
       {
         conditions: set(cloneDeep(condition), 'children[0].value.value', 1536),
@@ -144,7 +144,7 @@ describe('Sizes.parse()', () => {
 
   test('parses combined media queries with the "and" keyword', () => {
     expect(
-      Sizes.parse('(max-width: 780px) and (max-height: 720px) 60vh, 400px')
+      Sizes.parse('(max-width: 780px) and (max-height: 720px) 60vh, 400px'),
     ).toEqual([
       {
         conditions: {
@@ -423,7 +423,7 @@ describe('new DeviceSizes()', () => {
 
     const sizes = new DeviceSizes(
       new Sizes('(min-width: 680px) 400px, 100vw'),
-      devices
+      devices,
     )
 
     expect(sizes.targets).toEqual([

@@ -16,7 +16,7 @@ import type Metadata from './metadata'
 export function filterSizes<T>(
   list: T[],
   factor?: number,
-  calculate: (item: T) => number = filterFallback
+  calculate: (item: T) => number = filterFallback,
 ): T[] {
   // sort list from large to small
   const sorted = [...list].sort((a, b) => calculate(b) - calculate(a))
@@ -46,7 +46,7 @@ export type ResizeFromSizesOptions = ImageOptions & { minScale?: number }
 export async function resizeFromSizes(
   image: Image | ConfiguredImage,
   devices: DeviceSizes,
-  { minScale, ...options }: ResizeFromSizesOptions = {}
+  { minScale, ...options }: ResizeFromSizesOptions = {},
 ): Promise<Metadata> {
   const { width, height } = await image.stat()
   const scalingFactor =
@@ -55,7 +55,7 @@ export async function resizeFromSizes(
     devices.targets,
     scalingFactor,
     width,
-    height
+    height,
   )
   return image.resize({ widths, ...options })
 }
@@ -69,7 +69,7 @@ export function getWidthsFromInstructions(
   instructions: ResizeInstructions<number>[],
   scalingFactor?: number,
   width?: number,
-  height?: number
+  height?: number,
 ): number[] {
   const aspectRatio = width && height ? width / height : null
   let targets = instructions.map(target => {
@@ -77,7 +77,7 @@ export function getWidthsFromInstructions(
       return instructionsToWidth(target, aspectRatio)
     } else if ('height' in target) {
       throw new Error(
-        'You must specify an aspectRatio when getting widths from a non-standard sizes string.'
+        'You must specify an aspectRatio when getting widths from a non-standard sizes string.',
       )
     }
     return target.width
@@ -91,7 +91,7 @@ export function getWidthsFromInstructions(
 
 export function instructionsToWidth(
   resize: ResizeInstructions<number>,
-  aspect: number
+  aspect: number,
 ): number {
   if ('fit' in resize) {
     const resizeAspect = resize.width / resize.height
@@ -112,7 +112,7 @@ export function instructionsToWidth(
 export const permute = <T>(
   matrix: T[][],
   permutations: T[][] = [],
-  a: T[] = []
+  a: T[] = [],
 ): T[][] => {
   if (a.length === matrix.length) {
     // if is matrix length, consider it a complete permutation and add it to perms

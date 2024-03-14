@@ -31,7 +31,7 @@ export function getWidthsFromSizes(
     devices = defaults.devices,
     width,
     height,
-  }: WidthsFromSizesOptions = {}
+  }: WidthsFromSizesOptions = {},
 ): number[] {
   const parsedSizes = new Sizes(sizes)
   const targets = Device.fromDefinitions(devices)

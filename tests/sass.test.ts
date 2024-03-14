@@ -35,7 +35,7 @@ const defaultConfig: ConfigOptions = {
 
 const compile = async (
   sassString: string,
-  config: ConfigOptions = {}
+  config: ConfigOptions = {},
 ): Promise<string> => {
   const merged = new ResponsiveImages(_.merge(defaultConfig, config))
   return sass
@@ -48,7 +48,7 @@ const compile = async (
 
 const compileLegacy = async (
   sassString: string,
-  config: ConfigOptions = {}
+  config: ConfigOptions = {},
 ): Promise<string> => {
   const merged = new ResponsiveImages(_.merge(defaultConfig, config))
   return new Promise((resolve, reject) =>
@@ -61,8 +61,8 @@ const compileLegacy = async (
       (e, result) => {
         if (e) reject(e)
         if (result) resolve(result.css.toString())
-      }
-    )
+      },
+    ),
   )
 }
 
@@ -225,7 +225,7 @@ describe('bg mixin', () => {
             @include responsive.bg('./tests/assets/xlg.jpg');
           }
         `,
-        { sassPrefix }
+        { sassPrefix },
       ),
       compile(defaultExpected),
     ])

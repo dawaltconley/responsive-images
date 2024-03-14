@@ -12,7 +12,7 @@ const legacyToModern = (value: LegacyValue): Value =>
   toSass(fromLegacySass(value))
 
 export const toLegacyAsyncFunctions = (
-  sassFunctions: Record<string, CustomFunction<'async'>>
+  sassFunctions: Record<string, CustomFunction<'async'>>,
 ) => {
   return Object.entries(sassFunctions).reduce<
     Record<string, LegacyAsyncFunction>
@@ -24,6 +24,6 @@ export const toLegacyAsyncFunctions = (
         Promise.resolve(modernFn(args.map(legacyToModern))).then(done)
       },
     }),
-    {}
+    {},
   )
 }

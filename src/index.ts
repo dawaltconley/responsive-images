@@ -61,7 +61,7 @@ export default class ResponsiveImages extends Config {
 
   async resize(
     image: ImageSource,
-    options: ImageOptions = {}
+    options: ImageOptions = {},
   ): Promise<EleventyMetadata> {
     const { metadata } = await this.responsive(image).resize(options)
     return metadata
@@ -77,7 +77,7 @@ export default class ResponsiveImages extends Config {
 
   async pictureFromSizes(
     image: ImageSource,
-    kwargs: MixedOptions
+    kwargs: MixedOptions,
   ): Promise<string> {
     const [options, properties] = this.#handleMixedOptions(kwargs)
     const { sizes = '100vw' } = properties
@@ -88,7 +88,7 @@ export default class ResponsiveImages extends Config {
 
   async sourceFromSizes(
     image: ImageSource,
-    kwargs: MixedOptions
+    kwargs: MixedOptions,
   ): Promise<string> {
     const [options, properties] = this.#handleMixedOptions(kwargs)
     const { sizes = '100vw' } = properties
@@ -103,7 +103,7 @@ export default class ResponsiveImages extends Config {
    */
   getWidthsFromSizes(
     sizes: string,
-    { width, height }: Pick<WidthsFromSizesOptions, 'width' | 'height'> = {}
+    { width, height }: Pick<WidthsFromSizesOptions, 'width' | 'height'> = {},
   ): number[] {
     return getWidthsFromSizes(sizes, {
       devices: this.devices,

@@ -93,7 +93,7 @@ const liquidKwargsTag = (cb: (...args: any[]) => string | Promise<string>) =>
 
 export default function (
   eleventyConfig: any,
-  options: ConfigOptions | ResponsiveImages = {}
+  options: ConfigOptions | ResponsiveImages = {},
 ): void {
   const configured: ResponsiveImages =
     options instanceof ResponsiveImages
@@ -109,7 +109,7 @@ export default function (
   eleventyConfig.addNunjucksAsyncFilter('picture', filterify(pictureFromSizes))
   eleventyConfig.addNunjucksAsyncShortcode(
     'picture',
-    handleKwargs(pictureFromSizes)
+    handleKwargs(pictureFromSizes),
   )
 
   // Liquid

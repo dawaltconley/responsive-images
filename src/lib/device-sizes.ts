@@ -27,7 +27,7 @@ export default class DeviceSizes {
 
     const { landscape, portrait } = groupBy(
       this.devices.map((_d, i) => i),
-      i => this.devices[i].orientation
+      i => this.devices[i].orientation,
     )
     this.landscape = landscape
     this.portrait = portrait
@@ -38,13 +38,13 @@ export default class DeviceSizes {
       groupBy(devices, d => {
         const { w, h } = this.devices[d]
         return `${w},${h}`
-      })
+      }),
     )
   }
 
   async resize(
     image: Image,
-    options: ResizeFromSizesOptions = {}
+    options: ResizeFromSizesOptions = {},
   ): Promise<Metadata> {
     return resizeFromSizes(image, this, options)
   }
@@ -56,7 +56,7 @@ export default class DeviceSizes {
    */
   mapMetadata({ metadata }: Metadata): MetadataEntry[][] {
     const byWidth = Object.values(
-      groupBy(Object.values(metadata).flat(), ({ width }) => width)
+      groupBy(Object.values(metadata).flat(), ({ width }) => width),
     ).sort((a, b) => b[0].width - a[0].width)
 
     return this.targets.map<MetadataEntry[]>(target => {
@@ -64,7 +64,7 @@ export default class DeviceSizes {
         const { width, height } = byWidth[i][0]
         const next = byWidth[i + 1]?.[0]
         const targetWidth = Math.ceil(
-          instructionsToWidth(target, width / height)
+          instructionsToWidth(target, width / height),
         )
         if (width >= targetWidth && (!next || next.width < targetWidth)) {
           return byWidth[i]
@@ -76,7 +76,7 @@ export default class DeviceSizes {
 
   toMediaQueries(
     metadata: Metadata,
-    { orientations = ['landscape', 'portrait'] }: MediaQueriesOptions = {}
+    { orientations = ['landscape', 'portrait'] }: MediaQueriesOptions = {},
   ): MediaQueries {
     const queries: MediaQuery[] = []
     const metaMap = this.mapMetadata(metadata)
@@ -105,7 +105,7 @@ export default class DeviceSizes {
               url,
               sourceType,
               format,
-            }))
+            })),
           )
         })
       })

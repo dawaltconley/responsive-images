@@ -64,7 +64,7 @@ describe('filterSizes()', () => {
   test('filters no items with a scaling factor of 1', () => {
     const sortedWidths = [...sampleWidths].sort((a, b) => b - a)
     const sortedDevices = [...sampleDevices].sort(
-      (a, b) => b.w * b.h - a.w * a.h
+      (a, b) => b.w * b.h - a.w * a.h,
     )
     expect(filterSizes(sampleWidths, 1)).toEqual(sortedWidths)
     expect(filterSizes(sampleDevices, 1, calcDevices)).toEqual(sortedDevices)
@@ -90,7 +90,7 @@ describe('permute()', () => {
       permute([
         ['a', 'b'],
         ['c', 'd', 'e'],
-      ])
+      ]),
     ).toEqual([
       ['a', 'c'],
       ['a', 'd'],
@@ -107,7 +107,7 @@ describe('permute()', () => {
         ['a', 'b', 'c'],
         ['c', 'd', 'e'],
         ['g', 'h'],
-      ])
+      ]),
     ).toEqual([
       ['a', 'c', 'g'],
       ['a', 'c', 'h'],

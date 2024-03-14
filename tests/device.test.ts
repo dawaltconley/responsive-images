@@ -95,7 +95,7 @@ describe('Device.fromDefinitions()', () => {
           h: 1400,
           dppx: [1.5],
         },
-      ])
+      ]),
     )
 
     expect(devices).toEqual([
@@ -115,7 +115,7 @@ describe('Device.fromDefinitions()', () => {
       Device.fromDefinitions([
         { w: 800, h: 600, dppx: [1, 2], flip: true },
         new Device({ w: 1400, h: 1400, dppx: 1.5 }),
-      ])
+      ]),
     ).toEqual([
       new Device({ w: 800, h: 600, dppx: 1 }),
       new Device({ w: 800, h: 600, dppx: 2 }),
@@ -241,7 +241,7 @@ describe('Device.getImage()', () => {
 
   function run({ device, images }: Test, sizes: Sizes): void {
     expect(
-      Device.fromDefinitions([device]).map(d => d.getImage(sizes))
+      Device.fromDefinitions([device]).map(d => d.getImage(sizes)),
     ).toEqual(images)
   }
 
@@ -425,7 +425,7 @@ describe('Device.getImage()', () => {
 
   test('returns images using multiple conditions', () => {
     const sizes = new Sizes(
-      '(min-width: 1536px) 718.5px, (min-width: 1280px) 590px, (min-width: 1024px) 468px, (min-width: 768px) 704px, (min-width: 640px) 576px, 100vw'
+      '(min-width: 1536px) 718.5px, (min-width: 1280px) 590px, (min-width: 1024px) 468px, (min-width: 768px) 704px, (min-width: 640px) 576px, 100vw',
     )
     const device = new Device({ w: 1000, h: 400 })
     device.w = 1920
@@ -444,7 +444,7 @@ describe('Device.getImage()', () => {
 
   test('handles multiple "and" media queries', () => {
     const sizes = new Sizes(
-      '(max-width: 780px) and (max-height: 720px) 600px, 400px'
+      '(max-width: 780px) and (max-height: 720px) 600px, 400px',
     )
     const pass: Test = {
       device: { w: 600, h: 480 },
@@ -467,7 +467,7 @@ describe('Device.getImage()', () => {
 
   test('handles multiple "or" media queries', () => {
     const sizes = new Sizes(
-      '(min-width: 900px) or ((max-width: 780px) and (max-height: 720px)) 600px, 400px'
+      '(min-width: 900px) or ((max-width: 780px) and (max-height: 720px)) 600px, 400px',
     )
     // pass with max width/height
     const pass1: Test = {
@@ -491,7 +491,7 @@ describe('Device.getImage()', () => {
 
   test('handles "not" media queries', () => {
     const sizes = new Sizes(
-      '(not (max-width: 780px)) and (max-height: 720px) 600px, 400px'
+      '(not (max-width: 780px)) and (max-height: 720px) 600px, 400px',
     )
     const pass: Test = {
       device: { w: 800, h: 600 },
@@ -514,7 +514,7 @@ describe('Device.getImage()', () => {
 
   test('handles mixed and nested logic', () => {
     const sizes = new Sizes(
-      'not ((min-width: 900px) or ((max-width: 780px) and (max-height: 720px))) 600px, 400px'
+      'not ((min-width: 900px) or ((max-width: 780px) and (max-height: 720px))) 600px, 400px',
     )
     // inverting or test
     const pass: Test = {

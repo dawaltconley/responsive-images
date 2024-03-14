@@ -22,7 +22,7 @@ export default class Image {
 
   constructor(
     src: ImageSource,
-    { disableResize = false, ...options }: ImageOptions = {}
+    { disableResize = false, ...options }: ImageOptions = {},
   ) {
     this.src = src
     this.defaults = options
@@ -59,7 +59,7 @@ export default class Image {
       const cache = new RemoteAssetCache(
         src,
         cacheOptions?.directory,
-        cacheOptions
+        cacheOptions,
       )
       await cache.fetch()
       const metadata = await EleventyImage(cache.getCachedContentsPath(), {
@@ -87,7 +87,7 @@ export class ConfiguredImage extends Image {
 
   constructor(
     image: ImageSource,
-    { defaults, scalingFactor, disable, devices }: Config
+    { defaults, scalingFactor, disable, devices }: Config,
   ) {
     super(image, { ...defaults, disableResize: disable })
     this.devices = devices
@@ -103,7 +103,7 @@ export class ConfiguredImage extends Image {
    */
   fromSizes(
     sizesQueryString: string,
-    options: ImageOptions = {}
+    options: ImageOptions = {},
   ): ChainedPromise<SizesMetadata> {
     const getMetadata = async () => {
       const sizes = new DeviceSizes(sizesQueryString, this.devices)
