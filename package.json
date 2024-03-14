@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "compile": "npx tsc",
-    "build": "./build.sh",
+    "build": "./build.sh dist",
     "lint": "npx eslint . && npx stylelint src/sass/_mixins.scss && npx prettier -c .",
     "test": "npx vitest run && npm run lint",
     "test:watch": "npx vitest",
