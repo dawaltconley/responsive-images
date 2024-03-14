@@ -42,7 +42,7 @@
     "liquid-args": "^1.1.0",
     "lodash.groupby": "^4.6.0",
     "media-query-parser": "^2.0.2",
-    "sass-cast": "^0.4.3"
+    "sass-cast": "^0.5.6"
   },
   "optionalDependencies": {
     "sass": "^1.45.0"
