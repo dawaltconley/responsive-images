@@ -151,6 +151,7 @@ export class SizesMetadata extends Metadata {
     super(metadata)
     this.devices = devices
     this.sizes = devices.sizes
+    this.needsPicture ||= !devices.sizes.isValid // also needs a picture wrapper if using media queries
   }
 
   /**
