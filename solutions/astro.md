@@ -65,7 +65,7 @@ that `astro dev` and `astro build` are run from.
 ### Component
 
 Here is an example component file that configures ResponsiveImages and calls its
-`sourceFromSizes` method. You may want to import a configured instance into the
+`toSources` method. You may want to import a configured instance into the
 component instead, especially if you plan to use other methods in other build
 contexts, like the sass mixins.
 

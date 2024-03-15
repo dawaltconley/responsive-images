@@ -135,20 +135,19 @@ functions named `image-resize` and `image-queries`.
 
 ```js
 import ResponsiveImages from '@dawaltconley/responsive-images'
+import { getSassFunctions } from '@dawaltconley/responsive-images/sass'
 import sass from 'sass'
 
-const { sassFunctions } = new ResponsiveImages({
+const config = new ResponsiveImages({
   sassPrefix: 'custom-prefix',
 })
 
-// only the compileAsync and compileStringAsync methods are supported
 sass.compileAsync('./styles/images.scss', {
-  loadPaths: ['./node_modules'],
-  functions: sassFunctions,
+  functions: getSassFunctions(config),
 })
 ```
 
-If changed, the same prefix should be passed to the mixins when importing.
+If changed, you must also pass this prefix when importing the mixins.
 
 ```scss
 @use '@dawaltconley/responsive-images' with (
