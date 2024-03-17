@@ -69,6 +69,9 @@ function hastToHtml(hast: HastOutput): string {
   }, '')
 }
 
+// TODO if I can handle `toCss` for single-image metadata, I can simplify this by just having one
+// Metadata class, where `sizes` defaults to 100vw if there's not a provided `sizes` string...
+
 /**
  * An object representing generated responsive images, and providing methods to represent that in markup.
  */
