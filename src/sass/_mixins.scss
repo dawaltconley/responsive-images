@@ -52,13 +52,16 @@ $image-queries: meta.get-function('#{$prefix}-queries');
       @if list.length($images) > 1 {
         $image-set: ();
         @each $img in $images {
-          $url: map.get($img, image);
+          $image: (url('#{map.get($img, image)}'));
+          $dppx: map.get($img, dppx);
+          @if ($dppx) {
+            $image: list.append($image, '#{$dppx}x', $separator: space);
+          }
           $type: map.get($img, type);
-          $image-set: list.append(
-            $image-set,
-            (url('#{$url}') type('#{$type}')),
-            $separator: comma
-          );
+          @if ($type) {
+            $image: list.append($image, type('#{$type}'), $separator: space);
+          }
+          $image-set: list.append($image-set, $image, $separator: comma);
         }
         $image-set: image-set(#{$image-set});
         $image-set: list.join(
@@ -75,9 +78,6 @@ $image-queries: meta.get-function('#{$prefix}-queries');
         );
 
         background-image: $image-set;
-        @supports not (background-image: #{join-str($image-set, ', ')}) {
-          background-image: $fallback;
-        }
       } @else {
         background-image: $fallback;
       }

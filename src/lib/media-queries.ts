@@ -2,15 +2,24 @@ import { type Orientation } from './common'
 import { permute } from './utilities'
 import { css } from './syntax'
 
+// export interface MediaQuery {
+//   orientation?: Orientation | false
+//   maxWidth?: number | false
+//   minWidth?: number | false
+//   maxResolution?: number | false
+//   minResolution?: number | false
+//   url: string
+//   sourceType: string
+//   format: string
+// }
+
 export interface MediaQuery {
-  orientation: Orientation | false
+  orientation?: Orientation | false
   maxWidth?: number | false
   minWidth?: number | false
-  maxResolution?: number | false
-  minResolution?: number | false
-  url: string
-  sourceType: string
-  format: string
+  // maxHeight?: number | false
+  // minHeight?: number | false
+  images: ImageSet[]
 }
 
 // interface Image {
@@ -110,32 +119,18 @@ export default class MediaQueries {
       if (q.minWidth) {
         orQueries.push([css`(min-width: ${q.minWidth + 1}px)`])
       }
-
-      if (q.maxResolution || q.minResolution) {
-        const resolutions: string[] = []
-        if (q.maxResolution) {
-          resolutions.push(css`(max-resolution: ${q.maxResolution * 96}dpi)`)
-        }
-        if (q.minResolution) {
-          resolutions.push(
-            css`(min-resolution: ${q.minResolution * 96 + 1}dpi)`,
-          )
-        }
-        orQueries.push([resolutions.join(' and ')])
-      }
+      // if (q.maxHeight) {
+      //   andQueries.push(css`(max-height: ${q.maxHeight}px)`)
+      // }
+      // if (q.minHeight) {
+      //   orQueries.push([css`(min-height: ${q.minHeight + 1}px)`])
+      // }
 
       const selectors = permute(orQueries)
         .map(set => [...andQueries, ...set].join(' and '))
         .join(', ')
 
-      const images = map.get(selectors) || []
-      images.push({
-        image: q.url,
-        type: q.sourceType,
-        // dppx: q.maxResolution || undefined,
-      })
-
-      return map.set(selectors, images)
+      return map.set(selectors, q.images) // doesn't need to be a map
     }, new Map<string, ImageSet[]>())
 
     return this.#imageSet
@@ -152,27 +147,49 @@ export default class MediaQueries {
               }
             }
           `
+        // const noDppx =
+        //   images
+        //     .map(i => i.dppx)
+        //     .filter((d, i, arr) => d !== undefined && arr.indexOf(d) === i)
+        //     .length < 2
+        // const noTypes =
+        //   images
+        //     .map(i => i.type)
+        //     .filter((t, i, arr) => t !== undefined && arr.indexOf(t) === i)
+        //     .length < 2
 
         // TODO don't use image-set when there's only one type
         const imageSet = `image-set(${images
-          .map(({ image, type }) => `url('${image}') type('${type}')`)
+          .map(({ image, dppx, type }) => {
+            const options = [`url('${image}')`]
+            if (/* !noDppx && */ dppx) {
+              options.push(`${dppx}x`)
+            }
+            if (/* !noTypes && */ type) {
+              options.push(`type('${type}')`)
+            }
+            return options.join(' ')
+          })
           .join(', ')})`
-        const fallback = images.reduce(
-          (fallback, img) =>
-            img.dppx && fallback.dppx && img.dppx < fallback.dppx
-              ? img
-              : fallback,
-          images[images.length - 1],
-        )
+
+        // TODO probably handle fallback / supports separately, call this function again with modified arguments
+        // const fallback = images.reduce(
+        //   (fallback, img) =>
+        //     img.dppx && fallback.dppx && img.dppx < fallback.dppx
+        //       ? img
+        //       : fallback,
+        //   images[images.length - 1],
+        // )
+        // @supports not (background-image: ${imageSet}) {
+        //   ${selector} {
+        //     background-image: url('${fallback.image}');
+        //   }
+        // }
+
         return css`
           @media ${selectors} {
             ${selector} {
               background-image: ${imageSet};
-            }
-            @supports not (background-image: ${imageSet}) {
-              ${selector} {
-                background-image: url('${fallback.image}');
-              }
             }
           }
         `
@@ -186,15 +203,32 @@ export default class MediaQueries {
     // this could be compressed by removing the min queries, only using max
     // since you don't have to worry about overlapping queries with <picture> element
     return Array.from(this.imageSet.entries()).reduce<ImageSource[]>(
-      (sources, [selectors, images]) =>
-        sources.concat(
-          images.map<ImageSource>(image => ({
-            srcSet: image.image,
-            type: image.type,
+      (sources, [selectors, images]) => {
+        const byFormat = images.reduce((map, { image, type, dppx }) => {
+          const sources = map.get(type) || []
+          sources.push({ image, dppx })
+          return map.set(type, sources)
+        }, new Map<string | undefined, ImageSet[]>())
+        return sources.concat(
+          Array.from(byFormat).map<ImageSource>(([type, sources]) => ({
+            type,
             media: selectors,
-          }))
-        ),
-      []
+            srcSet:
+              sources.length > 1
+                ? sources
+                    .map(({ image, dppx = '1' }) => `${image} ${dppx}x`)
+                    .join(' ')
+                : `${sources[0].image}`,
+          })),
+          // images.map<ImageSource>(({image, type, dppx}) => ({
+          //   srcSet: image,
+          //   type,
+          //
+          //   media: selectors,
+          // })),
+        )
+      },
+      [],
     )
   }
 }

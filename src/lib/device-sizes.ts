@@ -5,7 +5,7 @@ import type Image from './image'
 import type Metadata from './metadata'
 import Sizes from './sizes'
 import Device from './device'
-import MediaQueries from './media-queries'
+import MediaQueries, { type ImageSet } from './media-queries'
 import {
   instructionsToWidth,
   resizeFromSizes,
@@ -89,24 +89,38 @@ export default class DeviceSizes {
         const maxWidth = i > 0 && current?.w
         const minWidth = next && next?.w
 
-        size.forEach((d, j, devices) => {
-          const current = this.devices[d]
-          const next = this.devices[devices[j + 1]]
-          const maxResolution = j > 0 && current.dppx
-          const minResolution = next && next.dppx
+        queries.push({
+          orientation,
+          maxWidth,
+          minWidth,
+          images: size.reduce<ImageSet[]>((images, d) => {
+            // const current = this.devices[d]
+            // const next = this.devices[devices[j + 1]]
 
-          queries.push(
-            ...metaMap[d].map<MediaQuery>(({ url, sourceType, format }) => ({
-              orientation,
-              maxWidth,
-              minWidth,
-              maxResolution,
-              minResolution,
-              url,
-              sourceType,
-              format,
-            })),
-          )
+            return images.concat(
+              ...metaMap[d].map<ImageSet>(({ url, sourceType }) => ({
+                image: url,
+                type: sourceType,
+                dppx: this.devices[d].dppx,
+              })),
+            )
+
+            // const maxResolution = j > 0 && current.dppx
+            // const minResolution = next && next.dppx
+
+            // queries.push(
+            //   ...metaMap[d].map<MediaQuery>(({ url, sourceType, format }) => ({
+            //     orientation,
+            //     maxWidth,
+            //     minWidth,
+            //     // maxResolution,
+            //     // minResolution,
+            //     // url,
+            //     // sourceType,
+            //     // format,
+            //   })),
+            // )
+          }, []),
         })
       })
     }

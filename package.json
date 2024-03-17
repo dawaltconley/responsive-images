@@ -17,7 +17,7 @@
     "compile": "npx tsc",
     "build": "./build.sh dist",
     "lint": "npx eslint . && npx stylelint src/sass/_mixins.scss && npx prettier -c .",
-    "test": "npx vitest run && npm run lint",
+    "test": "npx vitest --typecheck run && npm run lint",
     "test:watch": "npx vitest",
     "document": "npx typedoc src/index.ts src/sass/index.ts src/plugins/*.ts src/data/devices.ts",
     "prepublishOnly": "npm run document",
