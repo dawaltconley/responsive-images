@@ -8,10 +8,6 @@ import { isUrl, resizeFromSizes } from './utilities'
 import { chain, type ChainedPromise } from './chained-promise'
 
 export interface ImageOptions extends EleventyImage.BaseImageOptions {
-  /** rotate images to ensure correct orientation */
-  fixOrientation?: boolean
-  /** option to ensure original size is included if smaller than largest specified width by threshold amount */
-  minimumThreshold?: number
   disableResize?: boolean
 }
 
