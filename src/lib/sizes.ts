@@ -121,6 +121,20 @@ function parseImageSize(
     if (d === 'width' && ImageSize.isUnitValue(l)) {
       return { width: l }
     }
+    if (d === 'height' && ImageSize.isUnitValue(l)) {
+      return { height: l }
+    }
+  }
+  if (tokens.length === 3) {
+    const [d, width, height] = tokens
+    if (
+      typeof d === 'string' &&
+      isSizeKeyword(d) &&
+      ImageSize.isUnitValue(width) &&
+      ImageSize.isUnitValue(height)
+    ) {
+      return { width, height, fit: d }
+    }
   }
   throw new Error(`Unable to parse image sizes: ${tokens.join(' ')}`)
 }
