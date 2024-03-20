@@ -15,6 +15,11 @@ export type Unit = Parameters<typeof units.has>[number]
 
 export const isUnit = (s: string): s is Unit => units.has(s as Unit)
 
+// interface UnitValueInterface<U extends Unit> {
+//   value: number
+//   unit: U
+// }
+
 /**
  * Represents a value with a unit, such as 600px, 40vw, etc.
  * Used internally for parsing the sizes query string.
@@ -38,6 +43,11 @@ export default class UnitValue<U extends Unit = Unit> {
 
   uses<T extends U>(...units: T[]): this is UnitValue<T> {
     return units.some(u => u === this.unit)
+  }
+
+  /** @returns a copy of this UnitValue with a modified value */
+  copy(modify: (value: number) => number = n => n): UnitValue<U> {
+    return new UnitValue(modify(this.value), this.unit)
   }
 
   /** @constant used for parsing a CSS value */

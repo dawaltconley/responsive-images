@@ -4,9 +4,15 @@ import {
   stringify,
   type QueryNode,
   type ConditionNode,
+  // type FeatureNode,
+  type PlainFeatureNode,
+  type NumericValueNode,
+  type NumberNode,
+  type DimensionNode,
   type ParserError,
 } from 'media-query-parser'
 import {
+  Rect,
   ResizeInstructions,
   SizeKeyword,
   isSizeKeyword,
@@ -14,6 +20,7 @@ import {
   isDimension,
 } from './common'
 import { ImageSize } from './unit-values'
+import { instructionsToWidth } from './utilities'
 
 type SizesCondition = ConditionNode | QueryNode | null
 
@@ -33,6 +40,11 @@ export interface SizesQuery {
 
   /** whether this SizesQuery is valid in the browser */
   isValid: boolean
+}
+
+export interface ValidSizesQuery extends SizesQuery {
+  size: { width: ImageSize }
+  isValid: true
 }
 
 export default class Sizes {
@@ -151,4 +163,227 @@ function stringifySizesQuery({ conditions, size }: SizesQuery): string | null {
   if ('height' in size) return null
   if (!conditions) return size.width.toString()
   return `${stringify(conditions)} ${size.width}`
+}
+
+// const math
+
+function makeValid(
+  { conditions, size }: SizesQuery,
+  image: Rect,
+): ValidSizesQuery[] {
+  if (!('height' in size)) return { conditions, size, isValid: true }
+  const imageAspect = image.w / image.h
+  if (!('fit' in size)) {
+    const { height } = size
+    const width = height.copy(h => h * (image.w / image.h))
+    return [{ conditions, size: { width }, isValid: true }]
+  }
+  //
+  // const { width, height, fit } = size
+  // if (size.width.uses('px') && size.height.uses('px')) {
+  if (size.width.unit === size.height.unit) {
+    const resizeAspect = size.width.value / size.height.value
+    let width: ImageSize
+    // let width: ImageSize<'px'>
+    if (size.fit === 'cover') {
+      // if instructions are wider than image, use instruction width; if instructions are taller than image, use instruction height
+      width =
+        resizeAspect > imageAspect
+          ? size.width
+          : size.height.copy(h => h * imageAspect)
+    } else {
+      // if instructions are wider than image, use instruction height; if instructions are taller than image, use instruction width
+      width =
+        resizeAspect < imageAspect
+          ? size.width
+          : size.height.copy(h => h * imageAspect)
+    }
+    return [{ conditions, size: { width }, isValid: true }]
+  }
+  // if (size.width.unit === size.height.unit) {
+  //   const width = instructionsToWidth({ width }, imageAspect)
+  // }
+
+  // else, need to calculate breakpoint
+  // const bpWidth = getBreakpoint(size.width, image.w)
+  // const bpHeight = getBreakpoint(size.height, image.h)
+  // let bp: FeatureNode
+  // if (typeof bpWidth === 'number' && bpHeight instanceof ImageSize) {
+  //   bpHeight.value *= bpWidth
+  // }
+  // if (typeof bpHeight === 'number' && bpWidth instanceof ImageSize) {
+  //   bpWidth.value *= bpHeight
+  // }
+
+  const bp = getBreakpoint(size, image)
+
+  const newConditions = structuredClone(conditions)
+  if (!newConditions) {
+    return [{ conditions: bp, ... }, { conditions: null, size, isValid: true }]
+  }
+
+  // if ('fit' in size) {
+  //   console.log(size)
+  // }
+}
+
+type WithoutLoc<N extends PlainFeatureNode> = Omit<N, 'value' | 'start' | 'end'> & { value: Omit<NumericValueNode, 'start' | 'end'> }
+
+interface Breakpoint extends Partial<Rect> {
+  gt?: ImageSize,
+  lt?: ImageSize
+}
+
+function getBreakpoint(
+  // size: ResizeInstructions<ImageSize>,
+  { width, height, fit }: { width: ImageSize, height: ImageSize, fit: SizeKeyword },
+  image: Rect,
+): PlainFeatureNode {
+  // let bp: ResizeInstructions<number>
+  let bp: Breakpoint = {}
+
+  // this all assumes fit = 'cover'
+  if (width.uses('px') && !height.uses('px')) {
+    const breakAt = width.value * (image.h / image.w) * (100 / height.value)
+      bp.gt = height.copy(h => h * (image.w / image.h))
+      bp.lt = width
+    if (height.uses('vw')) {
+      bp.w = breakAt
+    } else if (height.uses('vh')) {
+      bp.h = breakAt
+    }
+  }
+  if (!width.uses('px') && height.uses('px')) {
+    const breakAt = height.value * (image.w / image.h) * (100 / width.value)
+    bp.gt = width
+    bp.lt = height.copy(h => h * (image.w / image.h))
+    if (width.uses('vw')) {
+      bp.w = breakAt // calculate width bp
+    } else if (width.uses('vh')) {
+      bp.h = breakAt // calculate height bp
+    }
+  }
+  if (width.uses('vw') && height.uses('vh')) {
+    // bp = bp.w / bp.h
+    bp.w = image.w / (100 / width.value)
+    bp.h = image.h / (100 / height.value)
+    bp.gt = height.copy(h => h * (image.w / image.h))
+    bp.lt = width
+  }
+  if (width.uses('vh') && height.uses('vw')) {
+    // bp = bp.w / bp.h
+    bp.w = image.h / (100 / height.value)
+    bp.h = image.w / (100 / width.value)
+    bp.gt = height.copy(h => h * (image.w / image.h))
+    bp.lt = width
+  }
+
+  if (!bp.gt || !bp.lt) {
+    throw new Error()
+  }
+
+  if (fit === 'contain') {
+    // just swap the values applied when above/below the breakpoint
+    const _gt = bp.gt
+    bp.gt = bp.lt
+    bp.lt = _gt
+  }
+
+  if (bp.w && bp.h) {
+    // need to return gt/lt somehow too? or handle outside?
+    return {
+      "_t": "feature",
+      "context": "value",
+      "feature": "min-aspect-ratio",
+      "value": {
+        "_t": "number",
+        "value": bp.w / bp.h,
+        "flag": "number",
+        start: -1,
+        end: -1,
+      },
+      start: -1,
+      end: -1,
+}
+
+
+  }
+
+  if (bp.w) {
+    return {
+  "_t": "feature",
+  "context": "value",
+  "feature": "min-width", // alternately switch between min/max to handle gt/lt
+  "value": {
+    "_t": "dimension",
+    "value": bp.w,
+    "unit": "px",
+    "start": -1,
+    "end": -1
+  },
+  "start": -1,
+  "end": -1
+}
+
+
+  }
+
+  if (bp.h) {
+    return {
+  "_t": "feature",
+  "context": "value",
+  "feature": "min-height", // alternately switch between min/max to handle gt/lt
+  "value": {
+    "_t": "dimension",
+    "value": bp.h,
+    "unit": "px",
+    "start": -1,
+    "end": -1
+  },
+  "start": -1,
+  "end": -1
+}
+  }
+
+  throw Error()
+}
+
+// function getBreakpoint(resize: ImageSize, image: number): ImageSize<'px'> | number {
+//   if (resize.uses('px')) {
+//     return resize.value / image
+//   }
+//   return new ImageSize(image * (100 / resize.value), 'px')
+//   // return resize.copy(v => (100 / v))
+// }
+
+function makeBreakpointQuery(value: ImageSize | number): FeatureNode {
+  
+}
+
+// function getBreakpoint(
+//   // size: ResizeInstructions<ImageSize>,
+//   size: { width: ImageSize, height: ImageSize, fit: SizeKeyword },
+//   image: Rect,
+// ): FeatureNode | null {
+
+}
+
+function instructionsToWidth(
+  resize: ResizeInstructions<ImageSize>,
+  aspect: number,
+): ImageSize {
+  if ('fit' in resize) {
+    const resizeAspect = resize.width / resize.height
+    if (resize.fit === 'cover') {
+      // if instructions are wider than image, use instruction width; if instructions are taller than image, use instruction height
+      return resizeAspect > aspect ? resize.width : resize.height * aspect
+    } else {
+      // if instructions are wider than image, use instruction height; if instructions are taller than image, use instruction width
+      return resizeAspect < aspect ? resize.width : resize.height * aspect
+    }
+  } else if ('height' in resize) {
+    return resize.height * aspect
+  } else {
+    return resize.width
+  }
 }

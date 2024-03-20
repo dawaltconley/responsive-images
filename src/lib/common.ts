@@ -60,12 +60,12 @@ export type ResizeInstructions<T extends number | UnitValue> =
   | { height: T }
   | { width: T; height: T; fit: SizeKeyword }
 
-export interface Rect {
+export interface Rect<T extends number | UnitValue = number> {
   /** width */
-  w: number
+  w: T
 
   /** height */
-  h: number
+  h: T
 }
 
 export const isRect = (object: unknown): object is Rect =>
