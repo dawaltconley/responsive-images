@@ -1,6 +1,7 @@
 import {
   parseMediaCondition,
   parseMediaQuery,
+  stringify,
   type QueryNode,
   type ConditionNode,
   type ParserError,
@@ -35,18 +36,25 @@ export interface SizesQuery {
 }
 
 export default class Sizes {
-  readonly string: string
+  readonly original: string
   readonly queries: SizesQuery[]
   readonly isValid: boolean
 
   constructor(sizes: string) {
-    this.string = sizes
+    this.original = sizes
     this.queries = Sizes.parse(sizes)
     this.isValid = this.queries.every(q => q.isValid)
   }
 
   toString(): string {
-    return this.string
+    return this.queries
+      .map(stringifySizesQuery)
+      .filter((q): q is string => q !== null)
+      .join(', ')
+  }
+
+  get string(): string {
+    return this.toString()
   }
 
   /**
@@ -123,4 +131,10 @@ function parseImageSize(
     }
   }
   throw new Error(`Unable to parse image sizes: ${tokens.join(' ')}`)
+}
+
+function stringifySizesQuery({ conditions, size }: SizesQuery): string | null {
+  if ('height' in size) return null
+  if (!conditions) return size.width.toString()
+  return `${stringify(conditions)} ${size.width}`
 }
