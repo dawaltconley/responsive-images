@@ -68,40 +68,81 @@ const compileLegacy = async (
 
 const defaultExpected = scss`
   .bg-image {
-    @media (orientation: landscape)  and (min-width: 1025px) {
+    @media (orientation: landscape) and (min-width: 1025px), (orientation: landscape) and (min-height: 769px) {
       background-image: url('/img/output-2048.jpeg');
     }
-    @media (orientation: landscape) and (max-width: 1024px) and (min-width: 769px) {
-      background-image: image-set(url("/img/output-2048.jpeg") 2x type("image/jpeg"), url("/img/output-1080.jpeg") 1x type("image/jpeg"));
+    @media (orientation: landscape) and (max-width: 1024px) and (min-width: 769px), (orientation: landscape) and (max-width: 1024px) and (min-height: 433px) {
+      background-image: image-set(
+        url("/img/output-2048.jpeg") 2x type("image/jpeg"),
+        url("/img/output-1080.jpeg") 1x type("image/jpeg")
+      );
     }
-    @media (orientation: landscape) and (max-width: 768px) {
-      background-image: image-set(url("/img/output-3072.jpeg") 4x type("image/jpeg"), url("/img/output-2048.jpeg") 2.5x type("image/jpeg"), url("/img/output-1080.jpeg") 1x type("image/jpeg"));
+    @media (orientation: landscape) and (max-width: 768px) and (max-height: 432px) {
+      background-image: image-set(
+        url("/img/output-3072.jpeg") 4x type("image/jpeg"),
+        url("/img/output-2048.jpeg") 2.5x type("image/jpeg"),
+        url("/img/output-1080.jpeg") 1x type("image/jpeg")
+      );
     }
-    @media (orientation: portrait) and (min-width: 433px) {
-      background-image: image-set(url("/img/output-2048.jpeg") 2x type("image/jpeg"), url("/img/output-1080.jpeg") 1x type("image/jpeg"));
+    @media (orientation: portrait) and (min-width: 433px), (orientation: portrait) and (min-height: 769px) {
+      background-image: image-set(
+        url("/img/output-2048.jpeg") 2x type("image/jpeg"),
+        url("/img/output-1080.jpeg") 1x type("image/jpeg")
+      );
     }
-    @media (orientation: portrait) and (max-width: 432px) {
-      background-image: image-set(url("/img/output-2048.jpeg") 4x type("image/jpeg"), url("/img/output-1080.jpeg") 2.5x type("image/jpeg"), url("/img/output-432.jpeg") 1x type("image/jpeg"));
+    @media (orientation: portrait) and (max-width: 432px) and (max-height: 768px) {
+      background-image: image-set(
+        url("/img/output-2048.jpeg") 4x type("image/jpeg"),
+        url("/img/output-1080.jpeg") 2.5x type("image/jpeg"),
+        url("/img/output-432.jpeg") 1x type("image/jpeg")
+      );
     }
   }
 `
 
 const defaultExpectedFormats = scss`
   .bg-image {
-    @media (orientation: landscape)  and (min-width: 1025px) {
-      background-image: image-set(url('/img/output-2048.webp') 1x type('image/webp'), url('/img/output-2048.jpeg') 1x type('image/jpeg'));
+    @media (orientation: landscape) and (min-width: 1025px), (orientation: landscape) and (min-height: 769px) {
+      background-image: image-set(
+        url('/img/output-2048.webp') 1x type('image/webp'),
+        url('/img/output-2048.jpeg') 1x type('image/jpeg')
+      );
     }
-    @media (orientation: landscape) and (max-width: 1024px) and (min-width: 769px) {
-      background-image: image-set(url("/img/output-2048.webp") 2x type('image/webp'), url("/img/output-2048.jpeg") 2x type('image/jpeg'), url("/img/output-1080.webp") 1x type('image/webp'), url("/img/output-1080.jpeg") 1x type('image/jpeg'));
+    @media (orientation: landscape) and (max-width: 1024px) and (min-width: 769px), (orientation: landscape) and (max-width: 1024px) and (min-height: 433px) {
+      background-image: image-set(
+        url("/img/output-2048.webp") 2x type('image/webp'),
+        url("/img/output-2048.jpeg") 2x type('image/jpeg'),
+        url("/img/output-1080.webp") 1x type('image/webp'),
+        url("/img/output-1080.jpeg") 1x type('image/jpeg')
+      );
     }
-    @media (orientation: landscape) and (max-width: 768px) {
-      background-image: image-set(url("/img/output-3072.webp") 4x type('image/webp'), url("/img/output-3072.jpeg") 4x type('image/jpeg'), url("/img/output-2048.webp") 2.5x type('image/webp'), url("/img/output-2048.jpeg") 2.5x type('image/jpeg'), url("/img/output-1080.webp") 1x type('image/webp'), url("/img/output-1080.jpeg") 1x type('image/jpeg'));
+    @media (orientation: landscape) and (max-width: 768px) and (max-height: 432px) {
+      background-image: image-set(
+        url("/img/output-3072.webp") 4x type('image/webp'),
+        url("/img/output-3072.jpeg") 4x type('image/jpeg'),
+        url("/img/output-2048.webp") 2.5x type('image/webp'),
+        url("/img/output-2048.jpeg") 2.5x type('image/jpeg'),
+        url("/img/output-1080.webp") 1x type('image/webp'),
+        url("/img/output-1080.jpeg") 1x type('image/jpeg')
+      );
     }
-    @media (orientation: portrait) and (min-width: 433px) {
-      background-image: image-set(url("/img/output-2048.webp") 2x type('image/webp'), url("/img/output-2048.jpeg") 2x type('image/jpeg'), url("/img/output-1080.webp") 1x type('image/webp'), url("/img/output-1080.jpeg") 1x type('image/jpeg'));
+    @media (orientation: portrait) and (min-width: 433px), (orientation: portrait) and (min-height: 769px) {
+      background-image: image-set(
+        url("/img/output-2048.webp") 2x type('image/webp'),
+        url("/img/output-2048.jpeg") 2x type('image/jpeg'),
+        url("/img/output-1080.webp") 1x type('image/webp'),
+        url("/img/output-1080.jpeg") 1x type('image/jpeg')
+      );
     }
-    @media (orientation: portrait) and (max-width: 432px) {
-      background-image: image-set(url("/img/output-2048.webp") 4x type('image/webp'), url("/img/output-2048.jpeg") 4x type('image/jpeg'), url("/img/output-1080.webp") 2.5x type('image/webp'), url("/img/output-1080.jpeg") 2.5x type('image/jpeg'), url("/img/output-432.webp") 1x type('image/webp'), url("/img/output-432.jpeg") 1x type('image/jpeg'));
+    @media (orientation: portrait) and (max-width: 432px) and (max-height: 768px) {
+      background-image: image-set(
+        url("/img/output-2048.webp") 4x type('image/webp'),
+        url("/img/output-2048.jpeg") 4x type('image/jpeg'),
+        url("/img/output-1080.webp") 2.5x type('image/webp'),
+        url("/img/output-1080.jpeg") 2.5x type('image/jpeg'),
+        url("/img/output-432.webp") 1x type('image/webp'),
+        url("/img/output-432.jpeg") 1x type('image/jpeg')
+      );
     }
   }
 `

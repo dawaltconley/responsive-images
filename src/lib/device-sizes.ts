@@ -88,39 +88,26 @@ export default class DeviceSizes {
         const next = this.devices[sizes[i + 1]?.[0]]
         const maxWidth = i > 0 && current?.w
         const minWidth = next && next?.w
+        const maxHeight = i > 0 && current?.h
+        const minHeight = next && next?.h
 
         queries.push({
           orientation,
           maxWidth,
           minWidth,
-          images: size.reduce<ImageSet[]>((images, d) => {
-            // const current = this.devices[d]
-            // const next = this.devices[devices[j + 1]]
-
-            return images.concat(
-              ...metaMap[d].map<ImageSet>(({ url, sourceType }) => ({
-                image: url,
-                type: sourceType,
-                dppx: this.devices[d].dppx,
-              })),
-            )
-
-            // const maxResolution = j > 0 && current.dppx
-            // const minResolution = next && next.dppx
-
-            // queries.push(
-            //   ...metaMap[d].map<MediaQuery>(({ url, sourceType, format }) => ({
-            //     orientation,
-            //     maxWidth,
-            //     minWidth,
-            //     // maxResolution,
-            //     // minResolution,
-            //     // url,
-            //     // sourceType,
-            //     // format,
-            //   })),
-            // )
-          }, []),
+          maxHeight,
+          minHeight,
+          images: size.reduce<ImageSet[]>(
+            (images, d) =>
+              images.concat(
+                ...metaMap[d].map<ImageSet>(({ url, sourceType }) => ({
+                  image: url,
+                  type: sourceType,
+                  dppx: this.devices[d].dppx,
+                })),
+              ),
+            [],
+          ),
         })
       })
     }

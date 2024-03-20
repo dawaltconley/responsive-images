@@ -119,12 +119,14 @@ export default class MediaQueries {
       if (q.minWidth) {
         orQueries.push([css`(min-width: ${q.minWidth + 1}px)`])
       }
-      // if (q.maxHeight) {
-      //   andQueries.push(css`(max-height: ${q.maxHeight}px)`)
-      // }
-      // if (q.minHeight) {
-      //   orQueries.push([css`(min-height: ${q.minHeight + 1}px)`])
-      // }
+      if (q.maxHeight) {
+        andQueries.push(css`(max-height: ${q.maxHeight}px)`)
+      }
+      if (q.minHeight) {
+        orQueries.push([css`(min-height: ${q.minHeight + 1}px)`])
+      }
+
+      console.log(orQueries, permute(orQueries))
 
       const selectors = permute(orQueries)
         .map(set => [...andQueries, ...set].join(' and '))
@@ -147,18 +149,6 @@ export default class MediaQueries {
               }
             }
           `
-        // const noDppx =
-        //   images
-        //     .map(i => i.dppx)
-        //     .filter((d, i, arr) => d !== undefined && arr.indexOf(d) === i)
-        //     .length < 2
-        // const noTypes =
-        //   images
-        //     .map(i => i.type)
-        //     .filter((t, i, arr) => t !== undefined && arr.indexOf(t) === i)
-        //     .length < 2
-
-        // TODO don't use image-set when there's only one type
         const imageSet = `image-set(${images
           .map(({ image, dppx, type }) => {
             const options = [`url('${image}')`]
@@ -171,20 +161,6 @@ export default class MediaQueries {
             return options.join(' ')
           })
           .join(', ')})`
-
-        // TODO probably handle fallback / supports separately, call this function again with modified arguments
-        // const fallback = images.reduce(
-        //   (fallback, img) =>
-        //     img.dppx && fallback.dppx && img.dppx < fallback.dppx
-        //       ? img
-        //       : fallback,
-        //   images[images.length - 1],
-        // )
-        // @supports not (background-image: ${imageSet}) {
-        //   ${selector} {
-        //     background-image: url('${fallback.image}');
-        //   }
-        // }
 
         return css`
           @media ${selectors} {
