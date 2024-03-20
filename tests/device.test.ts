@@ -555,6 +555,22 @@ describe('Device.getImage()', () => {
     run(fail2, sizes)
   })
 
+  test('handles "all"', () => {
+    const sizes = new Sizes('all 420px')
+    Device.fromDefinitions(defaultDevices).forEach(device => {
+      const width = 420 * device.dppx
+      expect(device.getImage(sizes)).toEqual({ width })
+    })
+  })
+
+  test('handles "not all"', () => {
+    const sizes = new Sizes('not all 50px, 50vw')
+    Device.fromDefinitions(defaultDevices).forEach(device => {
+      const width = Math.ceil(device.w * 0.5 * device.dppx)
+      expect(device.getImage(sizes)).toEqual({ width })
+    })
+  })
+
   test('handles a device with multiple resolutions', () => {
     const { sizes, pass, fail } = cloneDeep(template)
     pass.device.dppx = [4, 3.2, 2.0, 1.5, 1]
