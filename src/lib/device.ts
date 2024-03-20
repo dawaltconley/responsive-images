@@ -1,5 +1,6 @@
 import type { Rect, Orientation, ResizeInstructions } from './common'
-import type { MediaCondition, MediaFeature } from 'media-query-parser'
+import type { QueryNode, ConditionNode, FeatureNode } from 'media-query-parser'
+import { stringify } from 'media-query-parser'
 import type Sizes from './sizes'
 import UnitValue, {
   ImageSize,
@@ -44,25 +45,29 @@ export default class Device implements Rect {
   /**
    * @returns true if a single media condition applies to this device
    */
-  matches(condition: MediaCondition | MediaFeature): boolean {
-    if ('feature' in condition) {
-      return this.#matchesFeature(condition)
-    } else {
-      return this.#matchesCondition(condition)
+  matches(node: QueryNode | ConditionNode | FeatureNode): boolean {
+    if (node._t === 'feature') {
+      return this.#matchesFeature(node)
+    } else if (node._t === 'condition') {
+      return this.#matchesCondition(node)
+    } else if (node.type === 'all') {
+      return node.prefix !== 'not'
     }
+    throw new Error(`Unhandled media condition: ${stringify(node)}`)
   }
 
-  #matchesFeature(mediaFeature: MediaFeature): boolean {
+  #matchesFeature(mediaFeature: FeatureNode): boolean {
     if (mediaFeature.context === 'value') {
-      const { prefix, feature, value } = mediaFeature
-      if (value.type === '<dimension-token>' && value.unit === 'px') {
+      const { value } = mediaFeature // prefix no longer exists, feature is 'max-width' or 'min-width'. annoying!
+      const { feature, prefix } = parseFeature(mediaFeature.feature)
+      if (value._t === 'dimension' && value.unit === 'px') {
         return (
           (feature === 'width' && compare(this.w, value.value, prefix)) ||
           (feature === 'height' && compare(this.h, value.value, prefix))
         )
       }
       if (feature === 'resolution') {
-        if (value.type === '<dimension-token>' && isUnit(value.unit)) {
+        if (value._t === 'dimension' && isUnit(value.unit)) {
           const res = new UnitValue(value.value, value.unit)
           return (
             res.uses('dpi', 'dpcm', 'dppx', 'x') &&
@@ -71,27 +76,29 @@ export default class Device implements Rect {
         }
       }
       if (feature === 'aspect-ratio') {
-        if (value.type === '<ratio-token>' || value.type === '<number-token>') {
+        if (value._t === 'ratio' || value._t === 'number') {
           const ratio =
-            value.type === '<ratio-token>'
-              ? value.numerator / value.denominator
-              : value.value
+            value._t === 'ratio' ? value.left / value.right : value.value
           return compare(this.aspectRatio, ratio, prefix)
         }
       }
-      if (feature === 'orientation' && value.type === '<ident-token>') {
+      if (feature === 'orientation' && value._t === 'ident') {
         return this.orientation === value.value
       }
     }
     throw new Error(`Unhandled media feature: ${mediaFeature.feature}`)
   }
 
-  #matchesCondition({ operator, children }: MediaCondition): boolean {
+  #matchesCondition({ op: operator, nodes }: ConditionNode): boolean {
     if (operator === 'or') {
-      return children.some(child => this.matches(child))
+      return nodes.some(({ node }) =>
+        node._t === 'general-enclosed' ? false : this.matches(node),
+      )
     }
     // if not "or", treat as "and." should not matter for "not" and null
-    const and = children.every(child => this.matches(child))
+    const and = nodes.every(({ node }) =>
+      node._t === 'general-enclosed' ? true : this.matches(node),
+    )
     return operator === 'not' ? !and : and
   }
 
@@ -170,4 +177,21 @@ function compare(
     (prefix === 'max' && device <= feature) ||
     device === feature
   )
+}
+
+type MediaPrefix = 'max' | 'min'
+
+const isPrefix = (str: string): str is MediaPrefix =>
+  str === 'max' || str === 'min'
+
+interface MediaFeature {
+  feature: string
+  prefix: MediaPrefix | null
+}
+
+/** parses a feature like `min-width` into its base feature name (`width`) and prefix (`min`) */
+function parseFeature(featureString: string): MediaFeature {
+  const parsed = featureString.match(/^((?<prefix>min|max)-)?(?<feature>.*)/)
+  const { feature = featureString, prefix } = parsed?.groups || {}
+  return { feature, prefix: isPrefix(prefix) ? prefix : null }
 }

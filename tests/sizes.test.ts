@@ -4,26 +4,28 @@ import Device from '../src/lib/device'
 import Sizes from '../src/lib/sizes'
 import DeviceSizes from '../src/lib/device-sizes'
 import U from '../src/lib/unit-values'
-import { set, cloneDeep } from 'lodash'
 
 const devices = Device.fromDefinitions(defaultDevices)
 
 describe('Sizes.parse()', () => {
   test('parses media query and assigned width', () => {
-    expect(Sizes.parse('(min-width: 680px) 400px')).toEqual([
+    expect(Sizes.parse('(min-width: 680px) 400px')).toMatchObject([
       {
         conditions: {
-          operator: null,
-          children: [
+          _t: 'condition',
+          op: 'and',
+          nodes: [
             {
-              context: 'value',
-              prefix: 'min',
-              feature: 'width',
-              value: {
-                type: '<dimension-token>',
-                value: 680,
-                unit: 'px',
-                flag: 'number',
+              _t: 'in-parens',
+              node: {
+                _t: 'feature',
+                context: 'value',
+                feature: 'min-width',
+                value: {
+                  _t: 'dimension',
+                  value: 680,
+                  unit: 'px',
+                },
               },
             },
           ],
@@ -32,20 +34,23 @@ describe('Sizes.parse()', () => {
         isValid: true,
       },
     ])
-    expect(Sizes.parse('(max-width: 680px) 100vw')).toEqual([
+    expect(Sizes.parse('(max-width: 680px) 100vw')).toMatchObject([
       {
         conditions: {
-          operator: null,
-          children: [
+          _t: 'condition',
+          op: 'and',
+          nodes: [
             {
-              context: 'value',
-              prefix: 'max',
-              feature: 'width',
-              value: {
-                type: '<dimension-token>',
-                value: 680,
-                unit: 'px',
-                flag: 'number',
+              _t: 'in-parens',
+              node: {
+                _t: 'feature',
+                context: 'value',
+                feature: 'max-width',
+                value: {
+                  _t: 'dimension',
+                  value: 680,
+                  unit: 'px',
+                },
               },
             },
           ],
@@ -57,24 +62,18 @@ describe('Sizes.parse()', () => {
   })
 
   test('parses media query with fallback value', () => {
-    expect(Sizes.parse('(min-width: 680px) 400px, 100vw')).toEqual([
+    expect(Sizes.parse('(min-width: 680px) 400px, 100vw')).toMatchObject([
       {
-        conditions: {
-          operator: null,
-          children: [
-            {
-              context: 'value',
-              prefix: 'min',
-              feature: 'width',
-              value: {
-                type: '<dimension-token>',
-                value: 680,
-                unit: 'px',
-                flag: 'number',
-              },
-            },
+        conditions: expect.objectContaining({
+          nodes: [
+            expect.objectContaining({
+              node: expect.objectContaining({
+                feature: 'min-width',
+                value: expect.objectContaining({ value: 680, unit: 'px' }),
+              }),
+            }),
           ],
-        },
+        }),
         size: { width: new U(400, 'px') },
         isValid: true,
       },
@@ -87,50 +86,45 @@ describe('Sizes.parse()', () => {
   })
 
   test('parses multiple media queries', () => {
-    const condition = {
-      operator: null,
-      children: [
+    const getMinWidth = (width: number) => ({
+      nodes: [
         {
-          context: 'value',
-          prefix: 'min',
-          feature: 'width',
-          value: {
-            type: '<dimension-token>',
-            value: 680,
-            unit: 'px',
-            flag: 'number',
-          },
+          _t: 'in-parens',
+          node: expect.objectContaining({
+            feature: 'min-width',
+            value: expect.objectContaining({ value: width, unit: 'px' }),
+          }),
         },
       ],
-    }
+    })
 
     expect(
       Sizes.parse(
         '(min-width: 1536px) 718.5px, (min-width: 1280px) 590px, (min-width: 1024px) 468px, (min-width: 768px) 704px, (min-width: 640px) 576px, 100vw',
       ),
-    ).toEqual([
+    ).toMatchObject([
       {
-        conditions: set(cloneDeep(condition), 'children[0].value.value', 1536),
+        conditions: getMinWidth(1536),
         size: { width: new U(718.5, 'px') },
         isValid: true,
       },
       {
-        conditions: set(cloneDeep(condition), 'children[0].value.value', 1280),
+        conditions: getMinWidth(1280),
         size: { width: new U(590, 'px') },
         isValid: true,
       },
       {
-        conditions: set(cloneDeep(condition), 'children[0].value.value', 1024),
+        conditions: getMinWidth(1024),
         size: { width: new U(468, 'px') },
         isValid: true,
       },
       {
-        conditions: set(cloneDeep(condition), 'children[0].value.value', 768),
+        conditions: getMinWidth(768),
         size: { width: new U(704, 'px') },
         isValid: true,
       },
       {
-        conditions: set(cloneDeep(condition), 'children[0].value.value', 640),
+        conditions: getMinWidth(640),
         size: { width: new U(576, 'px') },
         isValid: true,
       },
@@ -145,65 +139,33 @@ describe('Sizes.parse()', () => {
   test('parses combined media queries with the "and" keyword', () => {
     expect(
       Sizes.parse('(max-width: 780px) and (max-height: 720px) 60vh, 400px'),
-    ).toEqual([
+    ).toMatchObject([
       {
-        conditions: {
-          operator: 'and',
-          children: [
-            {
-              context: 'value',
-              prefix: 'max',
-              feature: 'width',
-              value: {
-                type: '<dimension-token>',
-                value: 780,
-                unit: 'px',
-                flag: 'number',
-              },
-            },
-            {
-              context: 'value',
-              prefix: 'max',
-              feature: 'height',
-              value: {
-                type: '<dimension-token>',
-                value: 720,
-                unit: 'px',
-                flag: 'number',
-              },
-            },
+        conditions: expect.objectContaining({
+          _t: 'condition',
+          op: 'and',
+          nodes: [
+            expect.objectContaining({
+              _t: 'in-parens',
+              node: expect.objectContaining({
+                feature: 'max-width',
+                value: expect.objectContaining({ value: 780, unit: 'px' }),
+              }),
+            }),
+            expect.objectContaining({
+              _t: 'in-parens',
+              node: expect.objectContaining({
+                feature: 'max-height',
+                value: expect.objectContaining({ value: 720, unit: 'px' }),
+              }),
+            }),
           ],
-        },
+        }),
         size: { width: new U(60, 'vh') },
         isValid: true,
       },
       {
         conditions: null,
-        size: { width: new U(400, 'px') },
-        isValid: true,
-      },
-    ])
-  })
-
-  test('ignores excess parentheses', () => {
-    expect(Sizes.parse('((((min-width: 680px)))) 400px')).toEqual([
-      {
-        conditions: {
-          operator: null,
-          children: [
-            {
-              context: 'value',
-              prefix: 'min',
-              feature: 'width',
-              value: {
-                type: '<dimension-token>',
-                value: 680,
-                unit: 'px',
-                flag: 'number',
-              },
-            },
-          ],
-        },
         size: { width: new U(400, 'px') },
         isValid: true,
       },

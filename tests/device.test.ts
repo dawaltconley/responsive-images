@@ -534,6 +534,28 @@ describe('Device.getImage()', () => {
     run(fail2, sizes)
   })
 
+  test('handles excessive parentheses', () => {
+    const sizes = new Sizes(
+      'not ((((min-width: 900px)) or (((((max-width: 780px))) and (max-height: 720px))))) 600px, 400px',
+    )
+    // inverting or test
+    const pass: Test = {
+      device: { w: 772, h: 728 },
+      images: [{ width: 600 }],
+    }
+    const fail1: Test = {
+      device: { w: 600, h: 480 },
+      images: [{ width: 400 }],
+    }
+    const fail2: Test = {
+      ...fail1,
+      device: { w: 920, h: 600 },
+    }
+    run(pass, sizes)
+    run(fail1, sizes)
+    run(fail2, sizes)
+  })
+
   test('handles a device with multiple resolutions', () => {
     const { sizes, pass, fail } = cloneDeep(template)
     pass.device.dppx = [4, 3.2, 2.0, 1.5, 1]

@@ -1,4 +1,10 @@
-import { toAST, type MediaQuery, type MediaCondition } from 'media-query-parser'
+import {
+  parseMediaCondition,
+  parseMediaQuery,
+  type QueryNode,
+  type ConditionNode,
+  type ParserError,
+} from 'media-query-parser'
 import {
   ResizeInstructions,
   SizeKeyword,
@@ -7,6 +13,8 @@ import {
   isDimension,
 } from './common'
 import { ImageSize } from './unit-values'
+
+type SizesCondition = ConditionNode | QueryNode | null
 
 /**
  * represents a valid rule for the img sizes attribute,
@@ -17,7 +25,7 @@ export interface SizesQuery {
    * the conditions under which a sizes rule applies
    * 'null' should be treated as 'all', true no matter what
    */
-  conditions: MediaCondition | null
+  conditions: SizesCondition
 
   /** the image width applied under these conditions */
   size: ResizeInstructions<ImageSize>
@@ -70,7 +78,7 @@ export default class Sizes {
           }
         }
         return {
-          conditions: parseConditions(tokens.join(' ')),
+          conditions: parseConditions(tokens.join(' ').trim()),
           size: parseImageSize(imageSize),
           isValid: imageSize.length === 1,
         }
@@ -79,10 +87,19 @@ export default class Sizes {
   }
 }
 
-function parseConditions(queryString: string): MediaCondition | null {
-  let query: MediaQuery
+function parseConditions(queryString: string): SizesCondition {
+  if (!queryString) return null
+  let query: SizesCondition | ParserError
   try {
-    query = toAST(queryString)[0]
+    if (queryString === 'all' || queryString === 'not all') {
+      query = parseMediaQuery(queryString)
+    } else {
+      query = parseMediaCondition(queryString)
+    }
+    if ('_errid' in query) {
+      const { _errid, start, end } = query
+      throw new Error(`${_errid} ${start},${end}`)
+    }
   } catch (e) {
     let message = ''
     if (e instanceof Error) {
@@ -90,14 +107,7 @@ function parseConditions(queryString: string): MediaCondition | null {
     }
     throw new Error(`Couldn't parse sizes query: ${queryString}${message}`)
   }
-  if (query.mediaType !== 'all') {
-    throw new Error(`Invalid media type, only "all" is allowed: ${queryString}`)
-  }
-  if (query.mediaPrefix === 'not') {
-    // this should only fire for 'not all', which can be ignored
-    return null
-  }
-  return query.mediaCondition
+  return query
 }
 
 function parseImageSize(
