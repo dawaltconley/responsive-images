@@ -427,18 +427,17 @@ describe('Device.getImage()', () => {
     const sizes = new Sizes(
       '(min-width: 1536px) 718.5px, (min-width: 1280px) 590px, (min-width: 1024px) 468px, (min-width: 768px) 704px, (min-width: 640px) 576px, 100vw',
     )
-    const device = new Device({ w: 1000, h: 400 })
-    device.w = 1920
+    let device = new Device({ w: 1920, h: 400 })
     expect(device.getImage(sizes)).toEqual({ width: 719 })
-    device.w = 1440
+    device = new Device({ ...device, w: 1440 })
     expect(device.getImage(sizes)).toEqual({ width: 590 })
-    device.w = 1200
+    device = new Device({ ...device, w: 1200 })
     expect(device.getImage(sizes)).toEqual({ width: 468 })
-    device.w = 820
+    device = new Device({ ...device, w: 820 })
     expect(device.getImage(sizes)).toEqual({ width: 704 })
-    device.w = 680
+    device = new Device({ ...device, w: 680 })
     expect(device.getImage(sizes)).toEqual({ width: 576 })
-    device.w = 600
+    device = new Device({ ...device, w: 600 })
     expect(device.getImage(sizes)).toEqual({ width: 600 })
   })
 
