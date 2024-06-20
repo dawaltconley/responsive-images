@@ -79,7 +79,7 @@ export interface Props extends HTMLAttributes<'picture'>, ImageOptions {
   src: string;
   alt: string;
   sizes: string
-  imgProps?: HTMLAttributes<'img'>;
+  imgProps?: Omit<HTMLAttributes<'img'>, 'sizes' | 'class:list'>
 }
 
 const { src, alt, sizes, widths, formats, imgProps, ...pictureProps } =
@@ -96,9 +96,13 @@ const images = new ResponsiveImages({
   disable: !import.meta.env.PROD,
 });
 
+const imgOptions: ImageOptions = {}
+if (widths) imgOptions.widths = widths
+if (formats) imgOptions.formats = formats
+
 const sources = await images
   .responsive(src)
-  .fromSizes(sizes, { widths, formats })
+  .fromSizes(sizes, imgOptions)
   .toSources({ ...imgProps, alt })
 ---
 
