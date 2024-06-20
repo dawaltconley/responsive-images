@@ -3,6 +3,7 @@ import type { ConfiguredImage, ImageOptions } from './image'
 import type Image from './image'
 import type DeviceSizes from './device-sizes'
 import type Metadata from './metadata'
+import merge from 'lodash.merge'
 
 /**
  * Filters a dimensions list, returning only dimensions that meet a threshold for downsizing.
@@ -48,6 +49,7 @@ export async function resizeFromSizes(
   devices: DeviceSizes,
   { minScale, ...options }: ResizeFromSizesOptions = {},
 ): Promise<Metadata> {
+  console.log('resizeFromSizes', options)
   const { width, height } = await image.stat()
   const scalingFactor =
     minScale ?? ('scalingFactor' in image ? image.scalingFactor : undefined)
@@ -57,7 +59,9 @@ export async function resizeFromSizes(
     width,
     height,
   )
-  return image.resize({ widths, ...options })
+  console.log({ widths })
+  return image.resize(merge({ widths }, options))
+  // return image.resize({ ...options, widths: options.widths || widths })
 }
 
 /**

@@ -4,8 +4,13 @@ import EleventyImage from '@11ty/eleventy-img'
 import { RemoteAssetCache } from '@11ty/eleventy-fetch'
 import DeviceSizes from './device-sizes'
 import Metadata, { SizesMetadata } from './metadata'
-import { isUrl, resizeFromSizes } from './utilities'
+import {
+  isUrl,
+  resizeFromSizes,
+  type ResizeFromSizesOptions,
+} from './utilities'
 import { chain, type ChainedPromise } from './chained-promise'
+import merge from 'lodash.merge'
 
 export interface ImageOptions extends EleventyImage.BaseImageOptions {
   disableResize?: boolean
@@ -32,10 +37,11 @@ export default class Image {
    * @returns a promise resolving to a metadata object for the generated images
    */
   resize(options: ImageOptions = {}): ChainedPromise<Metadata> {
-    let imgOpts = {
-      ...this.defaults,
-      ...options,
-    }
+    console.log('resize defaults', this.defaults)
+    console.log('resize options', options)
+    // let imgOpts = { ...this.defaults, ...options }
+    let imgOpts = merge({}, this.defaults, options)
+    console.log('resize merged', imgOpts)
     if (this.disabled)
       imgOpts = {
         ...imgOpts,
@@ -99,14 +105,13 @@ export class ConfiguredImage extends Image {
    */
   fromSizes(
     sizesQueryString: string,
-    options: ImageOptions = {},
+    options: ResizeFromSizesOptions = {},
   ): ChainedPromise<SizesMetadata> {
+    console.log('fromSizes', options)
     const getMetadata = async () => {
       const sizes = new DeviceSizes(sizesQueryString, this.devices)
-      const { metadata } = await resizeFromSizes(this, sizes, {
-        minScale: this.scalingFactor,
-        ...options,
-      })
+      const opts = merge({ minScale: this.scalingFactor }, options)
+      const { metadata } = await resizeFromSizes(this, sizes, opts)
       return new SizesMetadata(metadata, sizes)
     }
     return chain(getMetadata())

@@ -223,6 +223,27 @@ describe('responsive.fromSizes()', () => {
     })
   })
 
+  test('ignores empty optional args', async () => {
+    const { metadata } = await responsive('./tests/assets/xlg.jpg').fromSizes(
+      '(min-width: 1600px) 52vh, (max-width: 800px) 360px, 80vw',
+      { widths: undefined, formats: undefined },
+    )
+    expect(metadata).toMatchObject({
+      webp: [
+        { width: 360, height: 202 },
+        { width: 624, height: 351 },
+        { width: 900, height: 506 },
+        { width: 1639, height: 921 },
+      ],
+      jpeg: [
+        { width: 360, height: 202 },
+        { width: 624, height: 351 },
+        { width: 900, height: 506 },
+        { width: 1639, height: 921 },
+      ],
+    })
+  })
+
   test('resizes remote images', async () => {
     const { metadata } = await responsive(
       'https://raw.githubusercontent.com/dawaltconley/responsive-images/main/tests/assets/portrait.jpeg',

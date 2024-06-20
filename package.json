@@ -41,9 +41,11 @@
     "@types/flat-cache": "^2.0.2",
     "@types/hast": "^3.0.4",
     "@types/lodash.groupby": "^4.6.9",
+    "@types/lodash.merge": "^4.6.9",
     "@types/node-fetch": "^2.6.11",
     "liquid-args": "^1.1.0",
     "lodash.groupby": "^4.6.0",
+    "lodash.merge": "^4.6.2",
     "media-query-parser": "^2.0.2",
     "sass-cast": "^0.5.6"
   },
