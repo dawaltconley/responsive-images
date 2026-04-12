@@ -2,3 +2,5 @@ dist/
 img/
 .cache/
 package-lock.json
+CLAUDE.local.md
+.claude/*.local.*
