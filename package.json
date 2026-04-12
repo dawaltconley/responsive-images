@@ -35,13 +35,11 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@11ty/eleventy-fetch": "^4.0.1",
+    "@11ty/eleventy-fetch": "^5.1.2",
     "@11ty/eleventy-img": "^4.0.2",
     "@types/11ty__eleventy-img": "^4.0.0",
-    "@types/flat-cache": "^2.0.2",
     "@types/hast": "^3.0.4",
     "@types/lodash.groupby": "^4.6.9",
-    "@types/node-fetch": "^2.6.11",
     "liquid-args": "^1.1.0",
     "lodash.groupby": "^4.6.0",
     "media-query-parser": "^2.0.2",

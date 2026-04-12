@@ -58,7 +58,7 @@ export default class Image {
         cacheOptions,
       )
       await cache.fetch()
-      const metadata = await EleventyImage(cache.getCachedContentsPath(), {
+      const metadata = await EleventyImage(cache.cache.contentsPath, {
         statsOnly: true,
         widths: [null],
         formats: [null],
