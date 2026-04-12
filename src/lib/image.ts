@@ -1,7 +1,7 @@
 import type Device from './device'
 import type { ImageSource, MetadataEntry } from '@11ty/eleventy-img'
 import EleventyImage from '@11ty/eleventy-img'
-import { RemoteAssetCache } from '@11ty/eleventy-fetch'
+import { Fetch } from '@11ty/eleventy-fetch'
 import DeviceSizes from './device-sizes'
 import Metadata, { SizesMetadata } from './metadata'
 import { isUrl, resizeFromSizes } from './utilities'
@@ -52,12 +52,8 @@ export default class Image {
 
     // handle remote assets
     if (isUrl(src)) {
-      const cache = new RemoteAssetCache(
-        src,
-        cacheOptions?.directory,
-        cacheOptions,
-      )
-      await cache.fetch()
+      const cache = Fetch(src, cacheOptions)
+      await cache.queue()
       const metadata = await EleventyImage(cache.cache.contentsPath, {
         statsOnly: true,
         widths: [null],
