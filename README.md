@@ -237,16 +237,16 @@ images using media queries and the CSS `background-image` property.
   background-repeat: no-repeat;
 
   @include responsive-images.bg(
-    $src: './assets/bg.jpg',
     // can be passed as the first positional argument
+    $src: './assets/bg.jpg',
+    // optional sizes string, defaults to 100vw
     $sizes: '(min-width: 1000px) 50vw, 100vw',
-    // optional; defaults to 100vw
-    $widths: 1000 800 600,
     // optional list of manual widths. doesn't change media queries.
-    $formats: webp null,
+    $widths: 1000 800 600,
     // optional; defaults to null (the original image format is preserved).
-    $orientations: portrait landscape,
+    $formats: webp null,
     // optionally target a single viewport orientation
+    $orientations: portrait landscape
   );
 }
 ```

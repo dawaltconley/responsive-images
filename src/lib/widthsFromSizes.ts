@@ -8,8 +8,10 @@ const defaults = new Config()
 /**
  * width and height are mandatory if parsing a non-standard sizes query string
  */
-export interface WidthsFromSizesOptions
-  extends Pick<ConfigOptions, 'devices' | 'scalingFactor'> {
+export interface WidthsFromSizesOptions extends Pick<
+  ConfigOptions,
+  'devices' | 'scalingFactor'
+> {
   /** providing the source width is useful to ensure that no images larger than the source image are created */
   width?: number
 
