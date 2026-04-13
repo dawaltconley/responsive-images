@@ -60,7 +60,7 @@
     "lodash": "^4.17.21",
     "node-html-parser": "^6.1.12",
     "prettier": "^3.2.5",
-    "sass": "^1.71.1",
+    "sass": "^1.99.0",
     "stylelint": "^16.2.1",
     "stylelint-config-recommended": "^14.0.0",
     "stylelint-config-recommended-scss": "^14.0.0",

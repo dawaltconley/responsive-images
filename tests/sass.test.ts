@@ -4,6 +4,7 @@ import * as sass from 'sass'
 import ResponsiveImages, { ConfigOptions } from '../src/index'
 import { scss } from '../src/lib/syntax'
 import { getSassFunctions, getLegacySassFunctions } from '../src/sass'
+import prettier from 'prettier'
 
 const defaultConfig: ConfigOptions = {
   scalingFactor: 0.5,
@@ -33,6 +34,9 @@ const defaultConfig: ConfigOptions = {
   ],
 }
 
+const format = async (css: string): Promise<string> =>
+  prettier.format(css, { parser: 'css' })
+
 const compile = async (
   sassString: string,
   config: ConfigOptions = {},
@@ -44,6 +48,7 @@ const compile = async (
       functions: getSassFunctions(merged),
     })
     .then(result => result.css)
+    .then(format)
 }
 
 const compileLegacy = async (
@@ -51,7 +56,7 @@ const compileLegacy = async (
   config: ConfigOptions = {},
 ): Promise<string> => {
   const merged = new ResponsiveImages(_.merge(defaultConfig, config))
-  return new Promise((resolve, reject) =>
+  return new Promise<string>((resolve, reject) =>
     sass.render(
       {
         data: sassString,
@@ -63,7 +68,7 @@ const compileLegacy = async (
         if (result) resolve(result.css.toString())
       },
     ),
-  )
+  ).then(format)
 }
 
 const defaultExpected = scss`
@@ -107,70 +112,70 @@ const defaultExpected = scss`
 const defaultExpectedFormats = scss`
   .bg-image {
     @media (orientation: landscape)  and (min-width: 1025px) {
+      background-image: image-set(url('/img/output-2048.webp') type('image/webp'), url('/img/output-2048.jpeg') type('image/jpeg'));
       @supports not (background-image: image-set(url('/img/output-2048.webp') type('image/webp'), url('/img/output-2048.jpeg') type('image/jpeg'))) {
         background-image: url('/img/output-2048.jpeg');
       }
-      background-image: image-set(url('/img/output-2048.webp') type('image/webp'), url('/img/output-2048.jpeg') type('image/jpeg'));
     }
     @media (orientation: landscape) and (max-width: 1024px) and (min-width: 769px) and (min-resolution: 97dpi) {
+      background-image: image-set(url("/img/output-2048.webp") type('image/webp'), url("/img/output-2048.jpeg") type('image/jpeg'));
       @supports not (background-image: image-set(url("/img/output-2048.webp") type('image/webp'), url("/img/output-2048.jpeg") type('image/jpeg'))) {
         background-image: url("/img/output-2048.jpeg");
       }
-      background-image: image-set(url("/img/output-2048.webp") type('image/webp'), url("/img/output-2048.jpeg") type('image/jpeg'));
     }
     @media (orientation: landscape) and (max-width: 1024px) and (min-width: 769px) and (max-resolution: 96dpi) {
+      background-image: image-set(url("/img/output-1080.webp") type('image/webp'), url("/img/output-1080.jpeg") type('image/jpeg'));
       @supports not (background-image: image-set(url("/img/output-1080.webp") type('image/webp'), url("/img/output-1080.jpeg") type('image/jpeg'))) {
         background-image: url("/img/output-1080.jpeg");
       }
-      background-image: image-set(url("/img/output-1080.webp") type('image/webp'), url("/img/output-1080.jpeg") type('image/jpeg'));
     }
     @media (orientation: landscape) and (max-width: 768px) and (min-resolution: 241dpi) {
+      background-image: image-set(url("/img/output-3072.webp") type('image/webp'), url("/img/output-3072.jpeg") type('image/jpeg'));
       @supports not (background-image: image-set(url("/img/output-3072.webp") type('image/webp'), url("/img/output-3072.jpeg") type('image/jpeg'))) {
         background-image: url("/img/output-3072.jpeg");
       }
-      background-image: image-set(url("/img/output-3072.webp") type('image/webp'), url("/img/output-3072.jpeg") type('image/jpeg'));
     }
     @media (orientation: landscape) and (max-width: 768px) and (max-resolution: 240dpi) and (min-resolution: 97dpi) {
+      background-image: image-set(url("/img/output-2048.webp") type('image/webp'), url("/img/output-2048.jpeg") type('image/jpeg'));
       @supports not (background-image: image-set(url("/img/output-2048.webp") type('image/webp'), url("/img/output-2048.jpeg") type('image/jpeg'))) {
         background-image: url("/img/output-2048.jpeg");
       }
-      background-image: image-set(url("/img/output-2048.webp") type('image/webp'), url("/img/output-2048.jpeg") type('image/jpeg'));
     }
     @media (orientation: landscape) and (max-width: 768px) and (max-resolution: 96dpi) {
+      background-image: image-set(url("/img/output-1080.webp") type('image/webp'), url("/img/output-1080.jpeg") type('image/jpeg'));
       @supports not (background-image: image-set(url("/img/output-1080.webp") type('image/webp'), url("/img/output-1080.jpeg") type('image/jpeg'))) {
         background-image: url("/img/output-1080.jpeg");
       }
-      background-image: image-set(url("/img/output-1080.webp") type('image/webp'), url("/img/output-1080.jpeg") type('image/jpeg'));
     }
     @media (orientation: portrait) and (min-width: 433px) and (min-resolution: 97dpi) {
+      background-image: image-set(url("/img/output-2048.webp") type('image/webp'), url("/img/output-2048.jpeg") type('image/jpeg'));
       @supports not (background-image: image-set(url("/img/output-2048.webp") type('image/webp'), url("/img/output-2048.jpeg") type('image/jpeg'))) {
         background-image: url("/img/output-2048.jpeg");
       }
-      background-image: image-set(url("/img/output-2048.webp") type('image/webp'), url("/img/output-2048.jpeg") type('image/jpeg'));
     }
     @media (orientation: portrait) and (min-width: 433px) and (max-resolution: 96dpi) {
+      background-image: image-set(url("/img/output-1080.webp") type('image/webp'), url("/img/output-1080.jpeg") type('image/jpeg'));
       @supports not (background-image: image-set(url("/img/output-1080.webp") type('image/webp'), url("/img/output-1080.jpeg") type('image/jpeg'))) {
         background-image: url("/img/output-1080.jpeg");
       }
-      background-image: image-set(url("/img/output-1080.webp") type('image/webp'), url("/img/output-1080.jpeg") type('image/jpeg'));
     }
     @media (orientation: portrait) and (max-width: 432px) and (min-resolution: 241dpi) {
+      background-image: image-set(url("/img/output-2048.webp") type('image/webp'), url("/img/output-2048.jpeg") type('image/jpeg'));
       @supports not (background-image: image-set(url("/img/output-2048.webp") type('image/webp'), url("/img/output-2048.jpeg") type('image/jpeg'))) {
         background-image: url("/img/output-2048.jpeg");
       }
-      background-image: image-set(url("/img/output-2048.webp") type('image/webp'), url("/img/output-2048.jpeg") type('image/jpeg'));
     }
     @media (orientation: portrait) and (max-width: 432px) and (max-resolution: 240dpi) and (min-resolution: 97dpi) {
+      background-image: image-set(url("/img/output-1080.webp") type('image/webp'), url("/img/output-1080.jpeg") type('image/jpeg'));
       @supports not (background-image: image-set(url("/img/output-1080.webp") type('image/webp'), url("/img/output-1080.jpeg") type('image/jpeg'))) {
         background-image: url("/img/output-1080.jpeg");
       }
-      background-image: image-set(url("/img/output-1080.webp") type('image/webp'), url("/img/output-1080.jpeg") type('image/jpeg'));
     }
     @media (orientation: portrait) and (max-width: 432px) and (max-resolution: 96dpi) {
+      background-image: image-set(url("/img/output-432.webp") type('image/webp'), url("/img/output-432.jpeg") type('image/jpeg'));
       @supports not (background-image: image-set(url("/img/output-432.webp") type('image/webp'), url("/img/output-432.jpeg") type('image/jpeg'))) {
         background-image: url("/img/output-432.jpeg");
       }
-      background-image: image-set(url("/img/output-432.webp") type('image/webp'), url("/img/output-432.jpeg") type('image/jpeg'));
     }
   }
 `
