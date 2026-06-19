@@ -1,7 +1,16 @@
-import { describe, test, expect, afterAll, vi } from 'vitest'
-import { mkdtempSync, mkdirSync, readdirSync, rmSync, statSync } from 'node:fs'
+import { describe, test, expect, beforeAll, afterAll, vi } from 'vitest'
+import {
+  mkdtempSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
+import { createServer, type Server } from 'node:http'
+import type { AddressInfo } from 'node:net'
 import ResponsiveImages, {
   type ConfigOptions,
   type ResizeOptions,
@@ -163,6 +172,127 @@ describe('remote image caching', () => {
     const spy = vi.spyOn(global, 'fetch')
     try {
       await responsive(REMOTE_URL).fromSizes(sizes)
+      expect(spy).not.toHaveBeenCalled()
+    } finally {
+      spy.mockRestore()
+    }
+  })
+})
+
+describe('remote image caching when disable is true', () => {
+  const outputDir = path.join(tmpDir, 'remote-disabled')
+  const fetchCacheDir = path.join(tmpDir, 'fetch-cache-disabled')
+  mkdirSync(outputDir)
+  mkdirSync(fetchCacheDir)
+  const { responsive } = new ResponsiveImages({
+    devices,
+    scalingFactor: 0.5,
+    disable: true,
+    defaults: {
+      outputDir,
+      urlPath: '/img/',
+      filenameFormat: (_id, _src, width, format) => `output-${width}.${format}`,
+      cacheOptions: { directory: fetchCacheDir },
+    },
+  } satisfies ConfigOptions)
+
+  const sizes = '(max-width: 800px) 100vw, 50vw'
+
+  test('downloads and caches the remote source on the first call', async () => {
+    await responsive(REMOTE_URL).fromSizes(sizes)
+    expect(readdirSync(fetchCacheDir).length).toBeGreaterThan(0)
+  }, 30_000)
+
+  test('does not re-fetch the remote image via fromSizes() on a repeated call', async () => {
+    await responsive(REMOTE_URL).fromSizes(sizes)
+    const spy = vi.spyOn(global, 'fetch')
+    try {
+      await responsive(REMOTE_URL).fromSizes(sizes)
+      expect(spy).not.toHaveBeenCalled()
+    } finally {
+      spy.mockRestore()
+    }
+  })
+
+  test('does not re-fetch the remote image via resize() on a repeated call', async () => {
+    await responsive(REMOTE_URL).resize()
+    const spy = vi.spyOn(global, 'fetch')
+    try {
+      await responsive(REMOTE_URL).resize()
+      expect(spy).not.toHaveBeenCalled()
+    } finally {
+      spy.mockRestore()
+    }
+  })
+})
+
+describe('remote image caching with a slow server', () => {
+  const outputDir = path.join(tmpDir, 'remote-slow')
+  const fetchCacheDir = path.join(tmpDir, 'fetch-cache-slow')
+  mkdirSync(outputDir)
+  mkdirSync(fetchCacheDir)
+
+  const SLOW_DELAY = 10000
+  const imageBuffer = readFileSync('./tests/assets/landscape.jpeg')
+
+  let server: Server
+  let slowUrl: string
+
+  beforeAll(
+    () =>
+      new Promise<void>(resolve => {
+        server = createServer((_req, res) => {
+          setTimeout(() => {
+            res.writeHead(200, { 'Content-Type': 'image/jpeg' })
+            res.end(imageBuffer)
+          }, SLOW_DELAY)
+        })
+        server.listen(0, '127.0.0.1', () => {
+          const addr = server.address() as AddressInfo
+          slowUrl = `http://127.0.0.1:${addr.port}/slow.jpg`
+          resolve()
+        })
+      }),
+  )
+
+  afterAll(
+    () =>
+      new Promise<void>(resolve => {
+        server.close(() => resolve())
+      }),
+  )
+
+  // mirrors a dev setup that disables resizing to avoid rebuild overhead
+  const { responsive } = new ResponsiveImages({
+    devices,
+    scalingFactor: 0.5,
+    disable: true,
+    defaults: {
+      outputDir,
+      urlPath: '/img/',
+      filenameFormat: (_id, _src, width, format) => `output-${width}.${format}`,
+      cacheOptions: { directory: fetchCacheDir },
+    },
+  } satisfies ConfigOptions)
+
+  const sizes = '(max-width: 800px) 100vw, 50vw'
+
+  test(
+    'waits on the slow server on the first call',
+    async () => {
+      const start = Date.now()
+      await responsive(slowUrl).fromSizes(sizes)
+      expect(Date.now() - start).toBeGreaterThanOrEqual(SLOW_DELAY)
+    },
+    SLOW_DELAY + 10_000,
+  )
+
+  test('uses the cache on a repeated call instead of waiting on the server again', async () => {
+    const spy = vi.spyOn(global, 'fetch')
+    const start = Date.now()
+    try {
+      await responsive(slowUrl).fromSizes(sizes)
+      expect(Date.now() - start).toBeLessThan(SLOW_DELAY)
       expect(spy).not.toHaveBeenCalled()
     } finally {
       spy.mockRestore()
