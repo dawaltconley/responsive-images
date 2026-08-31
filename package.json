@@ -4,7 +4,10 @@
   "description": "Scripts and utilities for working with responsive images.",
   "main": "dist/index.js",
   "exports": {
-    ".": "./dist/index.js",
+    ".": {
+      "sass": "./_index.scss",
+      "default": "./dist/index.js"
+    },
     "./eleventy": "./dist/plugins/eleventy.js",
     "./sass": "./dist/sass/index.js",
     "./devices": "./dist/data/devices.js"
